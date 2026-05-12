@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { curriculum } from '@/data/curriculum'
 import { Clock, CheckCircle, XCircle, Trophy, Target } from 'lucide-react'
@@ -18,7 +18,7 @@ interface Question {
   difficulty: number
 }
 
-export default function QuizPage() {
+function QuizContent() {
   const [questions, setQuestions] = useState<Question[]>([])
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
@@ -343,5 +343,14 @@ export default function QuizPage() {
         </div>
       </main>
     </div>
+  )
+}
+
+
+export default function QuizPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="text-2xl">Chargement...</div></div>}>
+      <QuizContent />
+    </Suspense>
   )
 }

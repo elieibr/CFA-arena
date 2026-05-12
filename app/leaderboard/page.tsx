@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { curriculum, getLeagueColor, getLeagueEmoji } from '@/data/curriculum'
 import { Trophy, Medal, Crown } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-export default function LeaderboardPage() {
+function LeaderboardContent() {
   const [leaderboardData, setLeaderboardData] = useState<any[]>([])
   const [currentUser, setCurrentUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -214,5 +214,13 @@ export default function LeaderboardPage() {
         </div>
       </main>
     </div>
+  )
+}
+
+export default function LeaderboardPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="text-2xl">Chargement...</div></div>}>
+      <LeaderboardContent />
+    </Suspense>
   )
 }
