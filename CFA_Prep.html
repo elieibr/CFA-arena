@@ -1,0 +1,1030 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>CFA Prep — Préparation Level 1 avec l'IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg-0:        oklch(0.16 0.012 250);   /* deepest */
+    --bg-1:        oklch(0.19 0.014 250);   /* card */
+    --bg-2:        oklch(0.22 0.016 250);   /* hover */
+    --bg-3:        oklch(0.26 0.018 250);   /* border-top */
+    --line:        oklch(0.28 0.014 250);
+    --line-soft:   oklch(0.24 0.012 250);
+    --fg-0:        oklch(0.97 0.005 250);
+    --fg-1:        oklch(0.82 0.010 250);
+    --fg-2:        oklch(0.62 0.012 250);
+    --fg-3:        oklch(0.46 0.012 250);
+
+    /* Bloomberg-terminal inspired green — sophisticated, not neon */
+    --acc-green:   oklch(0.78 0.16 145);
+    --acc-green-d: oklch(0.62 0.18 145);
+    /* Warm amber for CTAs / highlights */
+    --acc-amber:   oklch(0.78 0.14 75);
+    --acc-amber-d: oklch(0.66 0.16 65);
+    /* Cool periwinkle for tertiary tagging */
+    --acc-blue:    oklch(0.74 0.10 255);
+
+    /* Level badge colors — distinct hues, same chroma/lightness band */
+    --lv-beg:      oklch(0.74 0.10 255);  /* periwinkle */
+    --lv-int:      oklch(0.78 0.14 75);   /* amber */
+    --lv-adv:      oklch(0.78 0.16 145);  /* green */
+
+    --radius: 14px;
+    --radius-sm: 8px;
+
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --font-serif: 'Instrument Serif', Georgia, serif;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg-0);
+    color: var(--fg-0);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    min-height: 100vh;
+  }
+
+  ::selection { background: var(--acc-green); color: var(--bg-0); }
+
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 0 32px; }
+
+  /* === Ambient background === */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(circle at 15% -10%, oklch(0.32 0.06 145 / 0.18), transparent 45%),
+      radial-gradient(circle at 90% 5%, oklch(0.32 0.06 75 / 0.10), transparent 40%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  body > * { position: relative; z-index: 1; }
+
+  /* ===================== HEADER ===================== */
+  header.site {
+    border-bottom: 1px solid var(--line-soft);
+    background: oklch(0.16 0.012 250 / 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    position: sticky; top: 0;
+    z-index: 50;
+  }
+  .nav {
+    display: flex; align-items: center;
+    height: 68px;
+    gap: 48px;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 700; font-size: 16px;
+    letter-spacing: -0.01em;
+  }
+  .brand-mark {
+    width: 28px; height: 28px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, var(--acc-green) 0%, var(--acc-green-d) 100%);
+    display: grid; place-items: center;
+    color: var(--bg-0);
+    font-family: var(--font-mono);
+    font-weight: 600; font-size: 13px;
+    box-shadow: 0 0 0 1px oklch(0.78 0.16 145 / 0.3), 0 4px 12px oklch(0.78 0.16 145 / 0.15);
+  }
+  .brand-name { letter-spacing: -0.02em; }
+  .brand-name .dot { color: var(--acc-green); }
+
+  nav.primary {
+    display: flex; gap: 4px; flex: 1;
+  }
+  nav.primary a {
+    color: var(--fg-1);
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.15s ease;
+  }
+  nav.primary a:hover { color: var(--fg-0); background: var(--bg-1); }
+  nav.primary a.active {
+    color: var(--fg-0);
+    background: var(--bg-1);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+
+  .nav-end { display: flex; align-items: center; gap: 12px; }
+  .streak {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 7px 12px;
+    border-radius: 99px;
+    background: oklch(0.78 0.14 75 / 0.10);
+    border: 1px solid oklch(0.78 0.14 75 / 0.25);
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--acc-amber);
+  }
+  .streak-flame {
+    width: 14px; height: 14px;
+    background: var(--acc-amber);
+    -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8 1c1 2 3 3.5 3 6a3 3 0 0 1-6 0c0-1 .5-1.5 1-2-.5 2 1 3 1 3s-.5-2 1-4c0-1 0-2 0-3z"/></svg>') center/contain no-repeat;
+    mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8 1c1 2 3 3.5 3 6a3 3 0 0 1-6 0c0-1 .5-1.5 1-2-.5 2 1 3 1 3s-.5-2 1-4c0-1 0-2 0-3z"/></svg>') center/contain no-repeat;
+  }
+  .avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, oklch(0.45 0.08 255), oklch(0.35 0.06 280));
+    display: grid; place-items: center;
+    font-size: 12px; font-weight: 600;
+    color: var(--fg-0);
+    border: 1px solid var(--line);
+    cursor: pointer;
+  }
+
+  /* ===================== HERO ===================== */
+  .hero {
+    padding: 72px 0 56px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 64px;
+    align-items: end;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--fg-2);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 24px;
+  }
+  .eyebrow::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--acc-green);
+    box-shadow: 0 0 12px var(--acc-green);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+  h1.hero-title {
+    font-family: var(--font-sans);
+    font-size: 64px;
+    font-weight: 300;
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    margin: 0 0 24px;
+    color: var(--fg-0);
+    text-wrap: balance;
+  }
+  h1.hero-title em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--acc-green);
+  }
+  h1.hero-title .accent-amber {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--acc-amber);
+  }
+  .hero-sub {
+    color: var(--fg-2);
+    font-size: 16px;
+    max-width: 480px;
+    margin: 0 0 36px;
+    line-height: 1.55;
+  }
+  .hero-cta { display: flex; gap: 12px; align-items: center; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: var(--fg-0);
+    color: var(--bg-0);
+  }
+  .btn-primary:hover {
+    background: var(--acc-green);
+    transform: translateY(-1px);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--fg-1);
+    border: 1px solid var(--line);
+  }
+  .btn-ghost:hover { background: var(--bg-1); color: var(--fg-0); }
+  .btn-arrow {
+    width: 14px; height: 14px;
+    background: currentColor;
+    -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M3 8h10m-4-4l4 4-4 4" stroke="black" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>') center/contain no-repeat;
+    mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M3 8h10m-4-4l4 4-4 4" stroke="black" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>') center/contain no-repeat;
+  }
+
+  /* Progress dashboard card on the right */
+  .progress-card {
+    background: var(--bg-1);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .progress-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at top right, oklch(0.78 0.16 145 / 0.08), transparent 60%);
+    pointer-events: none;
+  }
+  .pc-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 20px;
+  }
+  .pc-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--fg-2);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-family: var(--font-mono);
+  }
+  .pc-date {
+    font-size: 12px;
+    color: var(--fg-3);
+    font-family: var(--font-mono);
+  }
+  .pc-big {
+    display: flex; align-items: baseline; gap: 12px;
+    margin-bottom: 8px;
+  }
+  .pc-percent {
+    font-family: var(--font-mono);
+    font-size: 56px;
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    color: var(--fg-0);
+    line-height: 1;
+  }
+  .pc-percent .pct-sym {
+    font-size: 28px;
+    color: var(--fg-2);
+    margin-left: 4px;
+  }
+  .pc-delta {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--acc-green);
+    background: oklch(0.78 0.16 145 / 0.10);
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+  .pc-label {
+    font-size: 13px;
+    color: var(--fg-2);
+    margin-bottom: 24px;
+  }
+  .pc-bar {
+    height: 8px;
+    background: var(--bg-0);
+    border-radius: 99px;
+    overflow: hidden;
+    border: 1px solid var(--line-soft);
+    position: relative;
+  }
+  .pc-bar-fill {
+    height: 100%;
+    width: 47%;
+    background: linear-gradient(90deg, var(--acc-green-d), var(--acc-green));
+    border-radius: 99px;
+    box-shadow: 0 0 12px oklch(0.78 0.16 145 / 0.4);
+    position: relative;
+  }
+  .pc-meta {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .pc-meta-item .label {
+    font-size: 11px;
+    color: var(--fg-3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-family: var(--font-mono);
+    margin-bottom: 4px;
+  }
+  .pc-meta-item .value {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--fg-0);
+  }
+
+  /* ===================== SECTIONS ===================== */
+  section.block { padding: 64px 0; }
+  .block-head {
+    display: flex; justify-content: space-between; align-items: end;
+    margin-bottom: 32px;
+  }
+  .block-head .left h2 {
+    font-size: 28px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    margin: 0 0 6px;
+  }
+  .block-head .left p {
+    margin: 0;
+    color: var(--fg-2);
+    font-size: 14px;
+  }
+  .block-head .right {
+    display: flex; gap: 8px; align-items: center;
+  }
+  .seg {
+    display: inline-flex;
+    background: var(--bg-1);
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 3px;
+  }
+  .seg button {
+    background: transparent;
+    border: none;
+    color: var(--fg-2);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .seg button.active {
+    background: var(--bg-2);
+    color: var(--fg-0);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+
+  /* ===================== SUBJECTS GRID ===================== */
+  .subjects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+  .subj {
+    background: var(--bg-1);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+    padding: 22px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    gap: 16px;
+    min-height: 220px;
+  }
+  .subj::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--subj-color, var(--acc-green));
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .subj:hover {
+    background: var(--bg-2);
+    border-color: var(--line);
+    transform: translateY(-2px);
+  }
+  .subj:hover::after { opacity: 1; }
+  .subj:hover .subj-cta { opacity: 1; transform: translateX(0); }
+
+  .subj-row1 {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 12px;
+  }
+  .subj-icon {
+    width: 36px; height: 36px;
+    border-radius: 9px;
+    background: var(--bg-0);
+    border: 1px solid var(--line);
+    display: grid; place-items: center;
+    color: var(--subj-color, var(--acc-green));
+    flex-shrink: 0;
+  }
+  .subj-icon svg { width: 18px; height: 18px; }
+  .subj-weight {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--fg-3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding-top: 4px;
+  }
+  .subj-name {
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--fg-0);
+    margin: 0;
+  }
+  .subj-readings {
+    font-size: 12px;
+    color: var(--fg-2);
+    font-family: var(--font-mono);
+    margin-top: 4px;
+  }
+
+  .subj-progress { margin-top: auto; }
+  .subj-prog-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 8px;
+  }
+  .subj-pct {
+    font-family: var(--font-mono);
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--fg-0);
+  }
+  .subj-pct .sym { font-size: 14px; color: var(--fg-2); }
+  .subj-bar {
+    height: 4px;
+    background: var(--bg-0);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .subj-bar-fill {
+    height: 100%;
+    background: var(--subj-color, var(--acc-green));
+    border-radius: 99px;
+    transition: width 0.6s ease;
+  }
+  .badge {
+    display: inline-flex; align-items: center;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 10.5px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-family: var(--font-mono);
+  }
+  .badge-beg {
+    background: oklch(0.74 0.10 255 / 0.12);
+    color: var(--lv-beg);
+    border: 1px solid oklch(0.74 0.10 255 / 0.25);
+  }
+  .badge-int {
+    background: oklch(0.78 0.14 75 / 0.12);
+    color: var(--lv-int);
+    border: 1px solid oklch(0.78 0.14 75 / 0.25);
+  }
+  .badge-adv {
+    background: oklch(0.78 0.16 145 / 0.12);
+    color: var(--lv-adv);
+    border: 1px solid oklch(0.78 0.16 145 / 0.25);
+  }
+
+  .subj-foot {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .subj-cta {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: var(--fg-2);
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0.6;
+    transform: translateX(-4px);
+    transition: all 0.2s;
+  }
+  .subj-cta .arr {
+    width: 12px; height: 12px;
+    background: currentColor;
+    -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M3 8h10m-4-4l4 4-4 4" stroke="black" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>') center/contain no-repeat;
+    mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M3 8h10m-4-4l4 4-4 4" stroke="black" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>') center/contain no-repeat;
+  }
+  .subj:hover .subj-cta { color: var(--subj-color); }
+
+  /* ===================== DAILY REVIEW + STATS row ===================== */
+  .duo {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 14px;
+  }
+
+  .review-card {
+    background:
+      radial-gradient(circle at top left, oklch(0.78 0.14 75 / 0.10), transparent 50%),
+      var(--bg-1);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .review-card .label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--acc-amber);
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .review-card .label::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--acc-amber);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--acc-amber);
+  }
+  .review-card h3 {
+    font-size: 32px;
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    margin: 0 0 8px;
+    line-height: 1.1;
+  }
+  .review-card h3 em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--acc-amber);
+    font-weight: 400;
+  }
+  .review-card .desc {
+    color: var(--fg-2);
+    font-size: 14px;
+    margin: 0 0 28px;
+    max-width: 380px;
+  }
+
+  .review-counter {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    background: var(--line-soft);
+    border: 1px solid var(--line-soft);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .rc-cell {
+    background: var(--bg-1);
+    padding: 14px 16px;
+  }
+  .rc-cell .n {
+    font-family: var(--font-mono);
+    font-size: 28px;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    color: var(--fg-0);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .rc-cell .n.urgent { color: var(--acc-amber); }
+  .rc-cell .l {
+    font-size: 11px;
+    color: var(--fg-3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-family: var(--font-mono);
+  }
+
+  .review-cta { display: flex; gap: 10px; margin-top: auto; }
+  .btn-amber {
+    background: var(--acc-amber);
+    color: var(--bg-0);
+  }
+  .btn-amber:hover {
+    background: var(--acc-amber-d);
+    transform: translateY(-1px);
+  }
+
+  .stats-card {
+    background: var(--bg-1);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 32px;
+    display: flex; flex-direction: column;
+  }
+  .stats-card h3 {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  .stats-card .h-sub {
+    color: var(--fg-2);
+    font-size: 13px;
+    margin: 0 0 24px;
+  }
+  .stat-list { display: flex; flex-direction: column; gap: 18px; flex: 1; }
+  .stat-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .stat-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .stat-meta { display: flex; align-items: center; gap: 14px; }
+  .stat-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: var(--bg-0);
+    border: 1px solid var(--line);
+    display: grid; place-items: center;
+    color: var(--fg-1);
+  }
+  .stat-icon svg { width: 16px; height: 16px; }
+  .stat-name { font-size: 13px; color: var(--fg-2); margin-bottom: 2px; }
+  .stat-num {
+    font-family: var(--font-mono);
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--fg-0);
+    letter-spacing: -0.02em;
+  }
+  .stat-num .sm { font-size: 13px; color: var(--fg-2); margin-left: 2px; }
+  .stat-trend {
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+  .trend-up { color: var(--acc-green); }
+  .trend-flat { color: var(--fg-3); }
+
+  /* ===================== FOOTER ===================== */
+  footer.site {
+    border-top: 1px solid var(--line-soft);
+    padding: 40px 0 32px;
+    margin-top: 32px;
+  }
+  .foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .foot-left {
+    display: flex; align-items: center; gap: 14px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--fg-3);
+  }
+  .foot-disc {
+    max-width: 520px;
+    font-size: 11.5px;
+    color: var(--fg-3);
+    line-height: 1.55;
+  }
+  .foot-links { display: flex; gap: 22px; }
+  .foot-links a {
+    color: var(--fg-2);
+    font-size: 13px;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .foot-links a:hover { color: var(--fg-0); }
+
+  /* responsive */
+  @media (max-width: 960px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+    h1.hero-title { font-size: 44px; }
+    .duo { grid-template-columns: 1fr; }
+    .pc-percent { font-size: 44px; }
+    nav.primary { display: none; }
+  }
+
+</style>
+</head>
+<body>
+
+<template id="__bundler_thumbnail" data-bg-color="#1a1f29">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#1a1f29"/>
+    <rect x="380" y="280" width="440" height="240" rx="48" fill="#4ade80"/>
+    <text x="600" y="445" font-family="ui-monospace, monospace" font-size="160" font-weight="600" fill="#1a1f29" text-anchor="middle">CP</text>
+    <circle cx="600" cy="660" r="6" fill="#4ade80"/>
+    <circle cx="624" cy="660" r="6" fill="#fbbf24"/>
+    <circle cx="648" cy="660" r="6" fill="#94a3b8"/>
+  </svg>
+</template>
+
+<!-- ===================== HEADER ===================== -->
+<header class="site">
+  <div class="wrap">
+    <div class="nav">
+      <a href="#" class="brand" style="color:var(--fg-0);text-decoration:none;">
+        <span class="brand-mark">CP</span>
+        <span class="brand-name">CFA Prep<span class="dot">.</span></span>
+      </a>
+      <nav class="primary">
+        <a href="#" class="active">Accueil</a>
+        <a href="#subjects">Matières</a>
+        <a href="#">Examen blanc</a>
+        <a href="#stats">Stats</a>
+        <a href="#">Paramètres</a>
+      </nav>
+      <div class="nav-end">
+        <span class="streak">
+          <span class="streak-flame"></span>
+          <span>14 jours</span>
+        </span>
+        <div class="avatar" title="Profil">MD</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">Session · Mardi 6 mai 2026 · 09:42</div>
+        <h1 class="hero-title">
+          Préparez le<br/>
+          CFA Level 1 avec <em>l'intelligence</em><br/>
+          d'une <span class="accent-amber">IA dédiée</span>.
+        </h1>
+        <p class="hero-sub">
+          Plan d'étude adaptatif, questions ciblées sur vos points faibles, et révision espacée calibrée pour l'examen de mai 2026. 4 mois, 10 matières, un objectif.
+        </p>
+        <div class="hero-cta">
+          <button class="btn btn-primary">Continuer la session <span class="btn-arrow"></span></button>
+          <button class="btn btn-ghost">Voir le plan d'étude</button>
+        </div>
+      </div>
+
+      <div class="progress-card">
+        <div class="pc-head">
+          <span class="pc-title">Progression globale</span>
+          <span class="pc-date">May 16, 2026 · J−9</span>
+        </div>
+        <div class="pc-big">
+          <div class="pc-percent">47<span class="pct-sym">%</span></div>
+          <div class="pc-delta">+ 3.2% / 7j</div>
+        </div>
+        <div class="pc-label">726 / 1 540 concepts maîtrisés</div>
+        <div class="pc-bar"><div class="pc-bar-fill"></div></div>
+        <div class="pc-meta">
+          <div class="pc-meta-item">
+            <div class="label">Heures</div>
+            <div class="value">142<span style="color:var(--fg-3);font-size:13px;">h</span></div>
+          </div>
+          <div class="pc-meta-item">
+            <div class="label">Précision</div>
+            <div class="value">68%</div>
+          </div>
+          <div class="pc-meta-item">
+            <div class="label">Streak</div>
+            <div class="value">14<span style="color:var(--fg-3);font-size:13px;">j</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SUBJECTS ===================== -->
+<section class="block" id="subjects">
+  <div class="wrap">
+    <div class="block-head">
+      <div class="left">
+        <h2>10 matières · pondération CFA Institute</h2>
+        <p>Cliquez une carte pour réviser. Les pondérations reflètent le poids de chaque matière à l'examen.</p>
+      </div>
+      <div class="right">
+        <div class="seg">
+          <button class="active">Toutes</button>
+          <button>En cours</button>
+          <button>À démarrer</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="subjects-grid" id="subjGrid"><!-- injected by JS --></div>
+  </div>
+</section>
+
+<!-- ===================== DAILY REVIEW + STATS ===================== -->
+<section class="block" id="stats" style="padding-top:0;">
+  <div class="wrap">
+    <div class="duo">
+
+      <div class="review-card">
+        <div class="label">Révision du jour · Spaced Repetition</div>
+        <h3>23 questions à <em>revoir</em><br/>avant 23h59.</h3>
+        <p class="desc">L'algorithme de répétition espacée a sélectionné les concepts qui s'effacent — vous les verrez juste avant qu'ils ne disparaissent.</p>
+
+        <div class="review-counter">
+          <div class="rc-cell">
+            <div class="n urgent">23</div>
+            <div class="l">Urgentes</div>
+          </div>
+          <div class="rc-cell">
+            <div class="n">47</div>
+            <div class="l">Cette semaine</div>
+          </div>
+          <div class="rc-cell">
+            <div class="n">~ 18 min</div>
+            <div class="l">Durée estimée</div>
+          </div>
+        </div>
+
+        <div class="review-cta">
+          <button class="btn btn-amber">Démarrer la révision <span class="btn-arrow"></span></button>
+          <button class="btn btn-ghost">Reporter à demain</button>
+        </div>
+      </div>
+
+      <div class="stats-card">
+        <h3>Mes statistiques</h3>
+        <p class="h-sub">Performance sur les 30 derniers jours.</p>
+        <div class="stat-list">
+          <div class="stat-row">
+            <div class="stat-meta">
+              <div class="stat-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 14V2m0 12h12M5 11l3-3 3 2 3-4"/></svg>
+              </div>
+              <div>
+                <div class="stat-name">Questions résolues</div>
+                <div class="stat-num">2 184</div>
+              </div>
+            </div>
+            <div class="stat-trend trend-up">↑ 12% / sem</div>
+          </div>
+
+          <div class="stat-row">
+            <div class="stat-meta">
+              <div class="stat-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 4v4l2.5 1.5"/></svg>
+              </div>
+              <div>
+                <div class="stat-name">Taux de réussite</div>
+                <div class="stat-num">68<span class="sm">%</span></div>
+              </div>
+            </div>
+            <div class="stat-trend trend-up">↑ 4 pts</div>
+          </div>
+
+          <div class="stat-row">
+            <div class="stat-meta">
+              <div class="stat-icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1l2 4 4 .5-3 3 1 4-4-2-4 2 1-4-3-3 4-.5z"/></svg>
+              </div>
+              <div>
+                <div class="stat-name">Niveau actuel</div>
+                <div class="stat-num" style="display:flex;align-items:center;gap:10px;">
+                  Intermediate
+                  <span class="badge badge-int">Niveau 2 / 3</span>
+                </div>
+              </div>
+            </div>
+            <div class="stat-trend trend-flat">— stable</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="site">
+  <div class="wrap">
+    <div class="foot">
+      <div class="foot-left">
+        <span class="brand-mark" style="width:22px;height:22px;font-size:11px;">CP</span>
+        <span>CFA Prep — © 2026</span>
+        <span style="opacity:0.5;">·</span>
+        <span>v 2.4.1</span>
+      </div>
+      <div class="foot-links">
+        <a href="#">Documentation</a>
+        <a href="#">Tarifs</a>
+        <a href="#">Communauté</a>
+        <a href="#">Support</a>
+        <a href="#">Confidentialité</a>
+      </div>
+    </div>
+    <p class="foot-disc" style="margin-top:18px;">
+      CFA Prep est une plateforme indépendante de préparation. Non affiliée, ni endossée, ni sponsorisée par aucun organisme professionnel de certification financière. Les marques déposées appartiennent à leurs propriétaires respectifs.
+    </p>
+  </div>
+</footer>
+
+<!-- ===================== SUBJECTS DATA + RENDER ===================== -->
+<script>
+  // Standard CFA Level 1 topic weights (publicly known curriculum structure)
+  const SUBJECTS = [
+    { code: 'QM',  name: 'Quantitative Methods',          weight: '8–12%',  readings: 9, pct: 72, level: 'adv', color: 'oklch(0.78 0.16 145)',
+      icon: '<path d="M3 14h10M3 11l3-4 3 2 4-6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' },
+    { code: 'EC',  name: 'Economics',                      weight: '8–12%',  readings: 6, pct: 58, level: 'int', color: 'oklch(0.74 0.10 255)',
+      icon: '<path d="M2 13h12M4 13V8m3 5V5m3 8V9m3 4V3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>' },
+    { code: 'FSA', name: 'Financial Statement Analysis',   weight: '13–17%', readings:11, pct: 41, level: 'int', color: 'oklch(0.78 0.14 75)',
+      icon: '<rect x="3" y="2" width="10" height="12" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M5 5h6M5 8h6M5 11h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' },
+    { code: 'CI',  name: 'Corporate Issuers',              weight: '8–12%',  readings: 7, pct: 63, level: 'int', color: 'oklch(0.78 0.16 145)',
+      icon: '<path d="M2 14h12M4 14V6l4-3 4 3v8M7 10h2M7 13h2" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' },
+    { code: 'EQ',  name: 'Equity Investments',             weight: '10–12%', readings: 7, pct: 35, level: 'int', color: 'oklch(0.74 0.10 255)',
+      icon: '<path d="M8 2v12M3 7l5-5 5 5M3 11l5 3 5-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' },
+    { code: 'FI',  name: 'Fixed Income',                   weight: '10–12%', readings: 9, pct: 22, level: 'beg', color: 'oklch(0.78 0.14 75)',
+      icon: '<path d="M2 8c2-3 4-3 6 0s4 3 6 0" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/><circle cx="8" cy="8" r="0.8" fill="currentColor"/>' },
+    { code: 'DV',  name: 'Derivatives',                    weight: '5–8%',   readings: 4, pct: 12, level: 'beg', color: 'oklch(0.78 0.16 145)',
+      icon: '<path d="M3 13L13 3M3 3l3 3M10 10l3 3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>' },
+    { code: 'AI',  name: 'Alternative Investments',        weight: '5–8%',   readings: 4, pct: 0,  level: 'beg', color: 'oklch(0.74 0.10 255)',
+      icon: '<path d="M8 2L2 6v6l6 4 6-4V6z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/><path d="M2 6l6 4 6-4M8 10v6" stroke="currentColor" stroke-width="1.5" fill="none"/>' },
+    { code: 'PM',  name: 'Portfolio Management',           weight: '5–8%',   readings: 6, pct: 51, level: 'int', color: 'oklch(0.78 0.14 75)',
+      icon: '<circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M8 2v6l4 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' },
+    { code: 'ES',  name: 'Ethical & Professional Standards', weight: '15–20%', readings: 5, pct: 89, level: 'adv', color: 'oklch(0.78 0.16 145)',
+      icon: '<path d="M8 2L3 4v4c0 3 2 5 5 6 3-1 5-3 5-6V4z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/><path d="M6 8l1.5 1.5L10 7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' },
+  ];
+
+  const LEVEL_LABEL = { beg: 'Beginner', int: 'Intermediate', adv: 'Advanced' };
+  const LEVEL_CLASS = { beg: 'badge-beg', int: 'badge-int', adv: 'badge-adv' };
+
+  const grid = document.getElementById('subjGrid');
+  grid.innerHTML = SUBJECTS.map(s => `
+    <div class="subj" style="--subj-color:${s.color};">
+      <div class="subj-row1">
+        <div class="subj-icon">
+          <svg viewBox="0 0 16 16">${s.icon}</svg>
+        </div>
+        <div class="subj-weight">${s.weight}</div>
+      </div>
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <h3 class="subj-name">${s.name}</h3>
+        </div>
+        <div class="subj-readings">${s.readings} readings · ${s.code}</div>
+      </div>
+      <div class="subj-progress">
+        <div class="subj-prog-row">
+          <span class="subj-pct">${s.pct}<span class="sym">%</span></span>
+          <span class="badge ${LEVEL_CLASS[s.level]}">${LEVEL_LABEL[s.level]}</span>
+        </div>
+        <div class="subj-bar"><div class="subj-bar-fill" style="width:${s.pct}%;"></div></div>
+      </div>
+      <div class="subj-foot">
+        <span style="font-size:12px;color:var(--fg-3);font-family:var(--font-mono);">
+          ${s.pct === 0 ? 'Pas démarré' : s.pct > 80 ? 'Quasi maîtrisé' : s.pct > 50 ? 'En progression' : 'À renforcer'}
+        </span>
+        <span class="subj-cta">Réviser <span class="arr"></span></span>
+      </div>
+    </div>
+  `).join('');
+
+  // simple nav active toggling
+  document.querySelectorAll('nav.primary a').forEach(a => {
+    a.addEventListener('click', e => {
+      document.querySelectorAll('nav.primary a').forEach(x => x.classList.remove('active'));
+      a.classList.add('active');
+    });
+  });
+  document.querySelectorAll('.seg button').forEach(b => {
+    b.addEventListener('click', () => {
+      b.parentElement.querySelectorAll('button').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>

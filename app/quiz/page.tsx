@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { curriculum } from '@/data/curriculum'
+import { mockEthicsQuestions } from '@/data/mock-questions'
 import { Clock, CheckCircle, XCircle, Trophy, Target } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -57,14 +58,34 @@ function QuizContent() {
   }, [currentQuestionIndex, isAnswered, questions])
 
   async function loadQuiz() {
+    console.log('=== loadQuiz START ===')
+    console.log('Topic ID from URL:', topicId)
     setLoading(true)
 
     const { data: { user } } = await supabase.auth.getUser()
+    console.log('User:', user?.id)
+
     if (!user) {
+      console.log('No user, redirecting to login')
       router.push('/login')
       return
     }
     setUserId(user.id)
+
+    console.log('Topic ID check:', topicId, topicId === 'ethical-standards')
+
+    // Use mock questions for Ethics
+    if (topicId === 'ethical-standards') {
+      console.log('✓ Loading mock Ethics questions...')
+      console.log('✓ Mock questions count:', mockEthicsQuestions.length)
+      console.log('✓ First question:', mockEthicsQuestions[0])
+      setQuestions(mockEthicsQuestions)
+      setLoading(false)
+      console.log('=== loadQuiz END (ethical-standards) ===')
+      return
+    }
+
+    console.log('Not ethics, trying database...')
 
     // Get 10 random questions for the topic
     let query = supabase
@@ -115,30 +136,90 @@ function QuizContent() {
   }
 
   async function saveAnswer(isCorrect: boolean) {
-    if (!userId) return
+    console.log('=== saveAnswer START ===')
+    console.log('userId:', userId)
+    console.log('isCorrect:', isCorrect)
+
+    if (!userId) {
+      console.log('❌ No userId, aborting saveAnswer')
+      return
+    }
 
     const currentQuestion = questions[currentQuestionIndex]
+    const pointsEarned = isCorrect ? (100 * currentQuestion.difficulty + Math.floor(100 * currentQuestion.difficulty * 0.5 * (timeLeft / 90))) : 0
+
+    console.log('Question:', currentQuestion.id, currentQuestion.topic_id)
+    console.log('Points earned:', pointsEarned)
 
     // Save to question_history
-    await supabase.from('question_history').insert({
+    console.log('📝 Inserting into question_history...')
+    const { data: historyData, error: historyError } = await supabase.from('question_history').insert({
       user_id: userId,
-      question_id: currentQuestion.id,
       topic_id: currentQuestion.topic_id,
+      question_text: currentQuestion.question_text,
+      user_answer: selectedAnswer || 'TIMEOUT',
+      correct_answer: currentQuestion.correct_answer,
       is_correct: isCorrect,
       time_taken: 90 - timeLeft,
-      points_earned: isCorrect ? (100 * currentQuestion.difficulty + Math.floor(100 * currentQuestion.difficulty * 0.5 * (timeLeft / 90))) : 0
-    })
+      difficulty: currentQuestion.difficulty === 1 ? 'easy' : currentQuestion.difficulty === 2 ? 'medium' : 'hard',
+      points_earned: pointsEarned
+    }).select()
+
+    if (historyError) {
+      console.error('❌ Error inserting question_history:', historyError)
+    } else {
+      console.log('✅ question_history inserted:', historyData)
+    }
+
+    // Update user profile total_points
+    if (isCorrect) {
+      console.log('📊 Updating profile total_points...')
+      const { data: currentProfile, error: profileSelectError } = await supabase
+        .from('profiles')
+        .select('total_points')
+        .eq('id', userId)
+        .single()
+
+      if (profileSelectError) {
+        console.error('❌ Error selecting profile:', profileSelectError)
+      } else {
+        console.log('Current profile total_points:', currentProfile?.total_points)
+
+        const newTotal = (currentProfile?.total_points || 0) + pointsEarned
+        console.log('New total will be:', newTotal)
+
+        const { data: updateData, error: profileUpdateError } = await supabase
+          .from('profiles')
+          .update({
+            total_points: newTotal
+          })
+          .eq('id', userId)
+          .select()
+
+        if (profileUpdateError) {
+          console.error('❌ Error updating profile:', profileUpdateError)
+        } else {
+          console.log('✅ Profile updated:', updateData)
+        }
+      }
+    }
 
     // Update user_topic_progress
-    const { data: existingProgress } = await supabase
+    console.log('📈 Checking user_topic_progress...')
+    const { data: existingProgress, error: progressSelectError } = await supabase
       .from('user_topic_progress')
       .select('*')
       .eq('user_id', userId)
       .eq('topic_id', currentQuestion.topic_id)
       .single()
 
+    if (progressSelectError && progressSelectError.code !== 'PGRST116') {
+      console.error('❌ Error selecting progress:', progressSelectError)
+    }
+
     if (existingProgress) {
-      await supabase
+      console.log('Updating existing progress:', existingProgress)
+      const { data: progressData, error: progressUpdateError } = await supabase
         .from('user_topic_progress')
         .update({
           questions_attempted: existingProgress.questions_attempted + 1,
@@ -147,26 +228,58 @@ function QuizContent() {
         })
         .eq('user_id', userId)
         .eq('topic_id', currentQuestion.topic_id)
+        .select()
+
+      if (progressUpdateError) {
+        console.error('❌ Error updating progress:', progressUpdateError)
+      } else {
+        console.log('✅ Progress updated:', progressData)
+      }
     } else {
-      await supabase.from('user_topic_progress').insert({
+      console.log('Creating new progress record')
+      const { data: progressData, error: progressInsertError } = await supabase.from('user_topic_progress').insert({
         user_id: userId,
         topic_id: currentQuestion.topic_id,
         questions_attempted: 1,
         questions_correct: isCorrect ? 1 : 0
-      })
+      }).select()
+
+      if (progressInsertError) {
+        console.error('❌ Error inserting progress:', progressInsertError)
+      } else {
+        console.log('✅ Progress created:', progressData)
+      }
     }
 
     // If incorrect, add to spaced repetition
     if (!isCorrect) {
-      await supabase.from('spaced_repetition_cards').insert({
+      console.log('📚 Adding to spaced_repetition_cards...')
+      const { error: srError } = await supabase.from('spaced_repetition_cards').insert({
         user_id: userId,
-        question_id: currentQuestion.id,
         topic_id: currentQuestion.topic_id,
-        interval: 1,
-        ease_factor: 2.5,
-        next_review: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+        question_text: currentQuestion.question_text,
+        question_data: {
+          id: currentQuestion.id,
+          question_text: currentQuestion.question_text,
+          option_a: currentQuestion.option_a,
+          option_b: currentQuestion.option_b,
+          option_c: currentQuestion.option_c,
+          correct_answer: currentQuestion.correct_answer,
+          explanation: currentQuestion.explanation,
+          difficulty: currentQuestion.difficulty
+        },
+        difficulty: currentQuestion.difficulty === 1 ? 'easy' : currentQuestion.difficulty === 2 ? 'medium' : 'hard',
+        next_review_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
       })
+
+      if (srError) {
+        console.error('❌ Error inserting spaced_repetition:', srError)
+      } else {
+        console.log('✅ Spaced repetition card created')
+      }
     }
+
+    console.log('=== saveAnswer END ===')
   }
 
   function handleNextQuestion() {
@@ -176,8 +289,8 @@ function QuizContent() {
       setIsAnswered(false)
       setTimeLeft(90)
     } else {
-      // Quiz finished
-      router.push('/dashboard')
+      // Quiz finished - force reload dashboard with timestamp
+      router.push(`/dashboard?refresh=${Date.now()}`)
     }
   }
 
@@ -210,138 +323,122 @@ function QuizContent() {
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
+    <div className="page">
+      {/* Quiz Header */}
+      <section className="quiz-header">
+        <div className="wrap">
+          <div className="quiz-header-top">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{topic?.titleFr || 'Quiz'}</h1>
-              <p className="text-sm text-gray-600">
+              <h1 className="quiz-title">{topic?.titleFr || 'Quiz'}</h1>
+              <p className="quiz-sub">
                 Question {currentQuestionIndex + 1} sur {questions.length}
               </p>
             </div>
-
-            <div className="flex gap-4">
-              {/* Timer */}
-              <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${timeLeft <= 10 ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
+            <div className="quiz-stats">
+              <div className="stat-pill stat-blue">
                 <Clock className="w-5 h-5" />
-                <span className="font-bold text-lg">{timeLeft}s</span>
+                <span>{timeLeft}s</span>
               </div>
-
-              {/* Score */}
-              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-yellow-100 text-yellow-700">
+              <div className="stat-pill stat-green">
                 <Trophy className="w-5 h-5" />
-                <span className="font-bold text-lg">{score.toLocaleString()}</span>
+                <span>{score.toLocaleString()}</span>
               </div>
             </div>
           </div>
-
-          {/* Progress Bar */}
-          <div className="mt-4">
-            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-blue-500 to-green-500 transition-all duration-300"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
+          <div className="progress-bar-lg">
+            <div
+              className="progress-fill"
+              style={{ width: `${progress}%` }}
+            />
           </div>
         </div>
-      </header>
+      </section>
 
       {/* Question */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-xl p-8 shadow-lg border border-gray-200">
-          {/* Difficulty Badge */}
-          <div className="flex justify-between items-start mb-6">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-500">Difficulté:</span>
-              <div className="flex gap-1">
-                {[...Array(3)].map((_, i) => (
-                  <div
-                    key={i}
-                    className={`w-3 h-3 rounded-full ${
-                      i < currentQuestion.difficulty ? 'bg-orange-500' : 'bg-gray-300'
-                    }`}
-                  />
-                ))}
+      <section className="quiz-content">
+        <div className="wrap" style={{ maxWidth: '960px' }}>
+          <div className="question-card">
+            {/* Difficulty & Points */}
+            <div className="question-meta">
+              <div className="difficulty-dots">
+                <span>Difficulté:</span>
+                <div className="dots">
+                  {[...Array(3)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="dot"
+                      style={{
+                        background: i < currentQuestion.difficulty ? 'var(--acc-amber)' : 'var(--line-soft)'
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="points-possible">
+                Points possibles: {100 * currentQuestion.difficulty + Math.floor(100 * currentQuestion.difficulty * 0.5 * (timeLeft / 90))}
               </div>
             </div>
-            <div className="text-sm text-gray-500">
-              Points possibles: {100 * currentQuestion.difficulty + Math.floor(100 * currentQuestion.difficulty * 0.5 * (timeLeft / 90))}
-            </div>
-          </div>
 
-          {/* Question Text */}
-          <h2 className="text-xl font-bold text-gray-900 mb-8">
-            {currentQuestion.question_text}
-          </h2>
+            {/* Question Text */}
+            <h2 className="question-text">
+              {currentQuestion.question_text}
+            </h2>
 
-          {/* Answer Options */}
-          <div className="space-y-4 mb-8">
-            {['A', 'B', 'C'].map((option) => {
-              const optionText = currentQuestion[`option_${option.toLowerCase()}` as keyof Question] as string
-              const isSelected = selectedAnswer === option
-              const isCorrect = option === currentQuestion.correct_answer
+            {/* Answer Options */}
+            <div className="options">
+              {['A', 'B', 'C'].map((option) => {
+                const optionText = currentQuestion[`option_${option.toLowerCase()}` as keyof Question] as string
+                const isSelected = selectedAnswer === option
+                const isCorrect = option === currentQuestion.correct_answer
 
-              let bgColor = 'bg-gray-50 hover:bg-gray-100 border-gray-300'
-              if (isAnswered) {
-                if (isCorrect) {
-                  bgColor = 'bg-green-100 border-green-500'
-                } else if (isSelected && !isCorrect) {
-                  bgColor = 'bg-red-100 border-red-500'
+                let className = 'option'
+                if (isAnswered) {
+                  if (isCorrect) className += ' option-correct'
+                  else if (isSelected && !isCorrect) className += ' option-wrong'
+                } else if (isSelected) {
+                  className += ' option-selected'
                 }
-              } else if (isSelected) {
-                bgColor = 'bg-blue-100 border-blue-500'
-              }
 
-              return (
-                <button
-                  key={option}
-                  onClick={() => handleAnswerSelect(option)}
-                  disabled={isAnswered}
-                  className={`w-full text-left p-4 rounded-lg border-2 transition ${bgColor} ${
-                    isAnswered ? 'cursor-not-allowed' : 'cursor-pointer'
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white border-2 border-gray-300 flex items-center justify-center font-bold">
-                      {option}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-gray-900">{optionText}</p>
-                    </div>
+                return (
+                  <button
+                    key={option}
+                    onClick={() => handleAnswerSelect(option)}
+                    disabled={isAnswered}
+                    className={className}
+                  >
+                    <div className="option-letter">{option}</div>
+                    <div className="option-text">{optionText}</div>
                     {isAnswered && isCorrect && (
-                      <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" />
+                      <CheckCircle className="option-icon" style={{ color: 'var(--acc-green)' }} />
                     )}
                     {isAnswered && isSelected && !isCorrect && (
-                      <XCircle className="w-6 h-6 text-red-600 flex-shrink-0" />
+                      <XCircle className="option-icon" style={{ color: 'oklch(0.78 0.14 25)' }} />
                     )}
-                  </div>
-                </button>
-              )
-            })}
-          </div>
-
-          {/* Explanation */}
-          {isAnswered && (
-            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
-              <h3 className="font-bold text-blue-900 mb-2">Explication:</h3>
-              <p className="text-blue-800">{currentQuestion.explanation}</p>
+                  </button>
+                )
+              })}
             </div>
-          )}
 
-          {/* Next Button */}
-          {isAnswered && (
-            <button
-              onClick={handleNextQuestion}
-              className="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-bold text-lg hover:from-blue-700 hover:to-blue-800 transition"
-            >
-              {currentQuestionIndex < questions.length - 1 ? 'Question Suivante' : 'Terminer le Quiz'}
-            </button>
-          )}
+            {/* Explanation */}
+            {isAnswered && (
+              <div className="explanation">
+                <h3>Explication:</h3>
+                <p>{currentQuestion.explanation}</p>
+              </div>
+            )}
+
+            {/* Next Button */}
+            {isAnswered && (
+              <button
+                onClick={handleNextQuestion}
+                className="btn btn-primary btn-lg"
+              >
+                {currentQuestionIndex < questions.length - 1 ? 'Question Suivante →' : 'Terminer le Quiz'}
+              </button>
+            )}
+          </div>
         </div>
-      </main>
+      </section>
     </div>
   )
 }

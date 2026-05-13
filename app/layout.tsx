@@ -1,21 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navigation from "@/components/Navigation";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import Header from "@/components/Header";
 
 export const metadata: Metadata = {
-  title: "CFA Arena - Préparation CFA Level 1",
-  description: "Plateforme gamifiée de préparation au CFA Level 1 avec système de points, ELO, ligues et classements",
+  title: "CFA Arena — Préparation Level 1 avec l'IA",
+  description: "Plan d'étude adaptatif, questions ciblées sur vos points faibles, et révision espacée calibrée pour l'examen CFA.",
 };
 
 export default function RootLayout({
@@ -24,12 +13,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="fr"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">
-        <Navigation />
+    <html lang="fr">
+      <body>
+        <Header />
         {children}
       </body>
     </html>

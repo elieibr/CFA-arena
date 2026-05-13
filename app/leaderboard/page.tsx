@@ -88,73 +88,67 @@ function LeaderboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="page">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-            <Trophy className="w-8 h-8 text-yellow-500" />
+      <section className="leaderboard-header">
+        <div className="wrap">
+          <h1 className="leaderboard-title">
+            <Trophy className="w-8 h-8" style={{ color: 'var(--acc-amber)' }} />
             Classement {selectedTopic && `: ${selectedTopic.titleFr}`}
           </h1>
         </div>
-      </header>
+      </section>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Filters */}
-        <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200 mb-8">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Filtrer par matière
-              </label>
-              <select
-                value={topic}
-                onChange={(e) => handleTopicChange(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Global</option>
-                {curriculum.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.titleFr}
-                  </option>
-                ))}
-              </select>
-            </div>
+      <section style={{ padding: '48px 0' }}>
+        <div className="wrap">
+          {/* Filters */}
+          <div className="filters-card">
+            <div className="filters-grid">
+              <div className="filter-group">
+                <label>Filtrer par matière</label>
+                <select
+                  value={topic}
+                  onChange={(e) => handleTopicChange(e.target.value)}
+                >
+                  <option value="">Global</option>
+                  {curriculum.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.titleFr}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Filtrer par ligue
-              </label>
-              <select
-                value={league}
-                onChange={(e) => handleLeagueChange(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Toutes les ligues</option>
-                <option value="bronze">🥉 Bronze</option>
-                <option value="silver">🥈 Silver</option>
-                <option value="gold">🥇 Gold</option>
-                <option value="diamond">💎 Diamond</option>
-                <option value="master">👑 Master</option>
-              </select>
+              <div className="filter-group">
+                <label>Filtrer par ligue</label>
+                <select
+                  value={league}
+                  onChange={(e) => handleLeagueChange(e.target.value)}
+                >
+                  <option value="">Toutes les ligues</option>
+                  <option value="bronze">🥉 Bronze</option>
+                  <option value="silver">🥈 Silver</option>
+                  <option value="gold">🥇 Gold</option>
+                  <option value="diamond">💎 Diamond</option>
+                  <option value="master">👑 Master</option>
+                </select>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Leaderboard Table */}
-        <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+          {/* Leaderboard Table */}
+          <div className="leaderboard-table">
+            <table>
+              <thead>
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Rang</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Joueur</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Ligue</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Points</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Questions</th>
+                  <th>Rang</th>
+                  <th>Joueur</th>
+                  <th>Ligue</th>
+                  <th>Points</th>
+                  <th>Questions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody>
                 {leaderboardData.map((entry, index) => {
                   const rankNumber = index + 1
                   const isCurrentUser = currentUser && entry.user_id === currentUser.id
@@ -162,39 +156,37 @@ function LeaderboardContent() {
                   return (
                     <tr
                       key={entry.user_id}
-                      className={`${isCurrentUser ? 'bg-blue-50' : 'hover:bg-gray-50'} transition`}
+                      className={isCurrentUser ? 'current-user' : ''}
                     >
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          {rankNumber === 1 && <Crown className="w-6 h-6 text-yellow-500" />}
-                          {rankNumber === 2 && <Medal className="w-6 h-6 text-gray-400" />}
-                          {rankNumber === 3 && <Medal className="w-6 h-6 text-amber-600" />}
-                          <span className="text-lg font-bold text-gray-900">#{rankNumber}</span>
+                      <td>
+                        <div className="rank-cell">
+                          {rankNumber === 1 && <Crown className="w-6 h-6" style={{ color: 'var(--acc-amber)' }} />}
+                          {rankNumber === 2 && <Medal className="w-6 h-6" style={{ color: 'var(--fg-3)' }} />}
+                          {rankNumber === 3 && <Medal className="w-6 h-6" style={{ color: 'var(--acc-amber)' }} />}
+                          <span className="rank-number">#{rankNumber}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="font-semibold text-gray-900">
+                      <td>
+                        <div className="player-name">
                           {entry.username}
                           {isCurrentUser && (
-                            <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
-                              Vous
-                            </span>
+                            <span className="you-badge">Vous</span>
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-br ${getLeagueColor(entry.league)} text-white font-medium`}>
+                      <td>
+                        <div className={`league-badge bg-gradient-to-br ${getLeagueColor(entry.league)} text-white`}>
                           <span>{getLeagueEmoji(entry.league)}</span>
-                          <span className="capitalize">{entry.league}</span>
+                          <span>{entry.league}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <span className="text-lg font-bold text-blue-600">
+                      <td>
+                        <span className="points-value">
                           {entry.total_points?.toLocaleString() || entry.points_earned?.toLocaleString() || 0}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <span className="text-lg font-semibold text-gray-700">
+                      <td>
+                        <span className="questions-value">
                           {entry.questions_correct || 0}/{entry.questions_attempted || 0}
                         </span>
                       </td>
@@ -203,16 +195,16 @@ function LeaderboardContent() {
                 })}
               </tbody>
             </table>
-          </div>
 
-          {leaderboardData.length === 0 && (
-            <div className="text-center py-12">
-              <Trophy className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 text-lg">Aucun joueur dans ce classement</p>
-            </div>
-          )}
+            {leaderboardData.length === 0 && (
+              <div className="text-center py-12">
+                <Trophy className="w-16 h-16" style={{ color: 'var(--fg-3)', margin: '0 auto 16px' }} />
+                <p style={{ color: 'var(--fg-2)', fontSize: '1.125rem' }}>Aucun joueur dans ce classement</p>
+              </div>
+            )}
+          </div>
         </div>
-      </main>
+      </section>
     </div>
   )
 }
