@@ -77,16 +77,16 @@ function QuizContent() {
 
     // Map topic ID to question sets
     const questionMap: { [key: string]: Question[] } = {
-      'ethics': ethicsQuestions,
-      'quant': quantQuestions,
-      'econ': economicsQuestions,
-      'fi': [],
-      'corp': [],
-      'equity': [],
+      'ethical-standards': ethicsQuestions,
+      'quantitative-methods': quantQuestions,
+      'economics': economicsQuestions,
+      'financial-statement-analysis': fraQuestions,
+      'corporate-issuers': [],
+      'equity-investments': [],
+      'fixed-income': [],
       'derivatives': [],
-      'alts': [],
-      'pm': [],
-      'fsa': fraQuestions
+      'alternative-investments': [],
+      'portfolio-management': []
     }
 
     const topicQuestions = questionMap[topicId || ''] || []
