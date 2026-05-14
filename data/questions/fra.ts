@@ -107,7 +107,7 @@ export const fraQuestions: Question[] = [
     option_b: '$2,250,000',
     option_c: '$4,000,000',
     correct_answer: 'B',
-    explanation: 'Percentage complete = Costs incurred / Total estimated costs = $1,800,000 / $4,000,000 = 45%. Revenue recognized = Contract price × Percentage complete = $5,000,000 × 45% = $2,250,000. This method matches revenue to project progress.',
+    explanation: 'Percentage complete = Costs incurred / Total estimated costs = $1,800,000 / $4,000,000 = 45%. Revenue recognized = Contract price * Percentage complete = $5,000,000 * 45% = $2,250,000. This method matches revenue to project progress.',
     difficulty: 2
   },
   {
@@ -118,7 +118,7 @@ export const fraQuestions: Question[] = [
     option_b: '$600',
     option_c: '$810',
     correct_answer: 'A',
-    explanation: 'Under IFRS 15, allocate transaction price based on relative standalone prices. Equipment allocation = ($600 / $1,800) × $1,620 = 0.333 × $1,620 = $540. Service allocation = ($1,200 / $1,800) × $1,620 = $1,080. Total standalone value is $600 + $1,200 = $1,800.',
+    explanation: 'Under IFRS 15, allocate transaction price based on relative standalone prices. Equipment allocation = ($600 / $1,800) * $1,620 = 0.333 * $1,620 = $540. Service allocation = ($1,200 / $1,800) * $1,620 = $1,080. Total standalone value is $600 + $1,200 = $1,800.',
     difficulty: 3
   },
   {
@@ -162,7 +162,7 @@ export const fraQuestions: Question[] = [
     option_b: '$380,000',
     option_c: '$400,000',
     correct_answer: 'B',
-    explanation: 'Carrying value at issuance = $5,000,000 × 0.95 = $4,750,000. Interest expense (effective interest method) = Carrying value × Market rate = $4,750,000 × 8% = $380,000. Cash interest paid = $5,000,000 × 7% = $350,000. The $30,000 difference amortizes the discount.',
+    explanation: 'Carrying value at issuance = $5,000,000 * 0.95 = $4,750,000. Interest expense (effective interest method) = Carrying value * Market rate = $4,750,000 * 8% = $380,000. Cash interest paid = $5,000,000 * 7% = $350,000. The $30,000 difference amortizes the discount.',
     difficulty: 2
   },
   {
@@ -173,7 +173,7 @@ export const fraQuestions: Question[] = [
     option_b: '1.43',
     option_c: '1.50',
     correct_answer: 'A',
-    explanation: 'Quick ratio = (Current assets - Inventory - Prepaid expenses) / Current liabilities = ($2,400,000 - $850,000 - $120,000) / $1,600,000 = $1,430,000 / $1,600,000 = 0.894 H 0.91. The quick ratio excludes less liquid current assets to measure short-term liquidity.',
+    explanation: 'Quick ratio = (Current assets - Inventory - Prepaid expenses) / Current liabilities = ($2,400,000 - $850,000 - $120,000) / $1,600,000 = $1,430,000 / $1,600,000 = 0.894 â‰ˆ 0.91. The quick ratio excludes less liquid current assets to measure short-term liquidity.',
     difficulty: 1
   },
   {
@@ -206,7 +206,7 @@ export const fraQuestions: Question[] = [
     option_b: '45.0 days',
     option_c: '51.2 days',
     correct_answer: 'A',
-    explanation: 'Days sales outstanding (average collection period) = 365 / Receivables turnover = 365 / 8.5 = 42.94 H 42.9 days. This represents the average time it takes to collect receivables. A lower number indicates faster collection.',
+    explanation: 'Days sales outstanding (average collection period) = 365 / Receivables turnover = 365 / 8.5 = 42.94 â‰ˆ 42.9 days. This represents the average time it takes to collect receivables. A lower number indicates faster collection.',
     difficulty: 1
   },
   {
@@ -217,7 +217,7 @@ export const fraQuestions: Question[] = [
     option_b: '$1.71',
     option_c: '$1.94',
     correct_answer: 'A',
-    explanation: 'Basic EPS = (Net income - Preferred dividends) / Weighted average common shares = ($1,450,000 - $180,000) / 850,000 = $1,270,000 / 850,000 = $1.494 H $1.49. Preferred dividends are subtracted because EPS measures earnings available to common shareholders.',
+    explanation: 'Basic EPS = (Net income - Preferred dividends) / Weighted average common shares = ($1,450,000 - $180,000) / 850,000 = $1,270,000 / 850,000 = $1.494 â‰ˆ $1.49. Preferred dividends are subtracted because EPS measures earnings available to common shareholders.',
     difficulty: 1
   },
   {
@@ -239,7 +239,7 @@ export const fraQuestions: Question[] = [
     option_b: '15.0%',
     option_c: '20.9%',
     correct_answer: 'C',
-    explanation: 'DuPont ROE = Net profit margin × Asset turnover × Equity multiplier = 6.8% × 1.4 × 2.2 = 0.068 × 1.4 × 2.2 = 0.2093 = 20.9%. This decomposition shows ROE is driven by profitability, efficiency, and leverage.',
+    explanation: 'DuPont ROE = Net profit margin * Asset turnover * Equity multiplier = 6.8% * 1.4 * 2.2 = 0.068 * 1.4 * 2.2 = 0.2093 = 20.9%. This decomposition shows ROE is driven by profitability, efficiency, and leverage.',
     difficulty: 2
   },
   {
@@ -305,7 +305,7 @@ export const fraQuestions: Question[] = [
     option_b: '$1,200,000',
     option_c: '$1,950,000',
     correct_answer: 'B',
-    explanation: 'Current assets = Current ratio × Current liabilities = 2.1 × $1,500,000 = $3,150,000. Quick assets = Quick ratio × Current liabilities = 1.3 × $1,500,000 = $1,950,000. Inventory (+ prepaid) = Current assets - Quick assets = $3,150,000 - $1,950,000 = $1,200,000.',
+    explanation: 'Current assets = Current ratio * Current liabilities = 2.1 * $1,500,000 = $3,150,000. Quick assets = Quick ratio * Current liabilities = 1.3 * $1,500,000 = $1,950,000. Inventory (+ prepaid) = Current assets - Quick assets = $3,150,000 - $1,950,000 = $1,200,000.',
     difficulty: 2
   },
   {
@@ -360,7 +360,7 @@ export const fraQuestions: Question[] = [
     option_b: '$4,650,000',
     option_c: '$4,740,000',
     correct_answer: 'B',
-    explanation: 'Investment (equity method) = Initial cost + Share of earnings - Share of dividends = $4,500,000 + (30% × $800,000) - (30% × $300,000) = $4,500,000 + $240,000 - $90,000 = $4,650,000. Equity method recognizes proportionate share of investee\'s earnings.',
+    explanation: 'Investment (equity method) = Initial cost + Share of earnings - Share of dividends = $4,500,000 + (30% * $800,000) - (30% * $300,000) = $4,500,000 + $240,000 - $90,000 = $4,650,000. Equity method recognizes proportionate share of investee\'s earnings.',
     difficulty: 2
   },
   {
@@ -388,12 +388,12 @@ export const fraQuestions: Question[] = [
   {
     id: 'fra-035',
     topic_id: 'financial-statement-analysis',
-    question_text: 'Thomas Murphy examines Beta Ltd., which translates its foreign subsidiary using the current rate method. The subsidiary had equity of ¬5,000,000 at year start (exchange rate 1.15 USD/EUR) and ¬5,600,000 at year-end (rate 1.22 USD/EUR), including ¬600,000 net income. The average rate was 1.18 USD/EUR. What is the cumulative translation adjustment for the year?',
+    question_text: 'Thomas Murphy examines Beta Ltd., which translates its foreign subsidiary using the current rate method. The subsidiary had equity of Â¬5,000,000 at year start (exchange rate 1.15 USD/EUR) and Â¬5,600,000 at year-end (rate 1.22 USD/EUR), including Â¬600,000 net income. The average rate was 1.18 USD/EUR. What is the cumulative translation adjustment for the year?',
     option_a: 'Gain of $350,000',
     option_b: 'Gain of $708,000',
     option_c: 'Gain of $332,000',
     correct_answer: 'C',
-    explanation: 'Ending equity at ending rate = ¬5,600,000 × 1.22 = $6,832,000. Beginning equity at ending rate = ¬5,000,000 × 1.22 = $6,100,000. Net income at average rate = ¬600,000 × 1.18 = $708,000. Translation gain = $6,832,000 - ($6,100,000 + $708,000) = $6,832,000 - $6,808,000 = $24,000. Actually, a better approach: Beginning at historical $5,750,000 (¬5M × 1.15), ending should be beginning + income = $5,750,000 + $708,000 = $6,458,000, but actual is $6,832,000, so gain = $374,000. The calculation depends on the method.',
+    explanation: 'Ending equity at ending rate = Â¬5,600,000 * 1.22 = $6,832,000. Beginning equity at ending rate = Â¬5,000,000 * 1.22 = $6,100,000. Net income at average rate = Â¬600,000 * 1.18 = $708,000. Translation gain = $6,832,000 - ($6,100,000 + $708,000) = $6,832,000 - $6,808,000 = $24,000. Actually, a better approach: Beginning at historical $5,750,000 (Â¬5M * 1.15), ending should be beginning + income = $5,750,000 + $708,000 = $6,458,000, but actual is $6,832,000, so gain = $374,000. The calculation depends on the method.',
     difficulty: 3
   },
   {
@@ -437,7 +437,7 @@ export const fraQuestions: Question[] = [
     option_b: '$4,500,000',
     option_c: '$10,500,000',
     correct_answer: 'B',
-    explanation: 'Operating income = Revenue × Operating profit margin = $25,000,000 × 18% = $4,500,000. Operating profit margin measures EBIT as a percentage of sales, showing profitability before interest and taxes.',
+    explanation: 'Operating income = Revenue * Operating profit margin = $25,000,000 * 18% = $4,500,000. Operating profit margin measures EBIT as a percentage of sales, showing profitability before interest and taxes.',
     difficulty: 1
   },
   {
@@ -448,7 +448,7 @@ export const fraQuestions: Question[] = [
     option_b: '$18,000,000',
     option_c: '$22,500,000',
     correct_answer: 'C',
-    explanation: 'Total asset turnover = Revenue / Average total assets. Therefore: Revenue = Total asset turnover × Average total assets = 1.8 × $12,500,000 = $22,500,000. Asset turnover measures how efficiently a company uses assets to generate sales.',
+    explanation: 'Total asset turnover = Revenue / Average total assets. Therefore: Revenue = Total asset turnover * Average total assets = 1.8 * $12,500,000 = $22,500,000. Asset turnover measures how efficiently a company uses assets to generate sales.',
     difficulty: 1
   },
   {
@@ -470,7 +470,7 @@ export const fraQuestions: Question[] = [
     option_b: '$3,300,000',
     option_c: '$3,500,000',
     correct_answer: 'B',
-    explanation: 'Common stock (at par) = 100,000 × $2 = $200,000. Total proceeds = 100,000 × $35 = $3,500,000. Additional paid-in capital = Total proceeds - Par value = $3,500,000 - $200,000 = $3,300,000. APIC represents the excess of issuance price over par value.',
+    explanation: 'Common stock (at par) = 100,000 * $2 = $200,000. Total proceeds = 100,000 * $35 = $3,500,000. Additional paid-in capital = Total proceeds - Par value = $3,500,000 - $200,000 = $3,300,000. APIC represents the excess of issuance price over par value.',
     difficulty: 1
   },
   {
@@ -492,7 +492,7 @@ export const fraQuestions: Question[] = [
     option_b: 'Debit Treasury stock $2,000,000',
     option_c: 'Debit Common stock $2,000,000',
     correct_answer: 'B',
-    explanation: 'Under the cost method, treasury stock is debited for the total repurchase cost = 50,000 × $40 = $2,000,000. Par value is irrelevant under the cost method. Treasury stock is a contra-equity account that reduces total equity.',
+    explanation: 'Under the cost method, treasury stock is debited for the total repurchase cost = 50,000 * $40 = $2,000,000. Par value is irrelevant under the cost method. Treasury stock is a contra-equity account that reduces total equity.',
     difficulty: 2
   },
   {
@@ -547,7 +547,7 @@ export const fraQuestions: Question[] = [
     option_b: '$19.6 million',
     option_c: '$26.0 million',
     correct_answer: 'B',
-    explanation: 'Segment A external = $12M × 60% = $7.2M. Segment B external = $8M × 80% = $6.4M. Segment C external = $6M × 100% = $6.0M. Total external revenue = $7.2M + $6.4M + $6.0M = $19.6 million. Intersegment sales are eliminated in consolidated external revenue.',
+    explanation: 'Segment A external = $12M * 60% = $7.2M. Segment B external = $8M * 80% = $6.4M. Segment C external = $6M * 100% = $6.0M. Total external revenue = $7.2M + $6.4M + $6.0M = $19.6 million. Intersegment sales are eliminated in consolidated external revenue.',
     difficulty: 2
   },
   {
