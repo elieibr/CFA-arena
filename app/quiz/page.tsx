@@ -3,7 +3,10 @@
 import { useState, useEffect, Suspense } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { curriculum } from '@/data/curriculum'
-import { mockEthicsQuestions } from '@/data/mock-questions'
+import { ethicsQuestions } from '@/data/questions/ethics'
+import { quantQuestions } from '@/data/questions/quant'
+import { economicsQuestions } from '@/data/questions/economics'
+import { fraQuestions } from '@/data/questions/fra'
 import { Clock, CheckCircle, XCircle, Trophy, Target } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -72,22 +75,34 @@ function QuizContent() {
     }
     setUserId(user.id)
 
-    console.log('Topic ID check:', topicId, topicId === 'ethical-standards')
+    // Map topic ID to question sets
+    const questionMap: { [key: string]: Question[] } = {
+      'ethics': ethicsQuestions,
+      'quant': quantQuestions,
+      'econ': economicsQuestions,
+      'fi': [],
+      'corp': [],
+      'equity': [],
+      'derivatives': [],
+      'alts': [],
+      'pm': [],
+      'fsa': fraQuestions
+    }
 
-    // Use mock questions for Ethics
-    if (topicId === 'ethical-standards') {
-      console.log('✓ Loading mock Ethics questions...')
-      console.log('✓ Mock questions count:', mockEthicsQuestions.length)
-      console.log('✓ First question:', mockEthicsQuestions[0])
-      setQuestions(mockEthicsQuestions)
+    const topicQuestions = questionMap[topicId || ''] || []
+
+    if (topicQuestions.length > 0) {
+      // Shuffle and take 10 random questions
+      const shuffled = [...topicQuestions].sort(() => Math.random() - 0.5)
+      const selected = shuffled.slice(0, 10)
+      setQuestions(selected)
       setLoading(false)
-      console.log('=== loadQuiz END (ethical-standards) ===')
+      console.log('=== loadQuiz END: Loaded', selected.length, 'questions for', topicId, '===')
       return
     }
 
-    console.log('Not ethics, trying database...')
-
-    // Get 10 random questions for the topic
+    // Fallback: try database for other topics
+    console.log('No local questions, trying database...')
     let query = supabase
       .from('questions')
       .select('*')
@@ -100,7 +115,6 @@ function QuizContent() {
     const { data } = await query
 
     if (data && data.length > 0) {
-      // Shuffle questions
       const shuffled = [...data].sort(() => Math.random() - 0.5)
       setQuestions(shuffled)
     }
