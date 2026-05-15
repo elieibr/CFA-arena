@@ -92,12 +92,24 @@ function QuizContent() {
     const topicQuestions = questionMap[topicId || ''] || []
 
     if (topicQuestions.length > 0) {
-      // Shuffle and take 10 random questions
-      const shuffled = [...topicQuestions].sort(() => Math.random() - 0.5)
-      const selected = shuffled.slice(0, 10)
-      setQuestions(selected)
+      // Show all questions in order
+      setQuestions(topicQuestions)
+
+      // Load saved progress
+      const { data: progressData } = await supabase
+        .from('user_topic_progress')
+        .select('current_question_index')
+        .eq('user_id', user.id)
+        .eq('topic_id', topicId)
+        .single()
+
+      if (progressData && progressData.current_question_index > 0) {
+        console.log('Resuming from question index:', progressData.current_question_index)
+        setCurrentQuestionIndex(progressData.current_question_index)
+      }
+
       setLoading(false)
-      console.log('=== loadQuiz END: Loaded', selected.length, 'questions for', topicId, '===')
+      console.log('=== loadQuiz END: Loaded', topicQuestions.length, 'questions for', topicId, '===')
       return
     }
 
@@ -238,6 +250,7 @@ function QuizContent() {
         .update({
           questions_attempted: existingProgress.questions_attempted + 1,
           questions_correct: existingProgress.questions_correct + (isCorrect ? 1 : 0),
+          current_question_index: currentQuestionIndex,
           last_practiced_at: new Date().toISOString()
         })
         .eq('user_id', userId)
@@ -255,7 +268,8 @@ function QuizContent() {
         user_id: userId,
         topic_id: currentQuestion.topic_id,
         questions_attempted: 1,
-        questions_correct: isCorrect ? 1 : 0
+        questions_correct: isCorrect ? 1 : 0,
+        current_question_index: currentQuestionIndex
       }).select()
 
       if (progressInsertError) {
