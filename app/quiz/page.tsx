@@ -6,6 +6,7 @@ import { curriculum } from '@/data/curriculum'
 import { ethicsQuestions } from '@/data/questions/ethics'
 import { ethicsAdvancedQuestions } from '@/data/questions/ethics-advanced'
 import { quantQuestions } from '@/data/questions/quant'
+import { quantAdvancedQuestions } from '@/data/questions/quant-advanced'
 import { economicsQuestions } from '@/data/questions/economics'
 import { fraQuestions } from '@/data/questions/fra'
 import { Clock, CheckCircle, XCircle, Trophy, Target } from 'lucide-react'
@@ -79,7 +80,7 @@ function QuizContent() {
     // Map topic ID to question sets
     const questionMap: { [key: string]: Question[] } = {
       'ethical-standards': [...ethicsQuestions, ...ethicsAdvancedQuestions],
-      'quantitative-methods': quantQuestions,
+      'quantitative-methods': [...quantQuestions, ...quantAdvancedQuestions],
       'economics': economicsQuestions,
       'financial-statement-analysis': fraQuestions,
       'corporate-issuers': [],
