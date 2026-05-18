@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { curriculum } from '@/data/curriculum'
 import { ethicsQuestions } from '@/data/questions/ethics'
+import { ethicsAdvancedQuestions } from '@/data/questions/ethics-advanced'
 import { quantQuestions } from '@/data/questions/quant'
 import { economicsQuestions } from '@/data/questions/economics'
 import { fraQuestions } from '@/data/questions/fra'
@@ -77,7 +78,7 @@ function QuizContent() {
 
     // Map topic ID to question sets
     const questionMap: { [key: string]: Question[] } = {
-      'ethical-standards': ethicsQuestions,
+      'ethical-standards': [...ethicsQuestions, ...ethicsAdvancedQuestions],
       'quantitative-methods': quantQuestions,
       'economics': economicsQuestions,
       'financial-statement-analysis': fraQuestions,
