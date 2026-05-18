@@ -8,6 +8,7 @@ import { ethicsAdvancedQuestions } from '@/data/questions/ethics-advanced'
 import { quantQuestions } from '@/data/questions/quant'
 import { quantAdvancedQuestions } from '@/data/questions/quant-advanced'
 import { economicsQuestions } from '@/data/questions/economics'
+import { economicsAdvancedQuestions } from '@/data/questions/economics-advanced'
 import { fraQuestions } from '@/data/questions/fra'
 import { Clock, CheckCircle, XCircle, Trophy, Target } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -81,7 +82,7 @@ function QuizContent() {
     const questionMap: { [key: string]: Question[] } = {
       'ethical-standards': [...ethicsQuestions, ...ethicsAdvancedQuestions],
       'quantitative-methods': [...quantQuestions, ...quantAdvancedQuestions],
-      'economics': economicsQuestions,
+      'economics': [...economicsQuestions, ...economicsAdvancedQuestions],
       'financial-statement-analysis': fraQuestions,
       'corporate-issuers': [],
       'equity-investments': [],
