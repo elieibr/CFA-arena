@@ -15,6 +15,7 @@ import { corporateFinanceAdvancedQuestions } from '@/data/questions/corporate-fi
 import { equityAdvancedQuestions } from '@/data/questions/equity-advanced'
 import { fixedIncomeAdvancedQuestions } from '@/data/questions/fixed-income-advanced'
 import { derivativesAdvancedQuestions } from '@/data/questions/derivatives-advanced'
+import { alternativeInvestmentsAdvancedQuestions } from '@/data/questions/alternative-investments-advanced'
 import { Clock, CheckCircle, XCircle, Trophy, Target } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -93,7 +94,7 @@ function QuizContent() {
       'equity-investments': equityAdvancedQuestions,
       'fixed-income': fixedIncomeAdvancedQuestions,
       'derivatives': derivativesAdvancedQuestions,
-      'alternative-investments': [],
+      'alternative-investments': alternativeInvestmentsAdvancedQuestions,
       'portfolio-management': []
     }
 
