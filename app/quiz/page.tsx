@@ -12,6 +12,7 @@ import { economicsAdvancedQuestions } from '@/data/questions/economics-advanced'
 import { fraQuestions } from '@/data/questions/fra'
 import { fraAdvancedQuestions } from '@/data/questions/fra-advanced'
 import { corporateFinanceAdvancedQuestions } from '@/data/questions/corporate-finance-advanced'
+import { equityAdvancedQuestions } from '@/data/questions/equity-advanced'
 import { Clock, CheckCircle, XCircle, Trophy, Target } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -87,7 +88,7 @@ function QuizContent() {
       'economics': [...economicsQuestions, ...economicsAdvancedQuestions],
       'financial-statement-analysis': [...fraQuestions, ...fraAdvancedQuestions],
       'corporate-issuers': corporateFinanceAdvancedQuestions,
-      'equity-investments': [],
+      'equity-investments': equityAdvancedQuestions,
       'fixed-income': [],
       'derivatives': [],
       'alternative-investments': [],
