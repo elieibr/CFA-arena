@@ -13,6 +13,7 @@ import { fraQuestions } from '@/data/questions/fra'
 import { fraAdvancedQuestions } from '@/data/questions/fra-advanced'
 import { corporateFinanceAdvancedQuestions } from '@/data/questions/corporate-finance-advanced'
 import { equityAdvancedQuestions } from '@/data/questions/equity-advanced'
+import { fixedIncomeAdvancedQuestions } from '@/data/questions/fixed-income-advanced'
 import { Clock, CheckCircle, XCircle, Trophy, Target } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -89,7 +90,7 @@ function QuizContent() {
       'financial-statement-analysis': [...fraQuestions, ...fraAdvancedQuestions],
       'corporate-issuers': corporateFinanceAdvancedQuestions,
       'equity-investments': equityAdvancedQuestions,
-      'fixed-income': [],
+      'fixed-income': fixedIncomeAdvancedQuestions,
       'derivatives': [],
       'alternative-investments': [],
       'portfolio-management': []
