@@ -16,6 +16,7 @@ import { equityAdvancedQuestions } from '@/data/questions/equity-advanced'
 import { fixedIncomeAdvancedQuestions } from '@/data/questions/fixed-income-advanced'
 import { derivativesAdvancedQuestions } from '@/data/questions/derivatives-advanced'
 import { alternativeInvestmentsAdvancedQuestions } from '@/data/questions/alternative-investments-advanced'
+import { portfolioManagementAdvancedQuestions } from '@/data/questions/portfolio-management-advanced'
 import { Clock, CheckCircle, XCircle, Trophy, Target } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -95,7 +96,7 @@ function QuizContent() {
       'fixed-income': fixedIncomeAdvancedQuestions,
       'derivatives': derivativesAdvancedQuestions,
       'alternative-investments': alternativeInvestmentsAdvancedQuestions,
-      'portfolio-management': []
+      'portfolio-management': portfolioManagementAdvancedQuestions
     }
 
     const topicQuestions = questionMap[topicId || ''] || []
