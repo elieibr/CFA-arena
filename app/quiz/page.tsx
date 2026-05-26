@@ -17,7 +17,6 @@ import { fixedIncomeAdvancedQuestions } from '@/data/questions/fixed-income-adva
 import { derivativesAdvancedQuestions } from '@/data/questions/derivatives-advanced'
 import { alternativeInvestmentsAdvancedQuestions } from '@/data/questions/alternative-investments-advanced'
 import { portfolioManagementAdvancedQuestions } from '@/data/questions/portfolio-management-advanced'
-import { Clock, CheckCircle, XCircle, Trophy, Target } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 interface Question {
@@ -41,6 +40,7 @@ function QuizContent() {
   const [timeLeft, setTimeLeft] = useState(90) // 90 seconds per question
   const [loading, setLoading] = useState(true)
   const [userId, setUserId] = useState<string | null>(null)
+  const [sessionStats, setSessionStats] = useState({ correct: 0, incorrect: 0 })
 
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -71,15 +71,11 @@ function QuizContent() {
   }, [currentQuestionIndex, isAnswered, questions])
 
   async function loadQuiz() {
-    console.log('=== loadQuiz START ===')
-    console.log('Topic ID from URL:', topicId)
     setLoading(true)
 
     const { data: { user } } = await supabase.auth.getUser()
-    console.log('User:', user?.id)
 
     if (!user) {
-      console.log('No user, redirecting to login')
       router.push('/login')
       return
     }
@@ -102,8 +98,8 @@ function QuizContent() {
     const topicQuestions = questionMap[topicId || ''] || []
 
     if (topicQuestions.length > 0) {
-      // Show all questions in order
-      setQuestions(topicQuestions)
+      // Show first 20 questions
+      setQuestions(topicQuestions.slice(0, 20))
 
       // Load saved progress
       const { data: progressData } = await supabase
@@ -114,31 +110,11 @@ function QuizContent() {
         .single()
 
       if (progressData && progressData.current_question_index > 0) {
-        console.log('Resuming from question index:', progressData.current_question_index)
-        setCurrentQuestionIndex(progressData.current_question_index)
+        setCurrentQuestionIndex(Math.min(progressData.current_question_index, 19))
       }
 
       setLoading(false)
-      console.log('=== loadQuiz END: Loaded', topicQuestions.length, 'questions for', topicId, '===')
       return
-    }
-
-    // Fallback: try database for other topics
-    console.log('No local questions, trying database...')
-    let query = supabase
-      .from('questions')
-      .select('*')
-      .limit(10)
-
-    if (topicId) {
-      query = query.eq('topic_id', topicId)
-    }
-
-    const { data } = await query
-
-    if (data && data.length > 0) {
-      const shuffled = [...data].sort(() => Math.random() - 0.5)
-      setQuestions(shuffled)
     }
 
     setLoading(false)
@@ -147,6 +123,7 @@ function QuizContent() {
   function handleTimeUp() {
     setIsAnswered(true)
     setSelectedAnswer(null)
+    setSessionStats(prev => ({ ...prev, incorrect: prev.incorrect + 1 }))
     saveAnswer(false)
   }
 
@@ -160,36 +137,27 @@ function QuizContent() {
     const isCorrect = answer === currentQuestion.correct_answer
 
     if (isCorrect) {
-      // Calculate points: base 100 × difficulty + time bonus (up to 50%)
       const basePoints = 100 * currentQuestion.difficulty
       const timeBonus = Math.floor(basePoints * 0.5 * (timeLeft / 90))
       const totalPoints = basePoints + timeBonus
 
       setScore(score + totalPoints)
+      setSessionStats(prev => ({ ...prev, correct: prev.correct + 1 }))
+    } else {
+      setSessionStats(prev => ({ ...prev, incorrect: prev.incorrect + 1 }))
     }
 
     await saveAnswer(isCorrect)
   }
 
   async function saveAnswer(isCorrect: boolean) {
-    console.log('=== saveAnswer START ===')
-    console.log('userId:', userId)
-    console.log('isCorrect:', isCorrect)
-
-    if (!userId) {
-      console.log('❌ No userId, aborting saveAnswer')
-      return
-    }
+    if (!userId) return
 
     const currentQuestion = questions[currentQuestionIndex]
     const pointsEarned = isCorrect ? (100 * currentQuestion.difficulty + Math.floor(100 * currentQuestion.difficulty * 0.5 * (timeLeft / 90))) : 0
 
-    console.log('Question:', currentQuestion.id, currentQuestion.topic_id)
-    console.log('Points earned:', pointsEarned)
-
     // Save to question_history
-    console.log('📝 Inserting into question_history...')
-    const { data: historyData, error: historyError } = await supabase.from('question_history').insert({
+    await supabase.from('question_history').insert({
       user_id: userId,
       topic_id: currentQuestion.topic_id,
       question_text: currentQuestion.question_text,
@@ -199,100 +167,56 @@ function QuizContent() {
       time_taken: 90 - timeLeft,
       difficulty: currentQuestion.difficulty === 1 ? 'easy' : currentQuestion.difficulty === 2 ? 'medium' : 'hard',
       points_earned: pointsEarned
-    }).select()
-
-    if (historyError) {
-      console.error('❌ Error inserting question_history:', historyError)
-    } else {
-      console.log('✅ question_history inserted:', historyData)
-    }
+    })
 
     // Update user profile total_points
     if (isCorrect) {
-      console.log('📊 Updating profile total_points...')
-      const { data: currentProfile, error: profileSelectError } = await supabase
+      const { data: currentProfile } = await supabase
         .from('profiles')
         .select('total_points')
         .eq('id', userId)
         .single()
 
-      if (profileSelectError) {
-        console.error('❌ Error selecting profile:', profileSelectError)
-      } else {
-        console.log('Current profile total_points:', currentProfile?.total_points)
+      const newTotal = (currentProfile?.total_points || 0) + pointsEarned
 
-        const newTotal = (currentProfile?.total_points || 0) + pointsEarned
-        console.log('New total will be:', newTotal)
-
-        const { data: updateData, error: profileUpdateError } = await supabase
-          .from('profiles')
-          .update({
-            total_points: newTotal
-          })
-          .eq('id', userId)
-          .select()
-
-        if (profileUpdateError) {
-          console.error('❌ Error updating profile:', profileUpdateError)
-        } else {
-          console.log('✅ Profile updated:', updateData)
-        }
-      }
+      await supabase
+        .from('profiles')
+        .update({ total_points: newTotal })
+        .eq('id', userId)
     }
 
     // Update user_topic_progress
-    console.log('📈 Checking user_topic_progress...')
-    const { data: existingProgress, error: progressSelectError } = await supabase
+    const { data: existingProgress } = await supabase
       .from('user_topic_progress')
       .select('*')
       .eq('user_id', userId)
       .eq('topic_id', currentQuestion.topic_id)
       .single()
 
-    if (progressSelectError && progressSelectError.code !== 'PGRST116') {
-      console.error('❌ Error selecting progress:', progressSelectError)
-    }
-
     if (existingProgress) {
-      console.log('Updating existing progress:', existingProgress)
-      const { data: progressData, error: progressUpdateError } = await supabase
+      await supabase
         .from('user_topic_progress')
         .update({
           questions_attempted: existingProgress.questions_attempted + 1,
           questions_correct: existingProgress.questions_correct + (isCorrect ? 1 : 0),
-          current_question_index: currentQuestionIndex,
+          current_question_index: currentQuestionIndex + 1,
           last_practiced_at: new Date().toISOString()
         })
         .eq('user_id', userId)
         .eq('topic_id', currentQuestion.topic_id)
-        .select()
-
-      if (progressUpdateError) {
-        console.error('❌ Error updating progress:', progressUpdateError)
-      } else {
-        console.log('✅ Progress updated:', progressData)
-      }
     } else {
-      console.log('Creating new progress record')
-      const { data: progressData, error: progressInsertError } = await supabase.from('user_topic_progress').insert({
+      await supabase.from('user_topic_progress').insert({
         user_id: userId,
         topic_id: currentQuestion.topic_id,
         questions_attempted: 1,
         questions_correct: isCorrect ? 1 : 0,
-        current_question_index: currentQuestionIndex
-      }).select()
-
-      if (progressInsertError) {
-        console.error('❌ Error inserting progress:', progressInsertError)
-      } else {
-        console.log('✅ Progress created:', progressData)
-      }
+        current_question_index: currentQuestionIndex + 1
+      })
     }
 
     // If incorrect, add to spaced repetition
     if (!isCorrect) {
-      console.log('📚 Adding to spaced_repetition_cards...')
-      const { error: srError } = await supabase.from('spaced_repetition_cards').insert({
+      await supabase.from('spaced_repetition_cards').insert({
         user_id: userId,
         topic_id: currentQuestion.topic_id,
         question_text: currentQuestion.question_text,
@@ -309,15 +233,7 @@ function QuizContent() {
         difficulty: currentQuestion.difficulty === 1 ? 'easy' : currentQuestion.difficulty === 2 ? 'medium' : 'hard',
         next_review_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
       })
-
-      if (srError) {
-        console.error('❌ Error inserting spaced_repetition:', srError)
-      } else {
-        console.log('✅ Spaced repetition card created')
-      }
     }
-
-    console.log('=== saveAnswer END ===')
   }
 
   function handleNextQuestion() {
@@ -327,7 +243,6 @@ function QuizContent() {
       setIsAnswered(false)
       setTimeLeft(90)
     } else {
-      // Quiz finished - force reload dashboard with timestamp
       router.push(`/dashboard?refresh=${Date.now()}`)
     }
   }
@@ -344,10 +259,10 @@ function QuizContent() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-2xl text-gray-600 mb-4">Aucune question disponible pour cette matière</p>
+          <p className="text-2xl mb-4" style={{ color: 'var(--fg-2)' }}>Aucune question disponible pour cette matière</p>
           <button
             onClick={() => router.push('/dashboard')}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="btn btn-primary"
           >
             Retour au Dashboard
           </button>
@@ -358,129 +273,195 @@ function QuizContent() {
 
   const currentQuestion = questions[currentQuestionIndex]
   const topic = curriculum.find((t) => t.id === currentQuestion.topic_id)
-  const progress = ((currentQuestionIndex + 1) / questions.length) * 100
+  const isTimerUrgent = timeLeft < 30
+  const totalAttempted = sessionStats.correct + sessionStats.incorrect
+  const successRate = totalAttempted > 0 ? Math.round((sessionStats.correct / totalAttempted) * 100) : 0
 
   return (
-    <div className="page">
-      {/* Quiz Header */}
-      <section className="quiz-header">
-        <div className="wrap">
-          <div className="quiz-header-top">
-            <div>
-              <h1 className="quiz-title">{topic?.titleFr || 'Quiz'}</h1>
-              <p className="quiz-sub">
-                Question {currentQuestionIndex + 1} sur {questions.length}
-              </p>
-            </div>
-            <div className="quiz-stats">
-              <div className="stat-pill stat-blue">
-                <Clock className="w-5 h-5" />
-                <span>{timeLeft}s</span>
-              </div>
-              <div className="stat-pill stat-green">
-                <Trophy className="w-5 h-5" />
-                <span>{score.toLocaleString()}</span>
-              </div>
-            </div>
-          </div>
-          <div className="progress-bar-lg">
-            <div
-              className="progress-fill"
-              style={{ width: `${progress}%` }}
-            />
+    <div className="quiz-wrap">
+      {/* Status strip */}
+      <div className="quiz-status">
+        <div className="qs-cell">
+          <div className="l">MATIÈRE</div>
+          <div className="v">
+            <span className="acc">{topic?.titleEn?.split(' ')[0] || 'Quiz'}</span> · {topic?.titleEn?.split(' ').slice(1).join(' ') || 'Session'}
           </div>
         </div>
-      </section>
+        <div className="qs-cell">
+          <div className="l">QUESTION</div>
+          <div className="v">{String(currentQuestionIndex + 1).padStart(2, '0')} / {questions.length}</div>
+        </div>
+        <div className="qs-cell">
+          <div className="l">PRÉCISION SESSION</div>
+          <div className="v">
+            {sessionStats.correct} / {totalAttempted} · <span className="acc">{successRate}%</span>
+          </div>
+        </div>
+        <div className={`qs-cell timer ${isTimerUrgent ? 'urgent' : ''}`}>
+          <div className="l">CHRONO QUESTION</div>
+          <div className="v">
+            {String(Math.floor(timeLeft / 60)).padStart(2, '0')}:{String(timeLeft % 60).padStart(2, '0')}
+            <span style={{ fontSize: '12px', color: 'var(--fg-3)' }}> / 01:30</span>
+          </div>
+        </div>
+      </div>
 
-      {/* Question */}
-      <section className="quiz-content">
-        <div className="wrap" style={{ maxWidth: '960px' }}>
-          <div className="question-card">
-            {/* Difficulty & Points */}
-            <div className="question-meta">
-              <div className="difficulty-dots">
-                <span>Difficulté:</span>
-                <div className="dots">
-                  {[...Array(3)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="dot"
-                      style={{
-                        background: i < currentQuestion.difficulty ? 'var(--acc-amber)' : 'var(--line-soft)'
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-              <div className="points-possible">
-                Points possibles: {100 * currentQuestion.difficulty + Math.floor(100 * currentQuestion.difficulty * 0.5 * (timeLeft / 90))}
-              </div>
-            </div>
+      {/* Progress */}
+      <div className="qprog-wrap">
+        <div className="qprog-head">
+          <span>PROGRESSION · SESSION</span>
+          <span className="right">
+            <span><span className="acc">●</span> {sessionStats.correct} CORRECTES</span>
+            <span><span className="dn">●</span> {sessionStats.incorrect} INCORRECTES</span>
+            <span><span style={{ color: 'var(--fg-2)' }}>●</span> {questions.length - totalAttempted} RESTANTES</span>
+          </span>
+        </div>
+        <div className="qprog">
+          {questions.map((_, idx) => {
+            let className = ''
+            if (idx < currentQuestionIndex) {
+              // Already answered - check from sessionStats
+              const answeredCorrectly = idx < sessionStats.correct + sessionStats.incorrect
+              className = answeredCorrectly ? (idx < sessionStats.correct ? 'correct' : 'wrong') : ''
+            } else if (idx === currentQuestionIndex) {
+              className = 'current'
+            }
+            return <span key={idx} className={className}></span>
+          })}
+        </div>
+      </div>
 
-            {/* Question Text */}
-            <h2 className="question-text">
-              {currentQuestion.question_text}
-            </h2>
+      {/* Question card */}
+      <div className="qcard">
+        <div className="qhead">
+          <div className="qhead-left">
+            <span className="qhead-id">Q-{String(currentQuestionIndex + 1).padStart(2, '0')} · {currentQuestion.id}</span>
+            <span className="tag">CFA-LIKE</span>
+          </div>
+          <div className="qhead-left">
+            <span className="diff">
+              {[...Array(5)].map((_, i) => (
+                <span key={i} className={i < currentQuestion.difficulty ? 'on' : ''}></span>
+              ))}
+            </span>
+            <span className="diff-label">
+              DIFFICULTÉ · {currentQuestion.difficulty === 1 ? 'FACILE' : currentQuestion.difficulty === 2 ? 'MOYEN' : 'DIFFICILE'}
+            </span>
+          </div>
+        </div>
 
-            {/* Answer Options */}
-            <div className="options">
-              {['A', 'B', 'C'].map((option) => {
-                const optionText = currentQuestion[`option_${option.toLowerCase()}` as keyof Question] as string
-                const isSelected = selectedAnswer === option
-                const isCorrect = option === currentQuestion.correct_answer
+        <div className="qbody">
+          <div className="qsection">
+            {topic?.titleEn?.toUpperCase() || 'QUIZ'}
+          </div>
 
-                let className = 'option'
-                if (isAnswered) {
-                  if (isCorrect) className += ' option-correct'
-                  else if (isSelected && !isCorrect) className += ' option-wrong'
-                } else if (isSelected) {
-                  className += ' option-selected'
-                }
+          <p className="qstem">
+            {currentQuestion.question_text}
+          </p>
 
-                return (
-                  <button
-                    key={option}
-                    onClick={() => handleAnswerSelect(option)}
-                    disabled={isAnswered}
-                    className={className}
-                  >
-                    <div className="option-letter">{option}</div>
-                    <div className="option-text">{optionText}</div>
-                    {isAnswered && isCorrect && (
-                      <CheckCircle className="option-icon" style={{ color: 'var(--acc-green)' }} />
-                    )}
-                    {isAnswered && isSelected && !isCorrect && (
-                      <XCircle className="option-icon" style={{ color: 'oklch(0.78 0.14 25)' }} />
-                    )}
-                  </button>
-                )
-              })}
-            </div>
+          <div className="choices">
+            {['A', 'B', 'C'].map((option) => {
+              const optionText = currentQuestion[`option_${option.toLowerCase()}` as keyof Question] as string
+              const isSelected = selectedAnswer === option
+              const isCorrect = option === currentQuestion.correct_answer
 
-            {/* Explanation */}
+              let className = 'choice'
+              if (isAnswered) {
+                if (isCorrect) className += ' correct'
+                else if (isSelected && !isCorrect) className += ' wrong'
+                className += ' disabled'
+              } else if (isSelected) {
+                className += ' selected'
+              }
+
+              return (
+                <button
+                  key={option}
+                  onClick={() => handleAnswerSelect(option)}
+                  disabled={isAnswered}
+                  className={className}
+                >
+                  <div className="choice-letter">{option}</div>
+                  <div className="choice-text">{optionText}</div>
+                  {!isAnswered && <div className="choice-key">{option === 'A' ? '1' : option === 'B' ? '2' : '3'}</div>}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        <div className="qfoot">
+          <div className="qfoot-left">
+            <button className="btn btn-ghost btn-sm btn-mono">⚑ SIGNALER</button>
+          </div>
+          <div className="qfoot-right">
+            <span className="qfoot-hint">Choisir : <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> · Valider : <kbd>↵</kbd></span>
             {isAnswered && (
-              <div className="explanation">
-                <h3>Explication:</h3>
-                <p>{currentQuestion.explanation}</p>
-              </div>
-            )}
-
-            {/* Next Button */}
-            {isAnswered && (
-              <button
-                onClick={handleNextQuestion}
-                className="btn btn-primary btn-lg"
-              >
-                {currentQuestionIndex < questions.length - 1 ? 'Question Suivante →' : 'Terminer le Quiz'}
+              <button className="btn btn-primary btn-mono" onClick={handleNextQuestion}>
+                {currentQuestionIndex < questions.length - 1 ? 'QUESTION SUIVANTE ▸' : 'TERMINER ▸'}
               </button>
             )}
           </div>
         </div>
-      </section>
+      </div>
+
+      {/* Feedback panel */}
+      {isAnswered && (
+        <div className={`feedback ${selectedAnswer !== currentQuestion.correct_answer ? 'wrong' : ''}`}>
+          <div className="fb-head">
+            <div className="fb-head-left">
+              {selectedAnswer === currentQuestion.correct_answer ? (
+                <svg viewBox="0 0 16 16" width="16" height="16" fill="var(--acc)">
+                  <path d="M3 8l3 3 7-7-1.4-1.4L6 8.2 4.4 6.6z"/>
+                </svg>
+              ) : (
+                <svg viewBox="0 0 16 16" width="16" height="16" fill="var(--danger)">
+                  <path d="M13.5 2.5L8 8 2.5 2.5 2 3l5.5 5.5L2 14l.5.5L8 9l5.5 5.5.5-.5L8.5 8.5 14 3z"/>
+                </svg>
+              )}
+              <span className="fb-verdict">
+                {selectedAnswer === currentQuestion.correct_answer ? 'BONNE RÉPONSE' : 'INCORRECT'} · {currentQuestion.correct_answer}
+              </span>
+              <span className="tag mono">{90 - timeLeft}s</span>
+            </div>
+            <div className="fb-xp">
+              {selectedAnswer === currentQuestion.correct_answer
+                ? `+ ${100 * currentQuestion.difficulty + Math.floor(100 * currentQuestion.difficulty * 0.5 * (timeLeft / 90))} XP`
+                : '+ 0 XP'}
+            </div>
+          </div>
+          <div className="fb-body">
+            <div className="fb-section">
+              <div className="fb-label">EXPLICATION</div>
+              <p className="fb-text">
+                {currentQuestion.explanation}
+              </p>
+            </div>
+
+            <div className="fb-stats">
+              <div>
+                <div className="v">{successRate}%</div>
+                <div className="l">PRÉCISION SESSION</div>
+              </div>
+              <div>
+                <div className="v">{90 - timeLeft}s</div>
+                <div className="l">TEMPS ÉCOULÉ</div>
+              </div>
+              <div>
+                <div className="v">{currentQuestion.difficulty} / 5</div>
+                <div className="l">DIFFICULTÉ</div>
+              </div>
+              <div>
+                <div className="v">{currentQuestionIndex + 1} / {questions.length}</div>
+                <div className="l">PROGRESSION</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
-
 
 export default function QuizPage() {
   return (
