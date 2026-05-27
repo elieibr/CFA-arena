@@ -3,7 +3,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 
 export const metadata: Metadata = {
-  title: "CFA Arena — Préparation Level 1 avec l'IA",
+  title: "CharterPath — Préparation Level 1 avec l'IA",
   description: "Plan d'étude adaptatif, questions ciblées sur vos points faibles, et révision espacée calibrée pour l'examen CFA.",
 };
 

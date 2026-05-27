@@ -1,4 +1,4 @@
-# CFA Arena 🏆
+# CharterPath 🏆
 
 A gamified, multi-user platform for CFA Level 1 exam preparation with real-time leaderboards, ELO ratings, and competitive leagues.
 
@@ -66,7 +66,7 @@ A gamified, multi-user platform for CFA Level 1 exam preparation with real-time 
 ## Project Structure
 
 ```
-cfa-arena/
+charterpath/
 ├── app/                    # Next.js App Router
 │   ├── (auth)/            # Auth pages (login, register)
 │   ├── (dashboard)/       # Protected dashboard pages

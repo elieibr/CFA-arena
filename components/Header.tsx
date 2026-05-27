@@ -36,7 +36,7 @@ export default function Header() {
     if (profile?.username) {
       return profile.username.substring(0, 2).toUpperCase()
     }
-    return 'CA'
+    return 'CP'
   }
 
   const getStreakDays = () => {
@@ -54,9 +54,9 @@ export default function Header() {
       <div className="wrap">
         <div className="nav">
           <Link href="/dashboard" className="brand">
-            <span className="brand-mark">CA</span>
+            <span className="brand-mark">CP</span>
             <span className="brand-name">
-              CFA Arena<span className="dot">.</span>
+              CharterPath<span className="dot">.</span>
             </span>
           </Link>
 

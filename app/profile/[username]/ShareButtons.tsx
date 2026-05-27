@@ -12,7 +12,7 @@ interface ShareButtonsProps {
 export default function ShareButtons({ profileUrl, username, globalRank }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false)
 
-  const shareMessage = `Je suis classé #${globalRank} sur CFA Arena ! Rejoins-moi pour préparer le CFA Level 1 🏆`
+  const shareMessage = `Je suis classé #${globalRank} sur CharterPath ! Rejoins-moi pour préparer le CFA Level 1 🏆`
 
   const handleCopyLink = async () => {
     try {

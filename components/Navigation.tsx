@@ -28,10 +28,10 @@ export default function Navigation() {
           {/* Logo */}
           <Link href="/dashboard" className="flex items-center gap-2">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">CF</span>
+              <span className="text-white font-bold text-xl">CP</span>
             </div>
             <span className="font-bold text-xl text-gray-900 hidden sm:block">
-              CFA Arena
+              CharterPath
             </span>
           </Link>
 
