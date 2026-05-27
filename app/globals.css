@@ -28,11 +28,11 @@
   --acc-bg:      oklch(0.78 0.16 180 / 0.08);
 
   /* Legacy green/amber/blue for compatibility */
-  --acc-green:   oklch(0.78 0.16 145);
+  --acc-green:   oklch(0.78 0.16 180);
   --acc-green-d: oklch(0.62 0.18 145);
   --acc-amber:   oklch(0.78 0.14 75);
   --acc-amber-d: oklch(0.66 0.16 65);
-  --acc-blue:    oklch(0.74 0.10 255);
+  --acc-blue:    oklch(0.78 0.16 180);
 
   /* Secondary signals */
   --warn:        oklch(0.78 0.14 75);     /* amber */
@@ -41,9 +41,9 @@
   --danger-dim:  oklch(0.66 0.16 25);
 
   /* Level badge colors — distinct hues, same chroma/lightness band */
-  --lv-beg:      oklch(0.74 0.10 255);  /* periwinkle */
+  --lv-beg:      oklch(0.78 0.16 180);  /* periwinkle */
   --lv-int:      oklch(0.78 0.14 75);   /* amber */
-  --lv-adv:      oklch(0.78 0.16 145);  /* green */
+  --lv-adv:      oklch(0.78 0.16 180);  /* green */
 
   --radius: 14px;
   --radius-sm: 8px;
@@ -84,7 +84,7 @@ body {
 }
 
 ::selection {
-  background: var(--acc-green);
+  background: var(--acc);
   color: var(--bg-0);
 }
 
@@ -199,13 +199,13 @@ h3 {
 }
 
 a {
-  color: var(--acc-blue);
+  color: var(--acc);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 a:hover {
-  color: var(--acc-green);
+  color: var(--acc);
 }
 
 /* ============ HEADER ============ */
@@ -241,14 +241,14 @@ header.site {
   width: 28px;
   height: 28px;
   border-radius: 7px;
-  background: linear-gradient(135deg, var(--acc-green) 0%, var(--acc-green-d) 100%);
+  background: linear-gradient(135deg, var(--acc) 0%, var(--acc-green-d) 100%);
   display: grid;
   place-items: center;
   color: var(--bg-0);
   font-family: var(--font-mono);
   font-weight: 600;
   font-size: 13px;
-  box-shadow: 0 0 0 1px oklch(0.78 0.16 145 / 0.3), 0 4px 12px oklch(0.78 0.16 145 / 0.15);
+  box-shadow: 0 0 0 1px oklch(0.78 0.16 180 / 0.3), 0 4px 12px oklch(0.78 0.16 180 / 0.15);
 }
 
 .brand-name {
@@ -256,7 +256,7 @@ header.site {
 }
 
 .brand-name .dot {
-  color: var(--acc-green);
+  color: var(--acc);
 }
 
 nav.primary {
@@ -351,8 +351,8 @@ nav.primary a.active {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--acc-green);
-  box-shadow: 0 0 12px var(--acc-green);
+  background: var(--acc);
+  box-shadow: 0 0 12px var(--acc);
   animation: pulse 2s ease-in-out infinite;
 }
 
@@ -376,7 +376,7 @@ h1.hero-title em {
   font-family: var(--font-serif);
   font-style: italic;
   font-weight: 400;
-  color: var(--acc-green);
+  color: var(--acc);
 }
 
 h1.hero-title .accent-amber {
@@ -422,7 +422,7 @@ h1.hero-title .accent-amber {
 }
 
 .btn-primary:hover {
-  background: var(--acc-green);
+  background: var(--acc);
   transform: translateY(-1px);
 }
 
@@ -461,7 +461,7 @@ h1.hero-title .accent-amber {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at top right, oklch(0.78 0.16 145 / 0.08), transparent 60%);
+  background: radial-gradient(circle at top right, oklch(0.78 0.16 180 / 0.08), transparent 60%);
   pointer-events: none;
 }
 
@@ -541,8 +541,8 @@ h1.hero-title .accent-amber {
   font-family: var(--font-mono);
   font-size: 13px;
   font-weight: 500;
-  color: var(--acc-green);
-  background: oklch(0.78 0.16 145 / 0.10);
+  color: var(--acc);
+  background: oklch(0.78 0.16 180 / 0.10);
   padding: 4px 8px;
   border-radius: 6px;
 }
@@ -564,9 +564,9 @@ h1.hero-title .accent-amber {
 
 .pc-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--acc-green-d), var(--acc-green));
+  background: linear-gradient(90deg, var(--acc-green-d), var(--acc));
   border-radius: 99px;
-  box-shadow: 0 0 12px oklch(0.78 0.16 145 / 0.4);
+  box-shadow: 0 0 12px oklch(0.78 0.16 180 / 0.4);
   position: relative;
   transition: width 0.6s ease;
 }
@@ -650,7 +650,7 @@ section.block {
   top: 0;
   bottom: 0;
   width: 2px;
-  background: var(--subj-color, var(--acc-green));
+  background: var(--subj-color, var(--acc));
   opacity: 0;
   transition: opacity 0.2s;
 }
@@ -685,7 +685,7 @@ section.block {
   border: 1px solid var(--line);
   display: grid;
   place-items: center;
-  color: var(--subj-color, var(--acc-green));
+  color: var(--subj-color, var(--acc));
   flex-shrink: 0;
 }
 
@@ -751,7 +751,7 @@ section.block {
 
 .subj-bar-fill {
   height: 100%;
-  background: var(--subj-color, var(--acc-green));
+  background: var(--subj-color, var(--acc));
   border-radius: 99px;
   transition: width 0.6s ease;
 }
@@ -795,9 +795,9 @@ section.block {
 }
 
 .badge-beg {
-  background: oklch(0.74 0.10 255 / 0.12);
+  background: oklch(0.78 0.16 180 / 0.12);
   color: var(--lv-beg);
-  border: 1px solid oklch(0.74 0.10 255 / 0.25);
+  border: 1px solid oklch(0.78 0.16 180 / 0.25);
 }
 
 .badge-int {
@@ -807,9 +807,9 @@ section.block {
 }
 
 .badge-adv {
-  background: oklch(0.78 0.16 145 / 0.12);
+  background: oklch(0.78 0.16 180 / 0.12);
   color: var(--lv-adv);
-  border: 1px solid oklch(0.78 0.16 145 / 0.25);
+  border: 1px solid oklch(0.78 0.16 180 / 0.25);
 }
 
 /* ============ QUIZ STYLES ============ */
@@ -857,15 +857,15 @@ section.block {
 }
 
 .stat-pill.stat-blue {
-  background: oklch(0.74 0.10 255 / 0.15);
-  border-color: var(--acc-blue);
-  color: var(--acc-blue);
+  background: oklch(0.78 0.16 180 / 0.15);
+  border-color: var(--acc);
+  color: var(--acc);
 }
 
 .stat-pill.stat-green {
-  background: oklch(0.78 0.16 145 / 0.15);
-  border-color: var(--acc-green);
-  color: var(--acc-green);
+  background: oklch(0.78 0.16 180 / 0.15);
+  border-color: var(--acc);
+  color: var(--acc);
 }
 
 .quiz-content {
@@ -952,13 +952,13 @@ section.block {
 }
 
 .option-selected {
-  background: oklch(0.74 0.10 255 / 0.15);
-  border-color: var(--acc-blue);
+  background: oklch(0.78 0.16 180 / 0.15);
+  border-color: var(--acc);
 }
 
 .option-correct {
-  background: oklch(0.78 0.16 145 / 0.15);
-  border-color: var(--acc-green);
+  background: oklch(0.78 0.16 180 / 0.15);
+  border-color: var(--acc);
 }
 
 .option-wrong {
@@ -993,8 +993,8 @@ section.block {
 }
 
 .explanation {
-  background: oklch(0.74 0.10 255 / 0.15);
-  border-left: 4px solid var(--acc-blue);
+  background: oklch(0.78 0.16 180 / 0.15);
+  border-left: 4px solid var(--acc);
   border-radius: var(--radius-sm);
   padding: 20px;
   margin-bottom: 24px;
@@ -1110,7 +1110,7 @@ section.block {
 }
 
 .leaderboard-table tbody tr.current-user {
-  background: oklch(0.74 0.10 255 / 0.1);
+  background: oklch(0.78 0.16 180 / 0.1);
 }
 
 .leaderboard-table td {
@@ -1139,10 +1139,10 @@ section.block {
   display: inline-block;
   margin-left: 8px;
   padding: 2px 8px;
-  background: oklch(0.74 0.10 255 / 0.2);
+  background: oklch(0.78 0.16 180 / 0.2);
   border-radius: 12px;
   font-size: 0.75rem;
-  color: var(--acc-blue);
+  color: var(--acc);
 }
 
 .league-badge {
@@ -1159,7 +1159,7 @@ section.block {
 .points-value {
   font-size: 1.125rem;
   font-weight: 700;
-  color: var(--acc-blue);
+  color: var(--acc);
 }
 
 .questions-value {
