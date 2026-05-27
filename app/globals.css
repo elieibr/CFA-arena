@@ -1342,9 +1342,9 @@ section.block {
   font-family: inherit;
   color: inherit;
 }
-.choice:hover {
+.choice:hover:not(.disabled) {
   background: var(--bg-3);
-  border-color: var(--line-bright);
+  border-color: var(--acc);
 }
 .choice-letter {
   font-family: var(--font-mono);

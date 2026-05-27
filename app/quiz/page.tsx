@@ -55,6 +55,32 @@ function QuizContent() {
     loadQuiz()
   }, [topicId])
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (isAnswered) {
+        if (e.key === 'Enter') {
+          handleNextQuestion()
+        }
+        return
+      }
+
+      if (e.key === '1') {
+        handleAnswerSelect('A')
+      } else if (e.key === '2') {
+        handleAnswerSelect('B')
+      } else if (e.key === '3') {
+        handleAnswerSelect('C')
+      } else if (e.key === 'Enter' && selectedAnswer) {
+        // Already selected, confirm
+        setIsAnswered(true)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
+    return () => window.removeEventListener('keydown', handleKeyPress)
+  }, [isAnswered, selectedAnswer, currentQuestionIndex, questions])
+
   useEffect(() => {
     if (!isAnswered && questions.length > 0) {
       const timer = setInterval(() => {
