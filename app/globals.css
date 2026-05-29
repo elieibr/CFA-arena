@@ -41,9 +41,9 @@
   --danger-dim:  oklch(0.66 0.16 25);
 
   /* Level badge colors — distinct hues, same chroma/lightness band */
-  --lv-beg:      oklch(0.78 0.16 180);  /* periwinkle */
+  --lv-beg:      oklch(0.74 0.10 255);  /* periwinkle */
   --lv-int:      oklch(0.78 0.14 75);   /* amber */
-  --lv-adv:      oklch(0.78 0.16 180);  /* green */
+  --lv-adv:      oklch(0.78 0.16 145);  /* green */
 
   --radius: 14px;
   --radius-sm: 8px;
@@ -795,9 +795,9 @@ section.block {
 }
 
 .badge-beg {
-  background: oklch(0.78 0.16 180 / 0.12);
+  background: oklch(0.74 0.10 255 / 0.12);
   color: var(--lv-beg);
-  border: 1px solid oklch(0.78 0.16 180 / 0.25);
+  border: 1px solid oklch(0.74 0.10 255 / 0.25);
 }
 
 .badge-int {
@@ -807,9 +807,9 @@ section.block {
 }
 
 .badge-adv {
-  background: oklch(0.78 0.16 180 / 0.12);
+  background: oklch(0.78 0.16 145 / 0.12);
   color: var(--lv-adv);
-  border: 1px solid oklch(0.78 0.16 180 / 0.25);
+  border: 1px solid oklch(0.78 0.16 145 / 0.25);
 }
 
 /* ============ QUIZ STYLES ============ */

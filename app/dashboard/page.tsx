@@ -87,8 +87,57 @@ export default function DashboardPage() {
   const totalCorrect = topicProgress.reduce((sum, t) => sum + t.questions_correct, 0)
   const totalPoints = profile?.total_points || 0
 
-  // Success rate (not progression - we don't have total questions available)
+  // Success rate
   const successRate = totalQuestions > 0 ? (totalCorrect / totalQuestions) * 100 : 0
+
+  // Map topic to color (from CFA_Prep.html)
+  const getTopicColor = (topicId: string) => {
+    const colorMap: { [key: string]: string } = {
+      'quantitative-methods': 'oklch(0.78 0.16 145)',
+      'economics': 'oklch(0.74 0.10 255)',
+      'financial-statement-analysis': 'oklch(0.78 0.14 75)',
+      'corporate-issuers': 'oklch(0.78 0.16 145)',
+      'equity-investments': 'oklch(0.74 0.10 255)',
+      'fixed-income': 'oklch(0.78 0.14 75)',
+      'derivatives': 'oklch(0.78 0.16 145)',
+      'alternative-investments': 'oklch(0.74 0.10 255)',
+      'portfolio-management': 'oklch(0.78 0.14 75)',
+      'ethical-standards': 'oklch(0.78 0.16 145)'
+    }
+    return colorMap[topicId] || 'oklch(0.78 0.16 145)'
+  }
+
+  // Topic icons (SVG paths from CFA_Prep.html)
+  const getTopicIcon = (topicId: string) => {
+    const iconMap: { [key: string]: string } = {
+      'quantitative-methods': '<path d="M3 14h10M3 11l3-4 3 2 4-6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+      'economics': '<path d="M2 13h12M4 13V8m3 5V5m3 8V9m3 4V3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>',
+      'financial-statement-analysis': '<rect x="3" y="2" width="10" height="12" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M5 5h6M5 8h6M5 11h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
+      'corporate-issuers': '<path d="M2 14h12M4 14V6l4-3 4 3v8M7 10h2M7 13h2" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+      'equity-investments': '<path d="M8 2v12M3 7l5-5 5 5M3 11l5 3 5-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+      'fixed-income': '<path d="M2 8c2-3 4-3 6 0s4 3 6 0" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/><circle cx="8" cy="8" r="0.8" fill="currentColor"/>',
+      'derivatives': '<path d="M3 13L13 3M3 3l3 3M10 10l3 3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>',
+      'alternative-investments': '<path d="M8 2L2 6v6l6 4 6-4V6z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/><path d="M2 6l6 4 6-4M8 10v6" stroke="currentColor" stroke-width="1.5" fill="none"/>',
+      'portfolio-management': '<circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M8 2v6l4 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
+      'ethical-standards': '<path d="M8 2L3 4v4c0 3 2 5 5 6 3-1 5-3 5-6V4z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/><path d="M6 8l1.5 1.5L10 7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+    }
+    return iconMap[topicId] || iconMap['ethical-standards']
+  }
+
+  // Get difficulty level
+  const getDifficultyLevel = (topic: any) => {
+    if (topic.difficultyMultiplier >= 1.3) return { level: 'adv', label: 'Advanced' }
+    if (topic.difficultyMultiplier >= 1.1) return { level: 'int', label: 'Intermediate' }
+    return { level: 'beg', label: 'Beginner' }
+  }
+
+  // Get status text
+  const getStatusText = (pct: number) => {
+    if (pct === 0) return 'Pas démarré'
+    if (pct > 80) return 'Quasi maîtrisé'
+    if (pct > 50) return 'En progression'
+    return 'À renforcer'
+  }
 
   return (
     <div className="page">
@@ -97,40 +146,53 @@ export default function DashboardPage() {
         <div className="wrap">
           <div className="hero-grid">
             {/* Left: Main Content */}
-            <div className="hero-content">
-              <div className="eyebrow">
-                <span className="pulse"></span>
-                Préparation CFA Level 1
-              </div>
+            <div>
+              <div className="eyebrow">Session · CharterPath</div>
               <h1 className="hero-title">
-                Maîtrisez le <em>CFA</em> avec un entraînement <em>adaptatif</em>
+                Préparez le<br />
+                CFA Level 1 avec <em>l'intelligence</em><br />
+                d'une <span className="accent-amber">IA dédiée</span>.
               </h1>
               <p className="hero-sub">
-                Questions ciblées sur vos points faibles, révision espacée calibrée, et simulations d'examen réalistes.
+                Plan d'étude adaptatif, questions ciblées sur vos points faibles, et révision espacée calibrée pour l'examen. 10 matières, un objectif.
               </p>
               <div className="hero-cta">
                 <a href="#subjects" className="btn btn-primary">
-                  Commencer l'entraînement →
+                  Continuer la session <span className="btn-arrow"></span>
                 </a>
                 <a href="/exam" className="btn btn-ghost">
-                  Examen blanc
+                  Voir le plan d'étude
                 </a>
               </div>
             </div>
 
             {/* Right: Progress Card */}
-            <div className="progress-card" style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '24px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: 'var(--fg-2)', fontSize: '13px' }}>Taux de réussite</span>
-                <span style={{ color: 'var(--fg-0)', fontSize: '15px', fontWeight: 500 }}>{successRate.toFixed(0)}%</span>
+            <div className="progress-card">
+              <div className="pc-head">
+                <span className="pc-title">Progression globale</span>
+                <span className="pc-date">{new Date().toLocaleDateString('fr-FR')}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: 'var(--fg-2)', fontSize: '13px' }}>Questions</span>
-                <span style={{ color: 'var(--fg-0)', fontSize: '15px', fontWeight: 500 }}>{totalCorrect}/{totalQuestions}</span>
+              <div className="pc-big">
+                <div className="pc-percent">{successRate.toFixed(0)}<span className="pct-sym">%</span></div>
+                <div className="pc-delta">+ 0% / 7j</div>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: 'var(--fg-2)', fontSize: '13px' }}>Points</span>
-                <span style={{ color: 'var(--acc-green)', fontSize: '15px', fontWeight: 600 }}>{totalPoints.toLocaleString()}</span>
+              <div className="pc-label">{totalCorrect} / {totalQuestions || 1540} concepts maîtrisés</div>
+              <div className="pc-bar">
+                <div className="pc-bar-fill" style={{ width: `${Math.min(successRate, 100)}%` }}></div>
+              </div>
+              <div className="pc-meta">
+                <div className="pc-meta-item">
+                  <div className="label">Heures</div>
+                  <div className="value">0<span style={{ color: 'var(--fg-3)', fontSize: '13px' }}>h</span></div>
+                </div>
+                <div className="pc-meta-item">
+                  <div className="label">Précision</div>
+                  <div className="value">{successRate.toFixed(0)}%</div>
+                </div>
+                <div className="pc-meta-item">
+                  <div className="label">Streak</div>
+                  <div className="value">{profile?.current_streak || 0}<span style={{ color: 'var(--fg-3)', fontSize: '13px' }}>j</span></div>
+                </div>
               </div>
             </div>
           </div>
@@ -138,89 +200,56 @@ export default function DashboardPage() {
       </section>
 
       {/* Subjects Section */}
-      <section id="subjects" className="subjects">
+      <section className="block" id="subjects">
         <div className="wrap">
-          <h2 className="section-title">Les 10 Matières CFA Level 1</h2>
+          <div className="block-head">
+            <div className="left">
+              <h2>10 matières · pondération CFA Institute</h2>
+              <p>Cliquez une carte pour réviser. Les pondérations reflètent le poids de chaque matière à l'examen.</p>
+            </div>
+          </div>
+
           <div className="subjects-grid">
             {curriculum.map((topic) => {
               const progress = topicProgress.find((p) => p.topic_id === topic.id)
               const attempted = progress?.questions_attempted || 0
               const correct = progress?.questions_correct || 0
-              const successRate = attempted > 0 ? (correct / attempted) * 100 : 0
-
-              // Map topic to color
-              const colorMap: { [key: string]: string } = {
-                'quant': 'var(--acc-green)',
-                'econ': 'var(--acc-blue)',
-                'fi': 'var(--acc-amber)',
-                'corp': 'var(--acc-green)',
-                'equity': 'var(--acc-blue)',
-                'derivatives': 'var(--acc-amber)',
-                'alts': 'var(--acc-green)',
-                'pm': 'var(--acc-blue)',
-                'fsa': 'var(--acc-amber)',
-                'ethics': 'var(--acc-green)'
-              }
-
-              // Map difficulty
-              const getDifficulty = () => {
-                if (topic.difficultyMultiplier >= 1.3) return 'adv'
-                if (topic.difficultyMultiplier >= 1.1) return 'int'
-                return 'beg'
-              }
+              const pct = attempted > 0 ? (correct / attempted) * 100 : 0
+              const difficulty = getDifficultyLevel(topic)
 
               return (
                 <div
                   key={topic.id}
                   className="subj"
                   onClick={() => router.push(`/quiz?topic=${topic.id}`)}
-                  style={{ '--subj-color': colorMap[topic.id] || 'var(--acc-green)' } as React.CSSProperties}
+                  style={{ '--subj-color': getTopicColor(topic.id) } as React.CSSProperties}
                 >
-                  <div className="subj-top">
-                    <div>
-                      <h3 className="subj-title">{topic.titleFr}</h3>
-                      <p className="subj-en">{topic.titleEn}</p>
-                    </div>
+                  <div className="subj-row1">
                     <div className="subj-icon">
-                      {topic.icon === 'Calculator' && '🔢'}
-                      {topic.icon === 'TrendingUp' && '📈'}
-                      {topic.icon === 'FileText' && '📄'}
-                      {topic.icon === 'Building' && '🏢'}
-                      {topic.icon === 'LineChart' && '📊'}
-                      {topic.icon === 'DollarSign' && '💵'}
-                      {topic.icon === 'GitBranch' && '🔀'}
-                      {topic.icon === 'Briefcase' && '💼'}
-                      {topic.icon === 'PieChart' && '🥧'}
-                      {topic.icon === 'Scale' && '⚖️'}
+                      <svg viewBox="0 0 16 16" dangerouslySetInnerHTML={{ __html: getTopicIcon(topic.id) }} />
                     </div>
+                    <div className="subj-weight">{(topic.weight * 100).toFixed(0)}%</div>
                   </div>
-                  <p className="subj-desc">{topic.description}</p>
-                  <div className="subj-meta">
-                    <div className="meta-row">
-                      <span>Poids exam</span>
-                      <strong>{(topic.weight * 100).toFixed(0)}%</strong>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                      <h3 className="subj-name">{topic.titleEn}</h3>
                     </div>
-                    <div className="meta-row">
-                      <span>Questions</span>
-                      <strong>{correct}/{attempted}</strong>
+                    <div className="subj-readings">{topic.titleFr}</div>
+                  </div>
+                  <div className="subj-progress">
+                    <div className="subj-prog-row">
+                      <span className="subj-pct">{pct.toFixed(0)}<span className="sym">%</span></span>
+                      <span className={`badge badge-${difficulty.level}`}>{difficulty.label}</span>
                     </div>
-                    <div className="meta-row">
-                      <span>Réussite</span>
-                      <strong>{successRate.toFixed(1)}%</strong>
+                    <div className="subj-bar">
+                      <div className="subj-bar-fill" style={{ width: `${Math.min(pct, 100)}%` }}></div>
                     </div>
                   </div>
                   <div className="subj-foot">
-                    <span className={`badge badge-${getDifficulty()}`}>
-                      {getDifficulty() === 'beg' && 'Débutant'}
-                      {getDifficulty() === 'int' && 'Intermédiaire'}
-                      {getDifficulty() === 'adv' && 'Avancé'}
+                    <span style={{ fontSize: '12px', color: 'var(--fg-3)', fontFamily: 'var(--font-mono)' }}>
+                      {getStatusText(pct)}
                     </span>
-                    <div className="progress-bar-sm">
-                      <div
-                        className="progress-fill"
-                        style={{ width: `${Math.min(successRate, 100)}%` }}
-                      />
-                    </div>
+                    <span className="subj-cta">Réviser <span className="arr"></span></span>
                   </div>
                 </div>
               )
