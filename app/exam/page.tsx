@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { curriculum } from '@/data/curriculum'
-import { Clock, CheckCircle, XCircle, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 interface Question {
@@ -22,6 +22,39 @@ interface Answer {
   questionIndex: number
   selectedAnswer: string | null
   isCorrect?: boolean
+}
+
+// Topic icons (SVG paths from CFA_Prep.html)
+const getTopicIcon = (topicId: string) => {
+  const iconMap: { [key: string]: string } = {
+    'quantitative-methods': '<path d="M3 14h10M3 11l3-4 3 2 4-6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    'economics': '<path d="M2 13h12M4 13V8m3 5V5m3 8V9m3 4V3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>',
+    'financial-statement-analysis': '<rect x="3" y="2" width="10" height="12" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M5 5h6M5 8h6M5 11h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
+    'corporate-issuers': '<path d="M2 14h12M4 14V6l4-3 4 3v8M7 10h2M7 13h2" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    'equity-investments': '<path d="M8 2v12M3 7l5-5 5 5M3 11l5 3 5-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    'fixed-income': '<path d="M2 8c2-3 4-3 6 0s4 3 6 0" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/><circle cx="8" cy="8" r="0.8" fill="currentColor"/>',
+    'derivatives': '<path d="M3 13L13 3M3 3l3 3M10 10l3 3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>',
+    'alternative-investments': '<path d="M8 2L2 6v6l6 4 6-4V6z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/><path d="M2 6l6 4 6-4M8 10v6" stroke="currentColor" stroke-width="1.5" fill="none"/>',
+    'portfolio-management': '<circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M8 2v6l4 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
+    'ethical-standards': '<path d="M8 2L3 4v4c0 3 2 5 5 6 3-1 5-3 5-6V4z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/><path d="M6 8l1.5 1.5L10 7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+  }
+  return iconMap[topicId] || iconMap['ethical-standards']
+}
+
+const getTopicCode = (topicId: string) => {
+  const codeMap: { [key: string]: string } = {
+    'quantitative-methods': 'QM',
+    'economics': 'EC',
+    'financial-statement-analysis': 'FSA',
+    'corporate-issuers': 'CI',
+    'equity-investments': 'EQ',
+    'fixed-income': 'FI',
+    'derivatives': 'DV',
+    'alternative-investments': 'AI',
+    'portfolio-management': 'PM',
+    'ethical-standards': 'ES'
+  }
+  return codeMap[topicId] || 'XX'
 }
 
 export default function ExamPage() {
@@ -171,63 +204,170 @@ export default function ExamPage() {
   // Start screen
   if (!examStarted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="bg-white rounded-xl p-12 shadow-lg">
-            <h1 className="text-4xl font-bold text-gray-900 mb-6">
-              📝 Examen Blanc CFA Level 1
+      <div className="page">
+        <section className="block">
+          <div className="wrap" style={{ maxWidth: '960px' }}>
+            <div className="eyebrow" style={{ marginBottom: '24px' }}>
+              180 questions · 4h30 · Score de passage 70%
+            </div>
+
+            <h1 style={{ fontSize: '28px', fontWeight: 500, letterSpacing: '-0.02em', marginBottom: '48px' }}>
+              Examen Blanc CFA Level 1
             </h1>
 
-            <div className="space-y-6 mb-8">
-              <div className="bg-blue-50 border-l-4 border-blue-500 p-4">
-                <h3 className="font-bold text-blue-900 mb-2">Informations:</h3>
-                <ul className="list-disc list-inside text-blue-800 space-y-1">
-                  <li>180 questions à choix multiples (A, B, C)</li>
-                  <li>Durée: 4 heures 30 minutes</li>
-                  <li>Questions réparties selon les poids officiels CFA</li>
-                  <li>Score de passage: 70%</li>
-                </ul>
-              </div>
+            {/* Info card */}
+            <div style={{
+              background: 'var(--bg-1)',
+              border: '1px solid var(--line)',
+              borderRadius: 'var(--radius)',
+              padding: '28px',
+              marginBottom: '24px'
+            }}>
+              <h3 style={{ fontSize: '16px', fontWeight: 500, marginBottom: '16px', color: 'var(--fg-0)' }}>
+                Informations
+              </h3>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--fg-1)', fontSize: '14px' }}>
+                  <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M3 8h10M8 3v10" strokeLinecap="round"/>
+                  </svg>
+                  180 questions à choix multiples (A, B, C)
+                </li>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--fg-1)', fontSize: '14px' }}>
+                  <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <circle cx="8" cy="8" r="6"/>
+                    <path d="M8 4v4l2.5 1.5" strokeLinecap="round"/>
+                  </svg>
+                  Durée: 4 heures 30 minutes
+                </li>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--fg-1)', fontSize: '14px' }}>
+                  <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M2 13h12M4 13V8m3 5V5m3 8V9m3 4V3" strokeLinecap="round"/>
+                  </svg>
+                  Questions réparties selon les poids officiels CFA
+                </li>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--fg-1)', fontSize: '14px' }}>
+                  <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M8 1l2 4 4 .5-3 3 1 4-4-2-4 2 1-4-3-3 4-.5z"/>
+                  </svg>
+                  Score de passage: 70%
+                </li>
+              </ul>
+            </div>
 
-              <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4">
-                <h3 className="font-bold text-yellow-900 mb-2">⚠️ Conditions d'examen:</h3>
-                <ul className="list-disc list-inside text-yellow-800 space-y-1">
-                  <li>Une fois démarré, le chronomètre ne peut pas être mis en pause</li>
-                  <li>Vous pouvez naviguer librement entre les questions</li>
-                  <li>Les questions non répondues seront comptées comme incorrectes</li>
-                  <li>Révisez vos réponses avant de terminer</li>
-                </ul>
+            {/* Conditions card */}
+            <div style={{
+              background: 'var(--bg-1)',
+              border: '1px solid var(--line)',
+              borderLeft: '2px solid var(--acc-amber)',
+              borderRadius: 'var(--radius)',
+              padding: '28px',
+              marginBottom: '36px',
+              position: 'relative'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                marginBottom: '16px',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '12px',
+                fontWeight: 500,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                color: 'var(--acc-amber)'
+              }}>
+                <span style={{
+                  width: '6px',
+                  height: '6px',
+                  background: 'var(--acc-amber)',
+                  borderRadius: '50%',
+                  boxShadow: '0 0 8px var(--acc-amber)'
+                }}></span>
+                Conditions d'examen
               </div>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <li style={{ color: 'var(--fg-2)', fontSize: '14px', lineHeight: '1.5' }}>
+                  • Une fois démarré, le chronomètre ne peut pas être mis en pause
+                </li>
+                <li style={{ color: 'var(--fg-2)', fontSize: '14px', lineHeight: '1.5' }}>
+                  • Vous pouvez naviguer librement entre les questions
+                </li>
+                <li style={{ color: 'var(--fg-2)', fontSize: '14px', lineHeight: '1.5' }}>
+                  • Les questions non répondues seront comptées comme incorrectes
+                </li>
+                <li style={{ color: 'var(--fg-2)', fontSize: '14px', lineHeight: '1.5' }}>
+                  • Révisez vos réponses avant de terminer
+                </li>
+              </ul>
+            </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {/* Topics grid */}
+            <div style={{ marginBottom: '48px' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: 500, marginBottom: '16px', color: 'var(--fg-0)' }}>
+                Répartition par matière
+              </h3>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+                gap: '12px'
+              }}>
                 {curriculum.map((topic) => (
-                  <div key={topic.id} className="text-center p-3 bg-gray-50 rounded-lg">
-                    <div className="text-2xl mb-1">
-                      {topic.icon === 'Calculator' && '🔢'}
-                      {topic.icon === 'TrendingUp' && '📈'}
-                      {topic.icon === 'FileText' && '📄'}
-                      {topic.icon === 'Building' && '🏢'}
-                      {topic.icon === 'LineChart' && '📊'}
-                      {topic.icon === 'DollarSign' && '💵'}
-                      {topic.icon === 'GitBranch' && '🔀'}
-                      {topic.icon === 'Briefcase' && '💼'}
-                      {topic.icon === 'PieChart' && '🥧'}
-                      {topic.icon === 'Scale' && '⚖️'}
+                  <div
+                    key={topic.id}
+                    style={{
+                      background: 'var(--bg-1)',
+                      border: '1px solid var(--line-soft)',
+                      borderRadius: 'var(--radius-sm)',
+                      padding: '16px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    <div style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      background: 'var(--bg-0)',
+                      border: '1px solid var(--line)',
+                      display: 'grid',
+                      placeItems: 'center',
+                      color: 'var(--fg-1)'
+                    }}>
+                      <svg viewBox="0 0 16 16" width="16" height="16" dangerouslySetInnerHTML={{ __html: getTopicIcon(topic.id) }} />
                     </div>
-                    <div className="text-xs text-gray-600">{(topic.weight * 100).toFixed(0)}%</div>
+                    <div style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '11px',
+                      color: 'var(--fg-3)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.06em'
+                    }}>
+                      {getTopicCode(topic.id)}
+                    </div>
+                    <div style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '16px',
+                      fontWeight: 500,
+                      color: 'var(--fg-0)'
+                    }}>
+                      {(topic.weight * 100).toFixed(0)}%
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <button
-              onClick={handleStartExam}
-              className="w-full py-4 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-bold text-xl hover:from-purple-700 hover:to-purple-800 transition"
-            >
-              Démarrer l'Examen
-            </button>
+            {/* Start button */}
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <button onClick={handleStartExam} className="btn btn-primary">
+                Démarrer l'Examen
+              </button>
+            </div>
           </div>
-        </div>
+        </section>
       </div>
     )
   }
@@ -238,34 +378,41 @@ export default function ExamPage() {
     const isPassing = score >= 70
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="bg-white rounded-xl p-12 shadow-lg">
-            <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                {isPassing ? '🎉 Félicitations!' : '📚 Continuez vos efforts!'}
+      <div className="page">
+        <section className="block">
+          <div className="wrap" style={{ maxWidth: '960px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+              <h1 style={{ fontSize: '28px', fontWeight: 500, letterSpacing: '-0.02em', marginBottom: '24px' }}>
+                {isPassing ? 'Félicitations!' : 'Continuez vos efforts!'}
               </h1>
-              <div className={`text-6xl font-bold mb-4 ${isPassing ? 'text-green-600' : 'text-orange-600'}`}>
+              <div style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '56px',
+                fontWeight: 500,
+                color: isPassing ? 'var(--acc)' : 'var(--acc-amber)',
+                marginBottom: '12px'
+              }}>
                 {score.toFixed(1)}%
               </div>
-              <p className="text-xl text-gray-600">
+              <p style={{ fontSize: '16px', color: 'var(--fg-2)' }}>
                 {correctCount} / {questions.length} réponses correctes
               </p>
-              {isPassing ? (
-                <p className="text-lg text-green-600 font-semibold mt-2">
-                  ✅ Score de passage atteint (70%)
-                </p>
-              ) : (
-                <p className="text-lg text-orange-600 font-semibold mt-2">
-                  ⚠️ Score de passage: 70%
-                </p>
-              )}
+              <p style={{
+                fontSize: '14px',
+                color: isPassing ? 'var(--acc)' : 'var(--acc-amber)',
+                fontWeight: 500,
+                marginTop: '12px'
+              }}>
+                {isPassing ? '✅ Score de passage atteint (70%)' : '⚠️ Score de passage: 70%'}
+              </p>
             </div>
 
             {/* Topic breakdown */}
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Résultats par matière</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div style={{ marginBottom: '48px' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: 500, marginBottom: '24px' }}>
+                Résultats par matière
+              </h2>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
                 {curriculum.map((topic) => {
                   const topicQuestions = questions.filter((q) => q.topic_id === topic.id)
                   const topicAnswers = topicQuestions.map((q) => {
@@ -276,22 +423,46 @@ export default function ExamPage() {
                   const topicScore = topicQuestions.length > 0 ? (topicCorrect / topicQuestions.length) * 100 : 0
 
                   return (
-                    <div key={topic.id} className="bg-gray-50 rounded-lg p-4">
-                      <div className="flex justify-between items-center mb-2">
-                        <h3 className="font-semibold text-gray-900">{topic.titleFr}</h3>
-                        <span className={`font-bold ${topicScore >= 70 ? 'text-green-600' : 'text-orange-600'}`}>
+                    <div
+                      key={topic.id}
+                      style={{
+                        background: 'var(--bg-1)',
+                        border: '1px solid var(--line-soft)',
+                        borderRadius: 'var(--radius)',
+                        padding: '20px'
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                        <h3 style={{ fontSize: '14px', fontWeight: 500, color: 'var(--fg-0)' }}>
+                          {topic.titleFr}
+                        </h3>
+                        <span style={{
+                          fontFamily: 'var(--font-mono)',
+                          fontSize: '18px',
+                          fontWeight: 500,
+                          color: topicScore >= 70 ? 'var(--acc)' : 'var(--acc-amber)'
+                        }}>
                           {topicScore.toFixed(0)}%
                         </span>
                       </div>
-                      <div className="flex justify-between text-sm text-gray-600">
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--fg-3)', marginBottom: '8px' }}>
                         <span>{topicCorrect} / {topicQuestions.length}</span>
                         <span>{(topic.weight * 100).toFixed(0)}% de l'examen</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2 mt-2 overflow-hidden">
-                        <div
-                          className={`h-full ${topicScore >= 70 ? 'bg-green-500' : 'bg-orange-500'} transition-all`}
-                          style={{ width: `${topicScore}%` }}
-                        />
+                      <div style={{
+                        width: '100%',
+                        height: '4px',
+                        background: 'var(--bg-0)',
+                        borderRadius: '99px',
+                        overflow: 'hidden'
+                      }}>
+                        <div style={{
+                          width: `${topicScore}%`,
+                          height: '100%',
+                          background: topicScore >= 70 ? 'var(--acc)' : 'var(--acc-amber)',
+                          borderRadius: '99px',
+                          transition: 'width 0.6s ease'
+                        }} />
                       </div>
                     </div>
                   )
@@ -300,22 +471,16 @@ export default function ExamPage() {
             </div>
 
             {/* Actions */}
-            <div className="flex gap-4">
-              <button
-                onClick={() => router.push('/dashboard')}
-                className="flex-1 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-bold hover:from-blue-700 hover:to-blue-800 transition"
-              >
+            <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+              <button onClick={() => router.push('/dashboard')} className="btn btn-ghost">
                 Retour au Dashboard
               </button>
-              <button
-                onClick={() => window.location.reload()}
-                className="flex-1 py-4 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-bold hover:from-purple-700 hover:to-purple-800 transition"
-              >
+              <button onClick={() => window.location.reload()} className="btn btn-primary">
                 Nouvel Examen
               </button>
             </div>
           </div>
-        </div>
+        </section>
       </div>
     )
   }
@@ -327,38 +492,75 @@ export default function ExamPage() {
   const topic = curriculum.find((t) => t.id === currentQuestion.topic_id)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div style={{ minHeight: '100vh', background: 'var(--bg-0)' }}>
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
+      <header style={{
+        background: 'var(--bg-1)',
+        borderBottom: '1px solid var(--line-soft)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 50
+      }}>
+        <div className="wrap">
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '16px 0'
+          }}>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Examen Blanc CFA Level 1</h1>
-              <p className="text-sm text-gray-600">
-                Question {currentQuestionIndex + 1} sur {questions.length}
+              <h1 style={{ fontSize: '16px', fontWeight: 500, marginBottom: '4px' }}>
+                Examen Blanc CFA Level 1
+              </h1>
+              <p style={{ fontSize: '13px', color: 'var(--fg-3)', fontFamily: 'var(--font-mono)' }}>
+                Question {currentQuestionIndex + 1} / {questions.length}
               </p>
             </div>
 
-            <div className="flex gap-4">
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
               {/* Timer */}
-              <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
-                timeLeft <= 600 ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-              }`}>
-                <Clock className="w-5 h-5" />
-                <span className="font-bold text-lg">{formatTime(timeLeft)}</span>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 14px',
+                borderRadius: '8px',
+                background: timeLeft <= 600 ? 'oklch(0.78 0.14 25 / 0.10)' : 'var(--bg-2)',
+                border: `1px solid ${timeLeft <= 600 ? 'oklch(0.78 0.14 25 / 0.25)' : 'var(--line)'}`,
+                color: timeLeft <= 600 ? 'var(--danger)' : 'var(--fg-1)',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '14px',
+                fontWeight: 500
+              }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <circle cx="8" cy="8" r="6"/>
+                  <path d="M8 4v4l2.5 1.5" strokeLinecap="round"/>
+                </svg>
+                {formatTime(timeLeft)}
               </div>
 
               {/* Progress */}
-              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-100 text-green-700">
-                <CheckCircle className="w-5 h-5" />
-                <span className="font-bold">{answeredCount}/{questions.length}</span>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 14px',
+                borderRadius: '8px',
+                background: 'oklch(0.78 0.16 145 / 0.10)',
+                border: '1px solid oklch(0.78 0.16 145 / 0.25)',
+                color: 'oklch(0.78 0.16 145)',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '14px',
+                fontWeight: 500
+              }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                {answeredCount}/{questions.length}
               </div>
 
               {/* Finish Button */}
-              <button
-                onClick={handleFinishExam}
-                className="px-6 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-bold hover:from-purple-700 hover:to-purple-800 transition"
-              >
+              <button onClick={handleFinishExam} className="btn btn-primary" style={{ padding: '8px 16px' }}>
                 Terminer
               </button>
             </div>
@@ -366,13 +568,22 @@ export default function ExamPage() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="wrap" style={{ paddingTop: '32px', paddingBottom: '32px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: '24px' }}>
           {/* Question navigator */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl p-4 shadow-md border border-gray-200 sticky top-24">
-              <h3 className="font-bold text-gray-900 mb-3">Navigation</h3>
-              <div className="grid grid-cols-6 gap-2 max-h-96 overflow-y-auto">
+          <div>
+            <div style={{
+              background: 'var(--bg-1)',
+              border: '1px solid var(--line)',
+              borderRadius: 'var(--radius)',
+              padding: '16px',
+              position: 'sticky',
+              top: '100px'
+            }}>
+              <h3 style={{ fontSize: '13px', fontWeight: 500, marginBottom: '12px', fontFamily: 'var(--font-mono)', color: 'var(--fg-2)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                Navigation
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '6px', maxHeight: '480px', overflowY: 'auto' }}>
                 {questions.map((_, index) => {
                   const answer = answers[index]
                   const isCurrent = index === currentQuestionIndex
@@ -382,13 +593,19 @@ export default function ExamPage() {
                     <button
                       key={index}
                       onClick={() => handleJumpToQuestion(index)}
-                      className={`w-10 h-10 rounded-lg font-bold text-sm transition ${
-                        isCurrent
-                          ? 'bg-blue-600 text-white ring-2 ring-blue-400'
-                          : isAnswered
-                          ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '6px',
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '11px',
+                        fontWeight: 500,
+                        border: isCurrent ? '2px solid var(--acc)' : '1px solid var(--line)',
+                        background: isAnswered ? 'oklch(0.78 0.16 145 / 0.10)' : 'var(--bg-0)',
+                        color: isAnswered ? 'oklch(0.78 0.16 145)' : 'var(--fg-2)',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s'
+                      }}
                     >
                       {index + 1}
                     </button>
@@ -399,80 +616,117 @@ export default function ExamPage() {
           </div>
 
           {/* Question */}
-          <div className="lg:col-span-3">
-            <div className="bg-white rounded-xl p-8 shadow-lg border border-gray-200">
-              {/* Topic badge */}
-              <div className="flex justify-between items-center mb-6">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-medium">
-                  <span>{topic?.titleFr}</span>
-                </div>
-                <div className="text-sm text-gray-500">
-                  Question {currentQuestionIndex + 1} / {questions.length}
-                </div>
+          <div style={{
+            background: 'var(--bg-1)',
+            border: '1px solid var(--line)',
+            borderRadius: 'var(--radius)',
+            padding: '32px'
+          }}>
+            {/* Topic badge */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '6px 12px',
+                borderRadius: '8px',
+                background: 'var(--bg-2)',
+                border: '1px solid var(--line)',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '12px',
+                color: 'var(--fg-1)'
+              }}>
+                {topic?.titleFr}
               </div>
-
-              {/* Question text */}
-              <h2 className="text-xl font-bold text-gray-900 mb-8">
-                {currentQuestion.question_text}
-              </h2>
-
-              {/* Answer options */}
-              <div className="space-y-4 mb-8">
-                {['A', 'B', 'C'].map((option) => {
-                  const optionText = currentQuestion[`option_${option.toLowerCase()}` as keyof Question] as string
-                  const isSelected = currentAnswer.selectedAnswer === option
-
-                  return (
-                    <button
-                      key={option}
-                      onClick={() => handleAnswerSelect(option)}
-                      className={`w-full text-left p-4 rounded-lg border-2 transition ${
-                        isSelected
-                          ? 'bg-blue-100 border-blue-500'
-                          : 'bg-gray-50 hover:bg-gray-100 border-gray-300'
-                      }`}
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className={`flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold ${
-                          isSelected ? 'bg-blue-500 text-white border-blue-500' : 'bg-white border-gray-300'
-                        }`}>
-                          {option}
-                        </div>
-                        <p className="text-gray-900 flex-1">{optionText}</p>
-                      </div>
-                    </button>
-                  )
-                })}
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--fg-3)' }}>
+                Question {currentQuestionIndex + 1} / {questions.length}
               </div>
+            </div>
 
-              {/* Navigation buttons */}
-              <div className="flex justify-between items-center pt-6 border-t border-gray-200">
-                <button
-                  onClick={handlePreviousQuestion}
-                  disabled={currentQuestionIndex === 0}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition ${
-                    currentQuestionIndex === 0
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                  Précédent
-                </button>
+            {/* Question text */}
+            <h2 style={{ fontSize: '19px', fontWeight: 400, color: 'var(--fg-0)', marginBottom: '32px', lineHeight: '1.55' }}>
+              {currentQuestion.question_text}
+            </h2>
 
-                <button
-                  onClick={handleNextQuestion}
-                  disabled={currentQuestionIndex === questions.length - 1}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition ${
-                    currentQuestionIndex === questions.length - 1
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : 'bg-blue-600 text-white hover:bg-blue-700'
-                  }`}
-                >
-                  Suivant
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
+            {/* Answer options */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '32px' }}>
+              {['A', 'B', 'C'].map((option) => {
+                const optionText = currentQuestion[`option_${option.toLowerCase()}` as keyof Question] as string
+                const isSelected = currentAnswer.selectedAnswer === option
+
+                return (
+                  <button
+                    key={option}
+                    onClick={() => handleAnswerSelect(option)}
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '36px 1fr',
+                      alignItems: 'center',
+                      padding: '16px 18px',
+                      background: isSelected ? 'oklch(0.78 0.16 180 / 0.06)' : 'var(--bg-2)',
+                      border: `1px solid ${isSelected ? 'var(--acc)' : 'var(--line)'}`,
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      transition: 'all 0.12s',
+                      gap: '16px',
+                      textAlign: 'left'
+                    }}
+                  >
+                    <div style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: isSelected ? 'var(--acc)' : 'var(--fg-2)',
+                      width: '28px',
+                      height: '28px',
+                      border: `1px solid ${isSelected ? 'var(--acc)' : 'var(--line-strong)'}`,
+                      display: 'grid',
+                      placeItems: 'center',
+                      background: isSelected ? 'var(--acc-bg)' : 'var(--bg-1)'
+                    }}>
+                      {option}
+                    </div>
+                    <div style={{ fontSize: '14.5px', color: 'var(--fg-0)', lineHeight: '1.4' }}>
+                      {optionText}
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Navigation buttons */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              paddingTop: '24px',
+              borderTop: '1px solid var(--line-soft)'
+            }}>
+              <button
+                onClick={handlePreviousQuestion}
+                disabled={currentQuestionIndex === 0}
+                className="btn btn-ghost"
+                style={{
+                  opacity: currentQuestionIndex === 0 ? 0.4 : 1,
+                  cursor: currentQuestionIndex === 0 ? 'not-allowed' : 'pointer'
+                }}
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Précédent
+              </button>
+
+              <button
+                onClick={handleNextQuestion}
+                disabled={currentQuestionIndex === questions.length - 1}
+                className="btn btn-primary"
+                style={{
+                  opacity: currentQuestionIndex === questions.length - 1 ? 0.4 : 1,
+                  cursor: currentQuestionIndex === questions.length - 1 ? 'not-allowed' : 'pointer'
+                }}
+              >
+                Suivant
+                <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
           </div>
         </div>
