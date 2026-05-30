@@ -66,8 +66,15 @@ export default function Header() {
             </Link>
             <Link href="/dashboard#subjects">Matières</Link>
             <Link href="/exam">Examen blanc</Link>
-            <Link href="/statistics">Stats</Link>
-            <Link href="/leaderboard">Classement</Link>
+            <Link href="/statistics" className={pathname === '/statistics' ? 'active' : ''}>
+              Stats
+            </Link>
+            <Link href="/subscription" className={pathname === '/subscription' ? 'active' : ''}>
+              Abonnement
+            </Link>
+            <Link href="/leaderboard" className={pathname === '/leaderboard' ? 'active' : ''}>
+              Classement
+            </Link>
           </nav>
 
           <div className="nav-end">
