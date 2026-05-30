@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { curriculum } from '@/data/curriculum'
-import { TrendingUp, Target, Clock, Calendar, Award, BarChart3 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 export default function StatisticsPage() {
@@ -79,7 +78,7 @@ export default function StatisticsPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-2xl">Chargement des statistiques...</div>
+        <div className="text-2xl">Chargement...</div>
       </div>
     )
   }
@@ -89,21 +88,8 @@ export default function StatisticsPage() {
   const totalCorrect = topicProgress.reduce((sum, t) => sum + t.questions_correct, 0)
   const overallAccuracy = totalQuestions > 0 ? (totalCorrect / totalQuestions) * 100 : 0
 
-  // Calculate daily activity (last 7 days)
-  const last7Days = Array.from({ length: 7 }, (_, i) => {
-    const date = new Date()
-    date.setDate(date.getDate() - (6 - i))
-    return date.toISOString().split('T')[0]
-  })
-
-  const dailyActivity = last7Days.map((date) => {
-    const count = questionHistory.filter((q) => q.created_at.startsWith(date)).length
-    return { date, count }
-  })
-
   // Calculate streak
   let currentStreak = 0
-  const today = new Date().toISOString().split('T')[0]
   const uniqueDates = [...new Set(questionHistory.map((q) => q.created_at.split('T')[0]))].sort().reverse()
 
   for (let i = 0; i < uniqueDates.length; i++) {
@@ -122,150 +108,262 @@ export default function StatisticsPage() {
   const totalTime = questionHistory.reduce((sum, q) => sum + (q.time_taken || 0), 0)
   const avgTimePerQuestion = questionHistory.length > 0 ? totalTime / questionHistory.length : 0
 
+  // Topic icon helper (from dashboard)
+  const getTopicIcon = (topicId: string) => {
+    const iconMap: { [key: string]: string } = {
+      'quantitative-methods': '<path d="M3 14h10M3 11l3-4 3 2 4-6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+      'economics': '<path d="M2 13h12M4 13V8m3 5V5m3 8V9m3 4V3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>',
+      'financial-statement-analysis': '<rect x="3" y="2" width="10" height="12" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M5 5h6M5 8h6M5 11h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
+      'corporate-issuers': '<path d="M2 14h12M4 14V6l4-3 4 3v8M7 10h2M7 13h2" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+      'equity-investments': '<path d="M8 2v12M3 7l5-5 5 5M3 11l5 3 5-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+      'fixed-income': '<path d="M2 8c2-3 4-3 6 0s4 3 6 0" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/><circle cx="8" cy="8" r="0.8" fill="currentColor"/>',
+      'derivatives': '<path d="M3 13L13 3M3 3l3 3M10 10l3 3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>',
+      'alternative-investments': '<path d="M8 2L2 6v6l6 4 6-4V6z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/><path d="M2 6l6 4 6-4M8 10v6" stroke="currentColor" stroke-width="1.5" fill="none"/>',
+      'portfolio-management': '<circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M8 2v6l4 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
+      'ethical-standards': '<path d="M8 2L3 4v4c0 3 2 5 5 6 3-1 5-3 5-6V4z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/><path d="M6 8l1.5 1.5L10 7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+    }
+    return iconMap[topicId] || iconMap['ethical-standards']
+  }
+
+  // Topic code helper
+  const getTopicCode = (topicId: string) => {
+    const codeMap: { [key: string]: string } = {
+      'quantitative-methods': 'QM',
+      'economics': 'EC',
+      'financial-statement-analysis': 'FSA',
+      'corporate-issuers': 'CI',
+      'equity-investments': 'EQ',
+      'fixed-income': 'FI',
+      'derivatives': 'DV',
+      'alternative-investments': 'AI',
+      'portfolio-management': 'PM',
+      'ethical-standards': 'ES'
+    }
+    return codeMap[topicId] || ''
+  }
+
+  // Topic color helper
+  const getTopicColor = (topicId: string) => {
+    const colorMap: { [key: string]: string } = {
+      'quantitative-methods': 'oklch(0.78 0.16 145)',
+      'economics': 'oklch(0.74 0.10 255)',
+      'financial-statement-analysis': 'oklch(0.78 0.14 75)',
+      'corporate-issuers': 'oklch(0.78 0.16 145)',
+      'equity-investments': 'oklch(0.74 0.10 255)',
+      'fixed-income': 'oklch(0.78 0.14 75)',
+      'derivatives': 'oklch(0.78 0.16 145)',
+      'alternative-investments': 'oklch(0.74 0.10 255)',
+      'portfolio-management': 'oklch(0.78 0.14 75)',
+      'ethical-standards': 'oklch(0.78 0.16 145)'
+    }
+    return colorMap[topicId] || 'oklch(0.78 0.16 145)'
+  }
+
+  // Get difficulty level
+  const getDifficultyLevel = (topic: any) => {
+    if (topic.difficultyMultiplier >= 1.3) return { level: 'adv', label: 'Advanced' }
+    if (topic.difficultyMultiplier >= 1.1) return { level: 'int', label: 'Intermediate' }
+    return { level: 'beg', label: 'Beginner' }
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="page">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-            <BarChart3 className="w-8 h-8 text-blue-600" />
-            Statistiques Détaillées
+      <section className="block" style={{ paddingTop: '48px', paddingBottom: '32px' }}>
+        <div className="wrap" style={{ maxWidth: '1120px' }}>
+          <div className="eyebrow" style={{ marginBottom: '16px' }}>
+            30 derniers jours · Mis à jour en temps réel
+          </div>
+          <h1 style={{ fontSize: '28px', fontWeight: 500, letterSpacing: '-0.02em', margin: 0 }}>
+            Statistiques
           </h1>
-          <p className="text-gray-600 mt-1">Analysez votre progression et vos performances</p>
         </div>
-      </header>
+      </section>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200">
-            <div className="flex items-center gap-3 mb-2">
-              <Target className="w-6 h-6 text-blue-600" />
-              <h3 className="text-sm font-medium text-gray-600">Taux de Réussite</h3>
+      {/* 4 Metric Cards */}
+      <section className="block" style={{ paddingTop: 0, paddingBottom: '32px' }}>
+        <div className="wrap" style={{ maxWidth: '1120px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
+            {/* Questions résolues */}
+            <div className="stat-row" style={{ borderBottom: 'none', paddingBottom: 0 }}>
+              <div className="stat-meta">
+                <div className="stat-icon">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M2 14V2m0 12h12M5 11l3-3 3 2 3-4"/>
+                  </svg>
+                </div>
+                <div>
+                  <div className="stat-name">Questions résolues</div>
+                  <div className="stat-num">{totalQuestions}</div>
+                </div>
+              </div>
             </div>
-            <div className="text-3xl font-bold text-gray-900">{overallAccuracy.toFixed(1)}%</div>
-            <p className="text-sm text-gray-500 mt-1">{totalCorrect} / {totalQuestions} correctes</p>
-          </div>
 
-          <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200">
-            <div className="flex items-center gap-3 mb-2">
-              <TrendingUp className="w-6 h-6 text-green-600" />
-              <h3 className="text-sm font-medium text-gray-600">Série Actuelle</h3>
-            </div>
-            <div className="text-3xl font-bold text-gray-900">{currentStreak} jours</div>
-            <p className="text-sm text-gray-500 mt-1">Continuez comme ça! 🔥</p>
-          </div>
-
-          <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200">
-            <div className="flex items-center gap-3 mb-2">
-              <Clock className="w-6 h-6 text-purple-600" />
-              <h3 className="text-sm font-medium text-gray-600">Temps Moyen</h3>
-            </div>
-            <div className="text-3xl font-bold text-gray-900">{avgTimePerQuestion.toFixed(0)}s</div>
-            <p className="text-sm text-gray-500 mt-1">par question</p>
-          </div>
-
-          <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200">
-            <div className="flex items-center gap-3 mb-2">
-              <Award className="w-6 h-6 text-yellow-600" />
-              <h3 className="text-sm font-medium text-gray-600">Points Totaux</h3>
-            </div>
-            <div className="text-3xl font-bold text-gray-900">{profile?.total_points?.toLocaleString() || 0}</div>
-            <p className="text-sm text-gray-500 mt-1">Ligue: {profile?.league || 'Bronze'}</p>
-          </div>
-        </div>
-
-        {/* Activity Chart */}
-        <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <Calendar className="w-6 h-6 text-blue-600" />
-            Activité des 7 Derniers Jours
-          </h2>
-          <div className="flex items-end justify-between gap-2 h-48">
-            {dailyActivity.map((day, index) => {
-              const maxCount = Math.max(...dailyActivity.map((d) => d.count), 1)
-              const height = (day.count / maxCount) * 100
-              const dayName = new Date(day.date).toLocaleDateString('fr-FR', { weekday: 'short' })
-
-              return (
-                <div key={index} className="flex-1 flex flex-col items-center gap-2">
-                  <div className="w-full flex items-end justify-center h-40">
-                    <div
-                      className="w-full bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-lg transition-all hover:from-blue-700 hover:to-blue-500"
-                      style={{ height: `${height}%`, minHeight: day.count > 0 ? '8px' : '0px' }}
-                    />
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xs font-medium text-gray-600">{dayName}</div>
-                    <div className="text-sm font-bold text-gray-900">{day.count}</div>
+            {/* Taux de réussite */}
+            <div className="stat-row" style={{ borderBottom: 'none', paddingBottom: 0 }}>
+              <div className="stat-meta">
+                <div className="stat-icon">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <circle cx="8" cy="8" r="6"/>
+                    <path d="M8 4v4l2.5 1.5"/>
+                  </svg>
+                </div>
+                <div>
+                  <div className="stat-name">Taux de réussite</div>
+                  <div
+                    className="stat-num"
+                    style={{
+                      color: overallAccuracy < 50
+                        ? 'var(--acc-amber)'
+                        : overallAccuracy >= 70
+                        ? 'var(--acc)'
+                        : 'var(--fg-0)'
+                    }}
+                  >
+                    {overallAccuracy.toFixed(0)}<span className="sm">%</span>
                   </div>
                 </div>
-              )
-            })}
+              </div>
+            </div>
+
+            {/* Temps moyen */}
+            <div className="stat-row" style={{ borderBottom: 'none', paddingBottom: 0 }}>
+              <div className="stat-meta">
+                <div className="stat-icon">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <circle cx="8" cy="8" r="6"/>
+                    <path d="M8 4v4l3 2" strokeLinecap="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <div className="stat-name">Temps moyen</div>
+                  <div className="stat-num">{avgTimePerQuestion.toFixed(0)}<span className="sm">s</span></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Série actuelle */}
+            <div className="stat-row" style={{ borderBottom: 'none', paddingBottom: 0 }}>
+              <div className="stat-meta">
+                <div className="stat-icon">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M2 13h12M3 13V8l3-2 3 3 4-5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <div className="stat-name">Série actuelle</div>
+                  <div className="stat-num">{currentStreak}<span className="sm">j</span></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+      </section>
 
-        {/* Topic Performance */}
-        <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Performance par Matière</h2>
-          <div className="space-y-4">
+      {/* Performance par matière */}
+      <section className="block" style={{ paddingTop: 0 }}>
+        <div className="wrap" style={{ maxWidth: '1120px' }}>
+          <h2 style={{ fontSize: '22px', fontWeight: 500, letterSpacing: '-0.02em', marginBottom: '24px' }}>
+            Performance par matière
+          </h2>
+          <div style={{ display: 'grid', gap: '14px' }}>
             {curriculum.map((topic) => {
               const progress = topicProgress.find((p) => p.topic_id === topic.id)
               const attempted = progress?.questions_attempted || 0
               const correct = progress?.questions_correct || 0
               const accuracy = attempted > 0 ? (correct / attempted) * 100 : 0
               const topicPoints = progress?.points_earned || 0
+              const difficulty = getDifficultyLevel(topic)
 
               return (
-                <div key={topic.id} className="border-b border-gray-100 pb-4 last:border-0">
-                  <div className="flex justify-between items-center mb-2">
-                    <div className="flex items-center gap-3">
-                      <div className="text-2xl">
-                        {topic.icon === 'Calculator' && '🔢'}
-                        {topic.icon === 'TrendingUp' && '📈'}
-                        {topic.icon === 'FileText' && '📄'}
-                        {topic.icon === 'Building' && '🏢'}
-                        {topic.icon === 'LineChart' && '📊'}
-                        {topic.icon === 'DollarSign' && '💵'}
-                        {topic.icon === 'GitBranch' && '🔀'}
-                        {topic.icon === 'Briefcase' && '💼'}
-                        {topic.icon === 'PieChart' && '🥧'}
-                        {topic.icon === 'Scale' && '⚖️'}
+                <div
+                  key={topic.id}
+                  style={{
+                    background: 'var(--bg-1)',
+                    border: '1px solid var(--line-soft)',
+                    borderRadius: 'var(--radius)',
+                    padding: '22px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '16px'
+                  }}
+                >
+                  {/* Top row: icon + code + name + badge */}
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', flex: 1 }}>
+                      <div className="stat-icon">
+                        <svg viewBox="0 0 16 16" dangerouslySetInnerHTML={{ __html: getTopicIcon(topic.id) }} />
                       </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{topic.titleFr}</h3>
-                        <p className="text-sm text-gray-500">{topic.titleEn}</p>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                          <span
+                            style={{
+                              fontFamily: 'var(--font-mono)',
+                              fontSize: '12px',
+                              color: 'var(--fg-3)',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.06em'
+                            }}
+                          >
+                            {getTopicCode(topic.id)}
+                          </span>
+                          <h3 style={{ fontSize: '16px', fontWeight: 500, margin: 0, letterSpacing: '-0.01em' }}>
+                            {topic.titleEn}
+                          </h3>
+                        </div>
+                        <div
+                          style={{
+                            fontSize: '12px',
+                            color: 'var(--fg-2)',
+                            fontFamily: 'var(--font-mono)',
+                            marginTop: '4px'
+                          }}
+                        >
+                          {topic.titleFr}
+                        </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-blue-600">{topicPoints.toLocaleString()} pts</div>
-                      <div className="text-sm text-gray-600">{attempted} questions</div>
+                    <span className={`badge badge-${difficulty.level}`}>{difficulty.label}</span>
+                  </div>
+
+                  {/* 3 stat rows */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+                    <div>
+                      <div className="stat-name">Précision</div>
+                      <div
+                        className="stat-num"
+                        style={{
+                          fontSize: '18px',
+                          color: accuracy < 50
+                            ? 'var(--acc-amber)'
+                            : accuracy >= 70
+                            ? 'var(--acc)'
+                            : 'var(--fg-0)'
+                        }}
+                      >
+                        {accuracy.toFixed(0)}<span className="sm">%</span>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="stat-name">Questions</div>
+                      <div className="stat-num" style={{ fontSize: '18px' }}>{attempted}</div>
+                    </div>
+                    <div>
+                      <div className="stat-name">Points</div>
+                      <div className="stat-num" style={{ fontSize: '18px' }}>{topicPoints}</div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4 mb-3">
-                    <div className="text-center p-2 bg-gray-50 rounded">
-                      <div className="text-xs text-gray-600">Précision</div>
-                      <div className={`text-lg font-bold ${accuracy >= 70 ? 'text-green-600' : 'text-orange-600'}`}>
-                        {accuracy.toFixed(1)}%
-                      </div>
-                    </div>
-                    <div className="text-center p-2 bg-gray-50 rounded">
-                      <div className="text-xs text-gray-600">Correctes</div>
-                      <div className="text-lg font-bold text-gray-900">{correct}</div>
-                    </div>
-                    <div className="text-center p-2 bg-gray-50 rounded">
-                      <div className="text-xs text-gray-600">Poids</div>
-                      <div className="text-lg font-bold text-gray-900">{(topic.weight * 100).toFixed(0)}%</div>
-                    </div>
-                  </div>
-
-                  <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                  {/* Progress bar */}
+                  <div style={{ height: '4px', background: 'var(--bg-0)', borderRadius: '99px', overflow: 'hidden' }}>
                     <div
-                      className={`h-full transition-all ${
-                        accuracy >= 70 ? 'bg-green-500' : accuracy >= 50 ? 'bg-yellow-500' : 'bg-orange-500'
-                      }`}
-                      style={{ width: `${Math.min(accuracy, 100)}%` }}
+                      style={{
+                        height: '100%',
+                        width: `${Math.min(accuracy, 100)}%`,
+                        background: getTopicColor(topic.id),
+                        borderRadius: '99px',
+                        transition: 'width 0.6s ease'
+                      }}
                     />
                   </div>
                 </div>
@@ -273,113 +371,93 @@ export default function StatisticsPage() {
             })}
           </div>
         </div>
+      </section>
 
-        {/* Exam History */}
-        {examHistory.length > 0 && (
-          <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Historique des Examens Blancs</h2>
-            <div className="space-y-3">
-              {examHistory.map((exam, index) => {
-                const isPassing = exam.score >= 70
-                const date = new Date(exam.created_at).toLocaleDateString('fr-FR', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric'
-                })
-
-                return (
-                  <div
-                    key={exam.id}
-                    className={`p-4 rounded-lg border-2 ${
-                      isPassing ? 'bg-green-50 border-green-200' : 'bg-orange-50 border-orange-200'
-                    }`}
-                  >
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <div className="font-semibold text-gray-900">
-                          Examen #{examHistory.length - index}
-                        </div>
-                        <div className="text-sm text-gray-600">{date}</div>
-                      </div>
-                      <div className="text-right">
-                        <div className={`text-2xl font-bold ${isPassing ? 'text-green-600' : 'text-orange-600'}`}>
-                          {exam.score.toFixed(1)}%
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          {exam.correct_answers} / {exam.total_questions}
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm text-gray-600">Temps</div>
-                        <div className="font-semibold text-gray-900">
-                          {Math.floor(exam.time_taken / 60)} min
-                        </div>
-                      </div>
-                      <div>
-                        {isPassing ? (
-                          <div className="text-2xl">✅</div>
-                        ) : (
-                          <div className="text-2xl">⚠️</div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
+      {/* Recommandations */}
+      <section className="block" style={{ paddingTop: 0 }}>
+        <div className="wrap" style={{ maxWidth: '1120px' }}>
+          <div
+            style={{
+              background: 'var(--bg-1)',
+              border: '1px solid var(--line)',
+              borderRadius: 'var(--radius)',
+              padding: '28px'
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '12px',
+                color: 'var(--acc-amber)',
+                marginBottom: '16px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em'
+              }}
+            >
+              <span
+                style={{
+                  width: '6px',
+                  height: '6px',
+                  background: 'var(--acc-amber)',
+                  borderRadius: '50%',
+                  boxShadow: '0 0 8px var(--acc-amber)',
+                  animation: 'pulse 2s ease-in-out infinite'
+                }}
+              ></span>
+              Recommandations
             </div>
-          </div>
-        )}
-
-        {/* Recommendations */}
-        <div className="mt-8 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-200">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">💡 Recommandations</h2>
-          <ul className="space-y-2">
-            {overallAccuracy < 70 && (
-              <li className="flex items-start gap-2">
-                <span className="text-blue-600">•</span>
-                <span className="text-gray-700">
-                  Votre taux de réussite global est de {overallAccuracy.toFixed(1)}%. Continuez à pratiquer pour atteindre 70%!
-                </span>
-              </li>
-            )}
-            {currentStreak === 0 && (
-              <li className="flex items-start gap-2">
-                <span className="text-blue-600">•</span>
-                <span className="text-gray-700">
+            <h3
+              style={{
+                fontSize: '22px',
+                fontWeight: 400,
+                letterSpacing: '-0.025em',
+                margin: '0 0 16px',
+                lineHeight: 1.3
+              }}
+            >
+              Points à améliorer pour <em style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>progresser</em>.
+            </h3>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {overallAccuracy < 70 && (
+                <li style={{ color: 'var(--fg-2)', fontSize: '14px', lineHeight: 1.5 }}>
+                  Votre taux de réussite global est de {overallAccuracy.toFixed(1)}%. Continuez à pratiquer pour atteindre 70%.
+                </li>
+              )}
+              {currentStreak === 0 && (
+                <li style={{ color: 'var(--fg-2)', fontSize: '14px', lineHeight: 1.5 }}>
                   Créez une habitude d'étude quotidienne pour améliorer votre rétention.
-                </span>
-              </li>
-            )}
-            {topicProgress.filter((p) => {
-              const accuracy = p.questions_attempted > 0 ? (p.questions_correct / p.questions_attempted) * 100 : 0
-              return accuracy < 50
-            }).length > 0 && (
-              <li className="flex items-start gap-2">
-                <span className="text-blue-600">•</span>
-                <span className="text-gray-700">
+                </li>
+              )}
+              {topicProgress.filter((p) => {
+                const accuracy = p.questions_attempted > 0 ? (p.questions_correct / p.questions_attempted) * 100 : 0
+                return accuracy < 50 && p.questions_attempted > 0
+              }).length > 0 && (
+                <li style={{ color: 'var(--fg-2)', fontSize: '14px', lineHeight: 1.5 }}>
                   Concentrez-vous sur les matières où votre précision est inférieure à 50%.
-                </span>
-              </li>
-            )}
-            {avgTimePerQuestion > 120 && (
-              <li className="flex items-start gap-2">
-                <span className="text-blue-600">•</span>
-                <span className="text-gray-700">
+                </li>
+              )}
+              {avgTimePerQuestion > 120 && (
+                <li style={{ color: 'var(--fg-2)', fontSize: '14px', lineHeight: 1.5 }}>
                   Votre temps moyen par question est de {avgTimePerQuestion.toFixed(0)}s. Essayez de viser 90s pour l'examen.
-                </span>
-              </li>
-            )}
-            {examHistory.length === 0 && (
-              <li className="flex items-start gap-2">
-                <span className="text-blue-600">•</span>
-                <span className="text-gray-700">
+                </li>
+              )}
+              {examHistory.length === 0 && (
+                <li style={{ color: 'var(--fg-2)', fontSize: '14px', lineHeight: 1.5 }}>
                   Passez un examen blanc pour évaluer votre niveau global.
-                </span>
-              </li>
-            )}
-          </ul>
+                </li>
+              )}
+              {overallAccuracy >= 70 && currentStreak > 0 && avgTimePerQuestion <= 120 && (
+                <li style={{ color: 'var(--fg-2)', fontSize: '14px', lineHeight: 1.5 }}>
+                  Excellente performance ! Continuez à maintenir cette cadence.
+                </li>
+              )}
+            </ul>
+          </div>
         </div>
-      </main>
+      </section>
     </div>
   )
 }
