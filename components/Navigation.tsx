@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Trophy, Brain, BarChart3, Settings, BookOpen } from 'lucide-react'
+import { Home, Trophy, Brain, BarChart3, Settings, BookOpen, CreditCard } from 'lucide-react'
 
 export default function Navigation() {
   const pathname = usePathname()
@@ -18,6 +18,7 @@ export default function Navigation() {
     { href: '/review', label: 'Révision', icon: Brain },
     { href: '/exam', label: 'Examen', icon: BookOpen },
     { href: '/statistics', label: 'Stats', icon: BarChart3 },
+    { href: '/subscription', label: 'Abonnement', icon: CreditCard },
     { href: '/settings', label: 'Paramètres', icon: Settings },
   ]
 
