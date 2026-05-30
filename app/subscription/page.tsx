@@ -140,6 +140,26 @@ export default function SubscriptionPage() {
                   border-left: none;
                   border-bottom: none;
                 }
+                .pricing-card-corners-bottom::before,
+                .pricing-card-corners-bottom::after {
+                  content: '';
+                  position: absolute;
+                  width: 20px;
+                  height: 20px;
+                  border: 2px solid var(--acc);
+                }
+                .pricing-card-corners-bottom::before {
+                  bottom: -36px;
+                  left: -36px;
+                  border-right: none;
+                  border-top: none;
+                }
+                .pricing-card-corners-bottom::after {
+                  bottom: -36px;
+                  right: -36px;
+                  border-left: none;
+                  border-top: none;
+                }
               `}</style>
 
               {/* Bottom corners via pseudo elements on inner div */}
@@ -147,28 +167,6 @@ export default function SubscriptionPage() {
                 style={{ position: 'relative', zIndex: 1 }}
                 className="pricing-card-corners-bottom"
               >
-                <style jsx>{`
-                  .pricing-card-corners-bottom::before,
-                  .pricing-card-corners-bottom::after {
-                    content: '';
-                    position: absolute;
-                    width: 20px;
-                    height: 20px;
-                    border: 2px solid var(--acc);
-                  }
-                  .pricing-card-corners-bottom::before {
-                    bottom: -36px;
-                    left: -36px;
-                    border-right: none;
-                    border-top: none;
-                  }
-                  .pricing-card-corners-bottom::after {
-                    bottom: -36px;
-                    right: -36px;
-                    border-left: none;
-                    border-top: none;
-                  }
-                `}</style>
 
                 {/* Label */}
                 <div
