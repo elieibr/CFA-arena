@@ -108,7 +108,7 @@ export default function StatisticsPage() {
   const totalTime = questionHistory.reduce((sum, q) => sum + (q.time_taken || 0), 0)
   const avgTimePerQuestion = questionHistory.length > 0 ? totalTime / questionHistory.length : 0
 
-  // Topic icon helper (from dashboard)
+  // Topic icon helper
   const getTopicIcon = (topicId: string) => {
     const iconMap: { [key: string]: string } = {
       'quantitative-methods': '<path d="M3 14h10M3 11l3-4 3 2 4-6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
@@ -125,47 +125,6 @@ export default function StatisticsPage() {
     return iconMap[topicId] || iconMap['ethical-standards']
   }
 
-  // Topic code helper
-  const getTopicCode = (topicId: string) => {
-    const codeMap: { [key: string]: string } = {
-      'quantitative-methods': 'QM',
-      'economics': 'EC',
-      'financial-statement-analysis': 'FSA',
-      'corporate-issuers': 'CI',
-      'equity-investments': 'EQ',
-      'fixed-income': 'FI',
-      'derivatives': 'DV',
-      'alternative-investments': 'AI',
-      'portfolio-management': 'PM',
-      'ethical-standards': 'ES'
-    }
-    return codeMap[topicId] || ''
-  }
-
-  // Topic color helper
-  const getTopicColor = (topicId: string) => {
-    const colorMap: { [key: string]: string } = {
-      'quantitative-methods': 'oklch(0.78 0.16 145)',
-      'economics': 'oklch(0.74 0.10 255)',
-      'financial-statement-analysis': 'oklch(0.78 0.14 75)',
-      'corporate-issuers': 'oklch(0.78 0.16 145)',
-      'equity-investments': 'oklch(0.74 0.10 255)',
-      'fixed-income': 'oklch(0.78 0.14 75)',
-      'derivatives': 'oklch(0.78 0.16 145)',
-      'alternative-investments': 'oklch(0.74 0.10 255)',
-      'portfolio-management': 'oklch(0.78 0.14 75)',
-      'ethical-standards': 'oklch(0.78 0.16 145)'
-    }
-    return colorMap[topicId] || 'oklch(0.78 0.16 145)'
-  }
-
-  // Get difficulty level
-  const getDifficultyLevel = (topic: any) => {
-    if (topic.difficultyMultiplier >= 1.3) return { level: 'adv', label: 'Advanced' }
-    if (topic.difficultyMultiplier >= 1.1) return { level: 'int', label: 'Intermediate' }
-    return { level: 'beg', label: 'Beginner' }
-  }
-
   return (
     <div className="page">
       {/* Header */}
@@ -180,191 +139,238 @@ export default function StatisticsPage() {
         </div>
       </section>
 
-      {/* 4 Metric Cards */}
+      {/* 4 Metrics Strip (pattern from index.html) */}
       <section className="block" style={{ paddingTop: 0, paddingBottom: '32px' }}>
         <div className="wrap" style={{ maxWidth: '1120px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
+          <div
+            style={{
+              background: 'var(--bg-1)',
+              border: '1px solid var(--line)',
+              borderRadius: 'var(--radius)',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              overflow: 'hidden'
+            }}
+          >
             {/* Questions résolues */}
-            <div className="stat-row" style={{ borderBottom: 'none', paddingBottom: 0 }}>
-              <div className="stat-meta">
-                <div className="stat-icon">
-                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <path d="M2 14V2m0 12h12M5 11l3-3 3 2 3-4"/>
-                  </svg>
-                </div>
-                <div>
-                  <div className="stat-name">Questions résolues</div>
-                  <div className="stat-num">{totalQuestions}</div>
-                </div>
+            <div
+              style={{
+                padding: '36px 32px',
+                borderRight: '1px solid var(--line)',
+                textAlign: 'center'
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '38px',
+                  fontWeight: 500,
+                  letterSpacing: '-0.03em',
+                  color: 'var(--fg-0)',
+                  lineHeight: 1,
+                  marginBottom: '8px'
+                }}
+              >
+                {totalQuestions}
+              </div>
+              <div
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '10.5px',
+                  color: 'var(--fg-2)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em'
+                }}
+              >
+                Questions résolues
               </div>
             </div>
 
             {/* Taux de réussite */}
-            <div className="stat-row" style={{ borderBottom: 'none', paddingBottom: 0 }}>
-              <div className="stat-meta">
-                <div className="stat-icon">
-                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <circle cx="8" cy="8" r="6"/>
-                    <path d="M8 4v4l2.5 1.5"/>
-                  </svg>
-                </div>
-                <div>
-                  <div className="stat-name">Taux de réussite</div>
-                  <div
-                    className="stat-num"
-                    style={{
-                      color: overallAccuracy < 50
-                        ? 'var(--acc-amber)'
-                        : overallAccuracy >= 70
-                        ? 'var(--acc)'
-                        : 'var(--fg-0)'
-                    }}
-                  >
-                    {overallAccuracy.toFixed(0)}<span className="sm">%</span>
-                  </div>
-                </div>
+            <div
+              style={{
+                padding: '36px 32px',
+                borderRight: '1px solid var(--line)',
+                textAlign: 'center'
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '38px',
+                  fontWeight: 500,
+                  letterSpacing: '-0.03em',
+                  color: overallAccuracy >= 70 ? 'var(--acc)' : 'var(--acc-amber)',
+                  lineHeight: 1,
+                  marginBottom: '8px'
+                }}
+              >
+                {overallAccuracy.toFixed(0)}%
+              </div>
+              <div
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '10.5px',
+                  color: 'var(--fg-2)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em'
+                }}
+              >
+                Taux de réussite
               </div>
             </div>
 
             {/* Temps moyen */}
-            <div className="stat-row" style={{ borderBottom: 'none', paddingBottom: 0 }}>
-              <div className="stat-meta">
-                <div className="stat-icon">
-                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <circle cx="8" cy="8" r="6"/>
-                    <path d="M8 4v4l3 2" strokeLinecap="round"/>
-                  </svg>
-                </div>
-                <div>
-                  <div className="stat-name">Temps moyen</div>
-                  <div className="stat-num">{avgTimePerQuestion.toFixed(0)}<span className="sm">s</span></div>
-                </div>
+            <div
+              style={{
+                padding: '36px 32px',
+                borderRight: '1px solid var(--line)',
+                textAlign: 'center'
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '38px',
+                  fontWeight: 500,
+                  letterSpacing: '-0.03em',
+                  color: 'var(--fg-0)',
+                  lineHeight: 1,
+                  marginBottom: '8px'
+                }}
+              >
+                {avgTimePerQuestion.toFixed(0)}s
+              </div>
+              <div
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '10.5px',
+                  color: 'var(--fg-2)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em'
+                }}
+              >
+                Temps moyen
               </div>
             </div>
 
             {/* Série actuelle */}
-            <div className="stat-row" style={{ borderBottom: 'none', paddingBottom: 0 }}>
-              <div className="stat-meta">
-                <div className="stat-icon">
-                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <path d="M2 13h12M3 13V8l3-2 3 3 4-5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-                <div>
-                  <div className="stat-name">Série actuelle</div>
-                  <div className="stat-num">{currentStreak}<span className="sm">j</span></div>
-                </div>
+            <div
+              style={{
+                padding: '36px 32px',
+                textAlign: 'center'
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '38px',
+                  fontWeight: 500,
+                  letterSpacing: '-0.03em',
+                  color: 'var(--fg-0)',
+                  lineHeight: 1,
+                  marginBottom: '8px'
+                }}
+              >
+                {currentStreak}j
+              </div>
+              <div
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '10.5px',
+                  color: 'var(--fg-2)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em'
+                }}
+              >
+                Série actuelle
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Performance par matière */}
+      {/* Performance par matière (pattern stat-rows from CFA_Prep.html) */}
       <section className="block" style={{ paddingTop: 0 }}>
         <div className="wrap" style={{ maxWidth: '1120px' }}>
           <h2 style={{ fontSize: '22px', fontWeight: 500, letterSpacing: '-0.02em', marginBottom: '24px' }}>
             Performance par matière
           </h2>
-          <div style={{ display: 'grid', gap: '14px' }}>
-            {curriculum.map((topic) => {
+
+          <div
+            style={{
+              background: 'var(--bg-1)',
+              border: '1px solid var(--line)',
+              borderRadius: 'var(--radius)',
+              padding: '0',
+              overflow: 'hidden'
+            }}
+          >
+            {curriculum.map((topic, index) => {
               const progress = topicProgress.find((p) => p.topic_id === topic.id)
               const attempted = progress?.questions_attempted || 0
               const correct = progress?.questions_correct || 0
               const accuracy = attempted > 0 ? (correct / attempted) * 100 : 0
-              const topicPoints = progress?.points_earned || 0
-              const difficulty = getDifficultyLevel(topic)
 
               return (
                 <div
                   key={topic.id}
                   style={{
-                    background: 'var(--bg-1)',
-                    border: '1px solid var(--line-soft)',
-                    borderRadius: 'var(--radius)',
-                    padding: '22px',
                     display: 'flex',
-                    flexDirection: 'column',
-                    gap: '16px'
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '18px 24px',
+                    borderBottom: index < curriculum.length - 1 ? '1px solid var(--line-soft)' : 'none'
                   }}
                 >
-                  {/* Top row: icon + code + name + badge */}
-                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', flex: 1 }}>
-                      <div className="stat-icon">
-                        <svg viewBox="0 0 16 16" dangerouslySetInnerHTML={{ __html: getTopicIcon(topic.id) }} />
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                          <span
-                            style={{
-                              fontFamily: 'var(--font-mono)',
-                              fontSize: '12px',
-                              color: 'var(--fg-3)',
-                              textTransform: 'uppercase',
-                              letterSpacing: '0.06em'
-                            }}
-                          >
-                            {getTopicCode(topic.id)}
-                          </span>
-                          <h3 style={{ fontSize: '16px', fontWeight: 500, margin: 0, letterSpacing: '-0.01em' }}>
-                            {topic.titleEn}
-                          </h3>
-                        </div>
-                        <div
-                          style={{
-                            fontSize: '12px',
-                            color: 'var(--fg-2)',
-                            fontFamily: 'var(--font-mono)',
-                            marginTop: '4px'
-                          }}
-                        >
-                          {topic.titleFr}
-                        </div>
-                      </div>
-                    </div>
-                    <span className={`badge badge-${difficulty.level}`}>{difficulty.label}</span>
-                  </div>
-
-                  {/* 3 stat rows */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
-                    <div>
-                      <div className="stat-name">Précision</div>
-                      <div
-                        className="stat-num"
-                        style={{
-                          fontSize: '18px',
-                          color: accuracy < 50
-                            ? 'var(--acc-amber)'
-                            : accuracy >= 70
-                            ? 'var(--acc)'
-                            : 'var(--fg-0)'
-                        }}
-                      >
-                        {accuracy.toFixed(0)}<span className="sm">%</span>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="stat-name">Questions</div>
-                      <div className="stat-num" style={{ fontSize: '18px' }}>{attempted}</div>
-                    </div>
-                    <div>
-                      <div className="stat-name">Points</div>
-                      <div className="stat-num" style={{ fontSize: '18px' }}>{topicPoints}</div>
-                    </div>
-                  </div>
-
-                  {/* Progress bar */}
-                  <div style={{ height: '4px', background: 'var(--bg-0)', borderRadius: '99px', overflow: 'hidden' }}>
+                  {/* Left: Icon + Name */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: 1 }}>
                     <div
                       style={{
-                        height: '100%',
-                        width: `${Math.min(accuracy, 100)}%`,
-                        background: getTopicColor(topic.id),
-                        borderRadius: '99px',
-                        transition: 'width 0.6s ease'
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '7px',
+                        background: 'var(--bg-0)',
+                        border: '1px solid var(--line)',
+                        display: 'grid',
+                        placeItems: 'center',
+                        color: 'var(--fg-1)',
+                        flexShrink: 0
                       }}
-                    />
+                    >
+                      <svg viewBox="0 0 16 16" width="16" height="16" dangerouslySetInnerHTML={{ __html: getTopicIcon(topic.id) }} />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '13px', color: 'var(--fg-2)' }}>
+                        {topic.titleEn}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Center: Value */}
+                  <div
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '18px',
+                      fontWeight: 500,
+                      color: 'var(--fg-0)',
+                      marginRight: '24px'
+                    }}
+                  >
+                    {accuracy.toFixed(0)}%
+                  </div>
+
+                  {/* Right: Trend */}
+                  <div
+                    style={{
+                      fontSize: '12px',
+                      fontFamily: 'var(--font-mono)',
+                      color: 'var(--fg-3)',
+                      minWidth: '80px',
+                      textAlign: 'right'
+                    }}
+                  >
+                    {attempted} questions
                   </div>
                 </div>
               )
@@ -420,38 +426,110 @@ export default function StatisticsPage() {
             >
               Points à améliorer pour <em style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>progresser</em>.
             </h3>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {overallAccuracy < 70 && (
-                <li style={{ color: 'var(--fg-2)', fontSize: '14px', lineHeight: 1.5 }}>
-                  Votre taux de réussite global est de {overallAccuracy.toFixed(1)}%. Continuez à pratiquer pour atteindre 70%.
+                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                  <div
+                    style={{
+                      width: '8px',
+                      height: '8px',
+                      background: 'var(--acc)',
+                      transform: 'rotate(45deg)',
+                      flexShrink: 0,
+                      marginTop: '6px'
+                    }}
+                  />
+                  <span style={{ color: 'var(--fg-1)', fontSize: '13.5px', lineHeight: 1.5 }}>
+                    Votre taux de réussite global est de {overallAccuracy.toFixed(1)}%. Continuez à pratiquer pour atteindre 70%.
+                  </span>
                 </li>
               )}
               {currentStreak === 0 && (
-                <li style={{ color: 'var(--fg-2)', fontSize: '14px', lineHeight: 1.5 }}>
-                  Créez une habitude d'étude quotidienne pour améliorer votre rétention.
+                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                  <div
+                    style={{
+                      width: '8px',
+                      height: '8px',
+                      background: 'var(--acc)',
+                      transform: 'rotate(45deg)',
+                      flexShrink: 0,
+                      marginTop: '6px'
+                    }}
+                  />
+                  <span style={{ color: 'var(--fg-1)', fontSize: '13.5px', lineHeight: 1.5 }}>
+                    Créez une habitude d'étude quotidienne pour améliorer votre rétention.
+                  </span>
                 </li>
               )}
               {topicProgress.filter((p) => {
                 const accuracy = p.questions_attempted > 0 ? (p.questions_correct / p.questions_attempted) * 100 : 0
                 return accuracy < 50 && p.questions_attempted > 0
               }).length > 0 && (
-                <li style={{ color: 'var(--fg-2)', fontSize: '14px', lineHeight: 1.5 }}>
-                  Concentrez-vous sur les matières où votre précision est inférieure à 50%.
+                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                  <div
+                    style={{
+                      width: '8px',
+                      height: '8px',
+                      background: 'var(--acc)',
+                      transform: 'rotate(45deg)',
+                      flexShrink: 0,
+                      marginTop: '6px'
+                    }}
+                  />
+                  <span style={{ color: 'var(--fg-1)', fontSize: '13.5px', lineHeight: 1.5 }}>
+                    Concentrez-vous sur les matières où votre précision est inférieure à 50%.
+                  </span>
                 </li>
               )}
               {avgTimePerQuestion > 120 && (
-                <li style={{ color: 'var(--fg-2)', fontSize: '14px', lineHeight: 1.5 }}>
-                  Votre temps moyen par question est de {avgTimePerQuestion.toFixed(0)}s. Essayez de viser 90s pour l'examen.
+                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                  <div
+                    style={{
+                      width: '8px',
+                      height: '8px',
+                      background: 'var(--acc)',
+                      transform: 'rotate(45deg)',
+                      flexShrink: 0,
+                      marginTop: '6px'
+                    }}
+                  />
+                  <span style={{ color: 'var(--fg-1)', fontSize: '13.5px', lineHeight: 1.5 }}>
+                    Votre temps moyen par question est de {avgTimePerQuestion.toFixed(0)}s. Essayez de viser 90s pour l'examen.
+                  </span>
                 </li>
               )}
               {examHistory.length === 0 && (
-                <li style={{ color: 'var(--fg-2)', fontSize: '14px', lineHeight: 1.5 }}>
-                  Passez un examen blanc pour évaluer votre niveau global.
+                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                  <div
+                    style={{
+                      width: '8px',
+                      height: '8px',
+                      background: 'var(--acc)',
+                      transform: 'rotate(45deg)',
+                      flexShrink: 0,
+                      marginTop: '6px'
+                    }}
+                  />
+                  <span style={{ color: 'var(--fg-1)', fontSize: '13.5px', lineHeight: 1.5 }}>
+                    Passez un examen blanc pour évaluer votre niveau global.
+                  </span>
                 </li>
               )}
               {overallAccuracy >= 70 && currentStreak > 0 && avgTimePerQuestion <= 120 && (
-                <li style={{ color: 'var(--fg-2)', fontSize: '14px', lineHeight: 1.5 }}>
-                  Excellente performance ! Continuez à maintenir cette cadence.
+                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                  <div
+                    style={{
+                      width: '8px',
+                      height: '8px',
+                      background: 'var(--acc)',
+                      transform: 'rotate(45deg)',
+                      flexShrink: 0,
+                      marginTop: '6px'
+                    }}
+                  />
+                  <span style={{ color: 'var(--fg-1)', fontSize: '13.5px', lineHeight: 1.5 }}>
+                    Excellente performance ! Continuez à maintenir cette cadence.
+                  </span>
                 </li>
               )}
             </ul>
