@@ -160,20 +160,21 @@ export default async function ProfilePage({ params }: PageProps) {
 
   const globalRank = (allProfiles?.findIndex(p => p.total_points <= profile.total_points) ?? -1) + 1
 
-  // Fetch question history stats
-  const { data: questionHistory } = await supabase
-    .from('question_history')
-    .select('is_correct, topic_id, points_earned')
-    .eq('user_id', profile.id)
-
-  const totalQuestions = questionHistory?.length ?? 0
-  const correctQuestions = questionHistory?.filter(q => q.is_correct).length ?? 0
-  const successRate = totalQuestions > 0 ? Math.round((correctQuestions / totalQuestions) * 100) : 0
-
   // Fetch topic progress
   const { data: topicProgress } = await supabase
     .from('user_topic_progress')
-    .select('*')
+    .select('topic_id, questions_attempted, questions_correct')
+    .eq('user_id', profile.id)
+
+  // Calculate global stats from topicProgress
+  const totalQuestions = topicProgress?.reduce((sum, t) => sum + (t.questions_attempted || 0), 0) || 0
+  const totalCorrect = topicProgress?.reduce((sum, t) => sum + (t.questions_correct || 0), 0) || 0
+  const successRate = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0
+
+  // Fetch question history stats (for points per topic)
+  const { data: questionHistory } = await supabase
+    .from('question_history')
+    .select('is_correct, topic_id, points_earned')
     .eq('user_id', profile.id)
 
   // Calculate points per topic from question history
