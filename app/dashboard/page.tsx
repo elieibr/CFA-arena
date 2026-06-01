@@ -9,6 +9,7 @@ export default function DashboardPage() {
   const [profile, setProfile] = useState<any>(null)
   const [topicProgress, setTopicProgress] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [copied, setCopied] = useState(false)
   const router = useRouter()
 
   const supabase = createBrowserClient(
@@ -139,6 +140,21 @@ export default function DashboardPage() {
     return 'À renforcer'
   }
 
+  // Copy profile URL to clipboard
+  const handleShareProfile = async () => {
+    if (!profile?.username) return
+
+    const profileUrl = `https://cfa-arena.vercel.app/profile/${profile.username}`
+
+    try {
+      await navigator.clipboard.writeText(profileUrl)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy:', err)
+    }
+  }
+
   return (
     <div className="page">
       {/* Hero Section */}
@@ -194,6 +210,60 @@ export default function DashboardPage() {
                   <div className="value">{profile?.current_streak || 0}<span style={{ color: 'var(--fg-3)', fontSize: '13px' }}>j</span></div>
                 </div>
               </div>
+
+              {/* Share Profile Button (only if public) */}
+              {profile?.is_public !== false && profile?.username && (
+                <button
+                  onClick={handleShareProfile}
+                  style={{
+                    width: '100%',
+                    marginTop: '16px',
+                    padding: '10px 16px',
+                    background: copied ? 'oklch(0.78 0.16 180 / 0.12)' : 'var(--bg-0)',
+                    border: '1px solid var(--line)',
+                    borderRadius: '8px',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '12px',
+                    fontWeight: 500,
+                    color: copied ? 'var(--acc)' : 'var(--fg-1)',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!copied) {
+                      e.currentTarget.style.borderColor = 'var(--line-strong)'
+                      e.currentTarget.style.background = 'var(--bg-1)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!copied) {
+                      e.currentTarget.style.borderColor = 'var(--line)'
+                      e.currentTarget.style.background = 'var(--bg-0)'
+                    }
+                  }}
+                >
+                  {copied ? (
+                    <>
+                      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <span>Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <path d="M10 2h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-3" strokeLinecap="round" strokeLinejoin="round"/>
+                        <rect x="2" y="2" width="8" height="8" rx="1" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <span>Share my profile</span>
+                    </>
+                  )}
+                </button>
+              )}
             </div>
           </div>
         </div>
