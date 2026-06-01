@@ -10,9 +10,9 @@ const supabase = createClient(
 )
 
 interface PageProps {
-  params: {
+  params: Promise<{
     username: string
-  }
+  }>
 }
 
 function getLeague(points: number): { name: string; color: string } {
@@ -36,7 +36,7 @@ function getBadges(points: number, successRate: number, streak: number) {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { username } = params
+  const { username } = await params
 
   // Fetch user profile for metadata
   const { data: profile } = await supabase
@@ -82,7 +82,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function ProfilePage({ params }: PageProps) {
-  const { username } = params
+  const { username } = await params
 
   // Fetch user profile
   const { data: profile, error: profileError } = await supabase
