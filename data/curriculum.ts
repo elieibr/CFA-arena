@@ -1,5 +1,6 @@
 export interface Topic {
   id: string
+  code: string
   titleFr: string
   titleEn: string
   weight: number
@@ -11,6 +12,7 @@ export interface Topic {
 export const curriculum: Topic[] = [
   {
     id: 'quantitative-methods',
+    code: 'QM',
     titleFr: 'Méthodes Quantitatives',
     titleEn: 'Quantitative Methods',
     weight: 0.10,
@@ -20,6 +22,7 @@ export const curriculum: Topic[] = [
   },
   {
     id: 'economics',
+    code: 'EC',
     titleFr: 'Économie',
     titleEn: 'Economics',
     weight: 0.10,
@@ -29,6 +32,7 @@ export const curriculum: Topic[] = [
   },
   {
     id: 'financial-statement-analysis',
+    code: 'FSA',
     titleFr: 'Analyse des États Financiers',
     titleEn: 'Financial Statement Analysis',
     weight: 0.13,
@@ -38,6 +42,7 @@ export const curriculum: Topic[] = [
   },
   {
     id: 'corporate-issuers',
+    code: 'CI',
     titleFr: 'Émetteurs Corporate',
     titleEn: 'Corporate Issuers',
     weight: 0.08,
@@ -47,6 +52,7 @@ export const curriculum: Topic[] = [
   },
   {
     id: 'equity-investments',
+    code: 'EQ',
     titleFr: 'Investissements Actions',
     titleEn: 'Equity Investments',
     weight: 0.11,
@@ -56,6 +62,7 @@ export const curriculum: Topic[] = [
   },
   {
     id: 'fixed-income',
+    code: 'FI',
     titleFr: 'Titres à Revenu Fixe',
     titleEn: 'Fixed Income',
     weight: 0.11,
@@ -65,6 +72,7 @@ export const curriculum: Topic[] = [
   },
   {
     id: 'derivatives',
+    code: 'DV',
     titleFr: 'Produits Dérivés',
     titleEn: 'Derivatives',
     weight: 0.05,
@@ -74,6 +82,7 @@ export const curriculum: Topic[] = [
   },
   {
     id: 'alternative-investments',
+    code: 'AI',
     titleFr: 'Investissements Alternatifs',
     titleEn: 'Alternative Investments',
     weight: 0.07,
@@ -83,6 +92,7 @@ export const curriculum: Topic[] = [
   },
   {
     id: 'portfolio-management',
+    code: 'PM',
     titleFr: 'Gestion de Portefeuille',
     titleEn: 'Portfolio Management',
     weight: 0.07,
@@ -92,6 +102,7 @@ export const curriculum: Topic[] = [
   },
   {
     id: 'ethical-standards',
+    code: 'ETH',
     titleFr: 'Éthique et Standards Professionnels',
     titleEn: 'Ethical and Professional Standards',
     weight: 0.15,
