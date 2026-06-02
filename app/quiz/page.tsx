@@ -78,6 +78,7 @@ function QuizContent() {
   const [userId, setUserId] = useState<string | null>(null)
   const [sessionStats, setSessionStats] = useState({ correct: 0, incorrect: 0 })
   const [topicComplete, setTopicComplete] = useState(false)
+  const [answers, setAnswers] = useState<{[key: number]: 'correct' | 'incorrect'}>({})
 
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -161,10 +162,10 @@ function QuizContent() {
     const allQuestions = questionMap[topicId || ''] || []
 
     if (allQuestions.length > 0) {
-      // Load saved progress and stats
+      // Load saved progress, stats, and answers
       const { data: progressData, error: progressError } = await supabase
         .from('user_topic_progress')
-        .select('current_question_index, questions_attempted, questions_correct')
+        .select('current_question_index, questions_attempted, questions_correct, answers')
         .eq('user_id', user.id)
         .eq('topic_id', topicId)
         .maybeSingle()
@@ -190,6 +191,9 @@ function QuizContent() {
         correct: questionsCorrect,
         incorrect: questionsIncorrect
       })
+
+      // Load answers from database
+      setAnswers(progressData?.answers || {})
 
       setLoading(false)
       return
@@ -224,6 +228,12 @@ function QuizContent() {
     } else {
       setSessionStats(prev => ({ ...prev, incorrect: prev.incorrect + 1 }))
     }
+
+    // Update answers state
+    setAnswers(prev => ({
+      ...prev,
+      [currentQuestionIndex]: isCorrect ? 'correct' : 'incorrect'
+    }))
 
     await saveAnswer(isCorrect)
   }
@@ -263,7 +273,7 @@ function QuizContent() {
         .eq('id', userId)
     }
 
-    // Update user_topic_progress - save next question index
+    // Update user_topic_progress - save next question index and answers
     const { data: existingProgress } = await supabase
       .from('user_topic_progress')
       .select('*')
@@ -273,6 +283,13 @@ function QuizContent() {
 
     const nextQuestionIndex = currentQuestionIndex + 1
 
+    // Build updated answers object
+    const existingAnswers = existingProgress?.answers || {}
+    const updatedAnswers = {
+      ...existingAnswers,
+      [currentQuestionIndex]: isCorrect ? 'correct' : 'incorrect'
+    }
+
     if (existingProgress) {
       await supabase
         .from('user_topic_progress')
@@ -280,7 +297,8 @@ function QuizContent() {
           questions_attempted: existingProgress.questions_attempted + 1,
           questions_correct: existingProgress.questions_correct + (isCorrect ? 1 : 0),
           current_question_index: nextQuestionIndex,
-          last_practiced_at: new Date().toISOString()
+          last_practiced_at: new Date().toISOString(),
+          answers: updatedAnswers
         })
         .eq('user_id', userId)
         .eq('topic_id', currentQuestion.topic_id)
@@ -290,7 +308,8 @@ function QuizContent() {
         topic_id: currentQuestion.topic_id,
         questions_attempted: 1,
         questions_correct: isCorrect ? 1 : 0,
-        current_question_index: nextQuestionIndex
+        current_question_index: nextQuestionIndex,
+        answers: updatedAnswers
       })
     }
 
@@ -343,6 +362,14 @@ function QuizContent() {
     setCurrentQuestionIndex(0)
     setSessionStats({ correct: 0, incorrect: 0 })
     setScore(0)
+    setSelectedAnswer(null)
+    setIsAnswered(false)
+    setTimeLeft(90)
+  }
+
+  function handleQuestionNavigation(index: number) {
+    // Navigate to specific question
+    setCurrentQuestionIndex(index)
     setSelectedAnswer(null)
     setIsAnswered(false)
     setTimeLeft(90)
@@ -468,6 +495,84 @@ function QuizContent() {
             <span><span className="dn">●</span> {sessionStats.incorrect} INCORRECTES</span>
             <span><span style={{ color: 'var(--fg-2)' }}>●</span> {questions.length - totalAttempted} RESTANTES</span>
           </span>
+        </div>
+      </div>
+
+      {/* Question Navigation Grid */}
+      <div style={{
+        maxWidth: '1100px',
+        margin: '0 auto 24px',
+        padding: '0 24px'
+      }}>
+        <div style={{
+          background: 'var(--bg-1)',
+          border: '1px solid var(--line)',
+          borderRadius: '12px',
+          padding: '20px'
+        }}>
+          <div style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '11px',
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            color: 'var(--fg-3)',
+            marginBottom: '12px',
+            fontWeight: 500
+          }}>
+            NAVIGATION QUESTIONS
+          </div>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, 24px)',
+            gap: '8px'
+          }}>
+            {questions.map((_, idx) => {
+              const answerStatus = answers[idx]
+              const isCurrent = idx === currentQuestionIndex
+
+              let bgColor = '#2a3340' // Gray - not answered
+              if (answerStatus === 'correct') bgColor = '#00e0c6' // Cyan - correct
+              if (answerStatus === 'incorrect') bgColor = '#ef4444' // Red - incorrect
+
+              return (
+                <button
+                  key={idx}
+                  onClick={() => handleQuestionNavigation(idx)}
+                  style={{
+                    width: '24px',
+                    height: '24px',
+                    background: bgColor,
+                    border: isCurrent ? '2px solid var(--acc)' : '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '4px',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    color: answerStatus ? '#07090c' : 'var(--fg-1)',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: isCurrent ? '0 0 0 3px rgba(0, 224, 198, 0.2)' : 'none'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isCurrent) {
+                      e.currentTarget.style.transform = 'scale(1.1)'
+                      e.currentTarget.style.borderColor = 'var(--acc)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isCurrent) {
+                      e.currentTarget.style.transform = 'scale(1)'
+                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
+                    }
+                  }}
+                >
+                  {idx + 1}
+                </button>
+              )
+            })}
+          </div>
         </div>
       </div>
 
