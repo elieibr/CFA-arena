@@ -31,8 +31,44 @@ interface Question {
   difficulty: number
 }
 
+interface ShuffledQuestion extends Question {
+  shuffledOptions: { letter: string; text: string }[]
+  shuffledCorrectAnswer: string
+}
+
+// Fisher-Yates shuffle
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
+}
+
+// Shuffle answer options for a question
+function shuffleQuestionOptions(question: Question): ShuffledQuestion {
+  const options = [
+    { letter: 'A', text: question.option_a },
+    { letter: 'B', text: question.option_b },
+    { letter: 'C', text: question.option_c }
+  ]
+
+  const shuffledOptions = shuffleArray(options)
+
+  // Find new letter for correct answer
+  const correctOptionText = question[`option_${question.correct_answer.toLowerCase()}` as keyof Question] as string
+  const newCorrectLetter = shuffledOptions.find(opt => opt.text === correctOptionText)?.letter || 'A'
+
+  return {
+    ...question,
+    shuffledOptions,
+    shuffledCorrectAnswer: newCorrectLetter
+  }
+}
+
 function QuizContent() {
-  const [questions, setQuestions] = useState<Question[]>([])
+  const [questions, setQuestions] = useState<ShuffledQuestion[]>([])
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
   const [isAnswered, setIsAnswered] = useState(false)
@@ -138,8 +174,11 @@ function QuizContent() {
       console.log('user.id:', user.id)
       console.log('topicId:', topicId)
 
+      // Shuffle answer options for all questions
+      const shuffledQuestions = allQuestions.map(q => shuffleQuestionOptions(q))
+
       // Set all questions and resume from saved index
-      setQuestions(allQuestions)
+      setQuestions(shuffledQuestions)
       setCurrentQuestionIndex(progressData?.current_question_index || 0)
 
       // Restore session stats from saved progress
@@ -173,7 +212,7 @@ function QuizContent() {
     setIsAnswered(true)
 
     const currentQuestion = questions[currentQuestionIndex]
-    const isCorrect = answer === currentQuestion.correct_answer
+    const isCorrect = answer === currentQuestion.shuffledCorrectAnswer
 
     if (isCorrect) {
       const basePoints = 100 * currentQuestion.difficulty
@@ -430,19 +469,6 @@ function QuizContent() {
             <span><span style={{ color: 'var(--fg-2)' }}>●</span> {questions.length - totalAttempted} RESTANTES</span>
           </span>
         </div>
-        <div className="qprog">
-          {questions.slice(0, Math.min(questions.length, 20)).map((_, idx) => {
-            let className = ''
-            if (idx < currentQuestionIndex) {
-              // Already answered - check from sessionStats
-              const answeredCorrectly = idx < sessionStats.correct + sessionStats.incorrect
-              className = answeredCorrectly ? (idx < sessionStats.correct ? 'correct' : 'wrong') : ''
-            } else if (idx === currentQuestionIndex) {
-              className = 'current'
-            }
-            return <span key={idx} className={className}></span>
-          })}
-        </div>
       </div>
 
       {/* Question card */}
@@ -474,10 +500,9 @@ function QuizContent() {
           </p>
 
           <div className="choices">
-            {['A', 'B', 'C'].map((option) => {
-              const optionText = currentQuestion[`option_${option.toLowerCase()}` as keyof Question] as string
-              const isSelected = selectedAnswer === option
-              const isCorrect = option === currentQuestion.correct_answer
+            {currentQuestion.shuffledOptions.map((option, idx) => {
+              const isSelected = selectedAnswer === option.letter
+              const isCorrect = option.letter === currentQuestion.shuffledCorrectAnswer
 
               let className = 'choice'
               if (isAnswered) {
@@ -490,14 +515,14 @@ function QuizContent() {
 
               return (
                 <button
-                  key={option}
-                  onClick={() => handleAnswerSelect(option)}
+                  key={option.letter}
+                  onClick={() => handleAnswerSelect(option.letter)}
                   disabled={isAnswered}
                   className={className}
                 >
-                  <div className="choice-letter">{option}</div>
-                  <div className="choice-text">{optionText}</div>
-                  {!isAnswered && <div className="choice-key">{option === 'A' ? '1' : option === 'B' ? '2' : '3'}</div>}
+                  <div className="choice-letter">{option.letter}</div>
+                  <div className="choice-text">{option.text}</div>
+                  {!isAnswered && <div className="choice-key">{idx + 1}</div>}
                 </button>
               )
             })}
@@ -521,10 +546,10 @@ function QuizContent() {
 
       {/* Feedback panel */}
       {isAnswered && (
-        <div className={`feedback ${selectedAnswer !== currentQuestion.correct_answer ? 'wrong' : ''}`}>
+        <div className={`feedback ${selectedAnswer !== currentQuestion.shuffledCorrectAnswer ? 'wrong' : ''}`}>
           <div className="fb-head">
             <div className="fb-head-left">
-              {selectedAnswer === currentQuestion.correct_answer ? (
+              {selectedAnswer === currentQuestion.shuffledCorrectAnswer ? (
                 <svg viewBox="0 0 16 16" width="16" height="16" fill="var(--acc)">
                   <path d="M3 8l3 3 7-7-1.4-1.4L6 8.2 4.4 6.6z"/>
                 </svg>
@@ -534,12 +559,12 @@ function QuizContent() {
                 </svg>
               )}
               <span className="fb-verdict">
-                {selectedAnswer === currentQuestion.correct_answer ? 'BONNE RÉPONSE' : 'INCORRECT'} · {currentQuestion.correct_answer}
+                {selectedAnswer === currentQuestion.shuffledCorrectAnswer ? 'BONNE RÉPONSE' : 'INCORRECT'} · {currentQuestion.shuffledCorrectAnswer}
               </span>
               <span className="tag mono">{90 - timeLeft}s</span>
             </div>
             <div className="fb-xp">
-              {selectedAnswer === currentQuestion.correct_answer
+              {selectedAnswer === currentQuestion.shuffledCorrectAnswer
                 ? `+ ${100 * currentQuestion.difficulty + Math.floor(100 * currentQuestion.difficulty * 0.5 * (timeLeft / 90))} XP`
                 : '+ 0 XP'}
             </div>
