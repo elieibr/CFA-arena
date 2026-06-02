@@ -129,6 +129,9 @@ function QuizContent() {
     if (topicQuestions.length > 0) {
       setTotalQuestions(topicQuestions.length)
 
+      console.log('Querying with topicId:', topicId)
+      console.log('Querying with userId:', user.id)
+
       // Load saved progress
       const { data: progressData } = await supabase
         .from('user_topic_progress')
