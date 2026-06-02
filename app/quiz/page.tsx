@@ -126,12 +126,17 @@ function QuizContent() {
 
     if (allQuestions.length > 0) {
       // Load saved progress
-      const { data: progressData } = await supabase
+      const { data: progressData, error: progressError } = await supabase
         .from('user_topic_progress')
         .select('current_question_index')
         .eq('user_id', user.id)
         .eq('topic_id', topicId)
         .maybeSingle()
+
+      console.log('progressData:', progressData)
+      console.log('progressError:', progressError)
+      console.log('user.id:', user.id)
+      console.log('topicId:', topicId)
 
       // Set all questions and resume from saved index
       setQuestions(allQuestions)
