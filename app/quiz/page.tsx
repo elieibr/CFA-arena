@@ -138,7 +138,7 @@ function QuizContent() {
         .select('current_question_index')
         .eq('user_id', user.id)
         .eq('topic_id', topicId)
-        .single()
+        .maybeSingle()
 
       // Calculate session start - round down to nearest session boundary (0, 20, 40, 60...)
       const globalIndex = progressData?.current_question_index || 0
@@ -247,7 +247,7 @@ function QuizContent() {
       .select('*')
       .eq('user_id', userId)
       .eq('topic_id', currentQuestion.topic_id)
-      .single()
+      .maybeSingle()
 
     // Calculate global position
     const globalPosition = sessionStart + currentQuestionIndex + 1
