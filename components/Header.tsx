@@ -54,7 +54,7 @@ export default function Header() {
       <div className="wrap">
         <div className="nav">
           <Link href="/dashboard" className="brand">
-            <img src="/charterpath-logo.svg" width="180" height="48" alt="CharterPath" />
+            <img src="/charterpath-logo.svg" width="170" height="42" alt="CharterPath" />
           </Link>
 
           <nav className="primary">
