@@ -164,16 +164,33 @@ export default function DashboardPage() {
             {/* Left: Main Content */}
             <div>
               <div className="eyebrow">Session · CharterPath</div>
-              <h1 className="hero-title">
+              <h1 className="hero-title" style={{ fontWeight: 700, color: '#e6ecf3' }}>
                 Préparez le<br />
-                CFA Level 1 avec <em>l'intelligence</em><br />
-                d'une <span className="accent-amber">IA dédiée</span>.
+                CFA Level 1 avec <span style={{ color: '#00e0c6' }}>l'intelligence</span><br />
+                d'une <span style={{ color: '#00e0c6' }}>IA dédiée</span>.
               </h1>
               <p className="hero-sub">
                 Plan d'étude adaptatif, questions ciblées sur vos points faibles, et révision espacée calibrée pour l'examen. 10 matières, un objectif.
               </p>
               <div className="hero-cta">
-                <a href="#subjects" className="btn btn-primary">
+                <a
+                  href="#subjects"
+                  className="btn"
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid #00e0c6',
+                    color: '#00e0c6',
+                    transition: 'all 0.15s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = '#00e0c6'
+                    e.currentTarget.style.color = '#07090c'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent'
+                    e.currentTarget.style.color = '#00e0c6'
+                  }}
+                >
                   Continuer la session <span className="btn-arrow"></span>
                 </a>
                 <a href="/exam" className="btn btn-ghost">
@@ -192,7 +209,7 @@ export default function DashboardPage() {
                 <div className="pc-percent">{successRate.toFixed(0)}<span className="pct-sym">%</span></div>
                 <div className="pc-delta">+ 0% / 7j</div>
               </div>
-              <div className="pc-label">{totalCorrect} / {totalQuestions || 1540} concepts maîtrisés</div>
+              <div className="pc-label">{totalCorrect} / 10 concepts maîtrisés</div>
               <div className="pc-bar">
                 <div className="pc-bar-fill" style={{ width: `${Math.min(successRate, 100)}%` }}></div>
               </div>
