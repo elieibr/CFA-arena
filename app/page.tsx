@@ -10,37 +10,6 @@ export default function LandingPage() {
 
   return (
     <div style={{ background: 'var(--bg-0)', minHeight: '100vh' }}>
-      {/* Navbar */}
-      <nav style={{
-        borderBottom: '1px solid var(--line)',
-        background: 'var(--bg-0)',
-        position: 'sticky',
-        top: 0,
-        zIndex: 1000
-      }}>
-        <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          padding: '16px 24px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}>
-          <img src="/charterpath-logo.svg" width="170" height="42" alt="CharterPath" />
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
-            <a href="#features" style={{ color: 'var(--fg-2)', fontSize: '14px', textDecoration: 'none' }}>Fonctionnalités</a>
-            <a href="#pricing" style={{ color: 'var(--fg-2)', fontSize: '14px', textDecoration: 'none' }}>Tarifs</a>
-            <Link href="/leaderboard" style={{ color: 'var(--fg-2)', fontSize: '14px', textDecoration: 'none' }}>Classement</Link>
-
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <Link href="/login" className="btn btn-ghost" style={{ padding: '8px 16px' }}>Se connecter</Link>
-              <Link href="/signup" className="btn btn-primary" style={{ padding: '8px 16px' }}>Commencer gratuitement</Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-
       {/* Hero */}
       <section style={{ padding: '120px 24px', textAlign: 'center' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
@@ -84,7 +53,17 @@ export default function LandingPage() {
           </p>
 
           <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginBottom: '64px' }}>
-            <Link href="/signup" className="btn btn-primary" style={{ padding: '14px 32px', fontSize: '16px' }}>
+            <Link href="/signup" style={{
+              padding: '14px 32px',
+              fontSize: '16px',
+              background: '#00e0c6',
+              color: '#07090c',
+              fontWeight: 600,
+              borderRadius: '8px',
+              textDecoration: 'none',
+              display: 'inline-block',
+              transition: 'all 0.15s ease'
+            }}>
               Commencer gratuitement
             </Link>
             <Link href="/leaderboard" className="btn btn-ghost" style={{ padding: '14px 32px', fontSize: '16px' }}>
@@ -142,26 +121,26 @@ export default function LandingPage() {
               {
                 title: 'Quiz adaptatif',
                 desc: '1 000 questions style CFA officiel. Chrono. Difficulté progressive.',
-                icon: '📝'
+                icon: <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00e0c6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="2" width="18" height="20" rx="2"/><path d="M7 6h10M7 10h10M7 14h6"/></svg>
               },
               {
                 title: 'Classement global',
                 desc: 'Comparez-vous aux autres candidats en temps réel.',
-                icon: '🏆'
+                icon: <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00e0c6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 15h16"/><path d="M10 18.5c0 2.5 2 4.5 4 4.5s4-2 4-4.5V15c0-2-2-3-4-3s-4 1-4 3v3.5Z"/></svg>
               },
               {
                 title: 'Progression détaillée',
                 desc: 'Taux de réussite par matière. Sauvegarde automatique.',
-                icon: '📊'
+                icon: <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00e0c6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="M18 17l-4-4-4 4-4-8"/></svg>
               }
             ].map((feature, i) => (
               <div key={i} style={{
                 padding: '32px',
-                background: 'var(--bg-0)',
-                border: '1px solid var(--line)',
+                background: '#0c1015',
+                border: '1px solid #1c232d',
                 borderRadius: '12px'
               }}>
-                <div style={{ fontSize: '48px', marginBottom: '16px' }}>{feature.icon}</div>
+                <div style={{ marginBottom: '16px' }}>{feature.icon}</div>
                 <h3 style={{
                   fontSize: '20px',
                   fontWeight: 600,
@@ -271,8 +250,8 @@ export default function LandingPage() {
             {/* Free */}
             <div style={{
               padding: '40px',
-              background: 'var(--bg-0)',
-              border: '1px solid var(--line)',
+              background: '#0c1015',
+              border: '1px solid #1c232d',
               borderRadius: '12px'
             }}>
               <div style={{
@@ -311,7 +290,7 @@ export default function LandingPage() {
                 gap: '12px'
               }}>
                 {[
-                  '20 questions/jour',
+                  '10 questions/jour',
                   '3 matières',
                   'Classement visible',
                   'Profil public'
@@ -336,8 +315,8 @@ export default function LandingPage() {
             {/* Pro */}
             <div style={{
               padding: '40px',
-              background: 'var(--bg-0)',
-              border: '2px solid var(--acc)',
+              background: '#0c1015',
+              border: '1px solid #1c232d',
               borderRadius: '12px',
               position: 'relative'
             }}>
@@ -535,7 +514,17 @@ export default function LandingPage() {
           }}>
             Rejoignez des centaines de candidats qui révisent sérieusement avec CharterPath.
           </p>
-          <Link href="/signup" className="btn btn-primary" style={{ padding: '16px 48px', fontSize: '18px' }}>
+          <Link href="/signup" style={{
+            padding: '16px 48px',
+            fontSize: '18px',
+            background: '#00e0c6',
+            color: '#07090c',
+            fontWeight: 600,
+            borderRadius: '8px',
+            textDecoration: 'none',
+            display: 'inline-block',
+            transition: 'all 0.15s ease'
+          }}>
             Créer mon compte gratuit
           </Link>
         </div>
