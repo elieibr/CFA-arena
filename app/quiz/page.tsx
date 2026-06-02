@@ -137,9 +137,12 @@ function QuizContent() {
         .eq('topic_id', topicId)
         .single()
 
-      // Calculate session start
+      // Calculate session start - round down to nearest session boundary (0, 20, 40, 60...)
       const globalIndex = progressData?.current_question_index || 0
-      const calculatedSessionStart = globalIndex
+      const calculatedSessionStart = Math.floor(globalIndex / 20) * 20
+
+      console.log('current_question_index from DB:', progressData?.current_question_index)
+      console.log('sessionStart calculated:', calculatedSessionStart)
 
       // Get session questions (20 questions starting from sessionStart)
       let sessionQuestions = topicQuestions.slice(calculatedSessionStart, calculatedSessionStart + 20)
@@ -301,7 +304,18 @@ function QuizContent() {
     }
   }
 
-  function handleNextSession() {
+  async function handleNextSession() {
+    // Save position at start of next session
+    const nextSessionStart = sessionStart + 20
+
+    if (userId && topicId) {
+      await supabase
+        .from('user_topic_progress')
+        .update({ current_question_index: nextSessionStart })
+        .eq('user_id', userId)
+        .eq('topic_id', topicId)
+    }
+
     // Reload quiz to load next 20 questions
     setSessionComplete(false)
     setCurrentQuestionIndex(0)
