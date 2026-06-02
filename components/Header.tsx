@@ -54,10 +54,7 @@ export default function Header() {
       <div className="wrap">
         <div className="nav">
           <Link href="/dashboard" className="brand">
-            <img src="/logo-mark.svg" width="28" height="28" alt="CharterPath" style={{ flexShrink: 0 }} />
-            <span style={{ fontWeight: 700, fontSize: '15px', letterSpacing: '-0.01em' }}>
-              Charter<span style={{ color: '#00e0c6' }}>Path</span>
-            </span>
+            <img src="/charterpath-logo.svg" width="180" height="48" alt="CharterPath" />
           </Link>
 
           <nav className="primary">
