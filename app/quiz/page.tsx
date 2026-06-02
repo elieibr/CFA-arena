@@ -41,9 +41,7 @@ function QuizContent() {
   const [loading, setLoading] = useState(true)
   const [userId, setUserId] = useState<string | null>(null)
   const [sessionStats, setSessionStats] = useState({ correct: 0, incorrect: 0 })
-  const [sessionStart, setSessionStart] = useState(0)
-  const [totalQuestions, setTotalQuestions] = useState(0)
-  const [sessionComplete, setSessionComplete] = useState(false)
+  const [topicComplete, setTopicComplete] = useState(false)
 
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -110,7 +108,7 @@ function QuizContent() {
     }
     setUserId(user.id)
 
-    // Map topic ID to question sets
+    // Map topic ID to question sets - load ALL questions
     const questionMap: { [key: string]: Question[] } = {
       'ethical-standards': [...ethicsQuestions, ...ethicsAdvancedQuestions],
       'quantitative-methods': [...quantQuestions, ...quantAdvancedQuestions],
@@ -124,14 +122,9 @@ function QuizContent() {
       'portfolio-management': portfolioManagementAdvancedQuestions
     }
 
-    const topicQuestions = questionMap[topicId || ''] || []
+    const allQuestions = questionMap[topicId || ''] || []
 
-    if (topicQuestions.length > 0) {
-      setTotalQuestions(topicQuestions.length)
-
-      console.log('Querying with topicId:', topicId)
-      console.log('Querying with userId:', user.id)
-
+    if (allQuestions.length > 0) {
       // Load saved progress
       const { data: progressData } = await supabase
         .from('user_topic_progress')
@@ -140,34 +133,9 @@ function QuizContent() {
         .eq('topic_id', topicId)
         .maybeSingle()
 
-      // Calculate session start - round down to nearest session boundary (0, 20, 40, 60...)
-      const globalIndex = progressData?.current_question_index || 0
-      const calculatedSessionStart = Math.floor(globalIndex / 20) * 20
-
-      console.log('current_question_index from DB:', progressData?.current_question_index)
-      console.log('sessionStart calculated:', calculatedSessionStart)
-
-      // Get session questions (20 questions starting from sessionStart)
-      let sessionQuestions = topicQuestions.slice(calculatedSessionStart, calculatedSessionStart + 20)
-
-      // If no more questions, restart from beginning
-      if (sessionQuestions.length === 0) {
-        setSessionStart(0)
-        sessionQuestions = topicQuestions.slice(0, 20)
-        // Reset progress to 0
-        if (progressData) {
-          await supabase
-            .from('user_topic_progress')
-            .update({ current_question_index: 0 })
-            .eq('user_id', user.id)
-            .eq('topic_id', topicId)
-        }
-      } else {
-        setSessionStart(calculatedSessionStart)
-      }
-
-      setQuestions(sessionQuestions)
-      setCurrentQuestionIndex(0)
+      // Set all questions and resume from saved index
+      setQuestions(allQuestions)
+      setCurrentQuestionIndex(progressData?.current_question_index || 0)
 
       setLoading(false)
       return
@@ -241,7 +209,7 @@ function QuizContent() {
         .eq('id', userId)
     }
 
-    // Update user_topic_progress
+    // Update user_topic_progress - save next question index
     const { data: existingProgress } = await supabase
       .from('user_topic_progress')
       .select('*')
@@ -249,8 +217,7 @@ function QuizContent() {
       .eq('topic_id', currentQuestion.topic_id)
       .maybeSingle()
 
-    // Calculate global position
-    const globalPosition = sessionStart + currentQuestionIndex + 1
+    const nextQuestionIndex = currentQuestionIndex + 1
 
     if (existingProgress) {
       await supabase
@@ -258,7 +225,7 @@ function QuizContent() {
         .update({
           questions_attempted: existingProgress.questions_attempted + 1,
           questions_correct: existingProgress.questions_correct + (isCorrect ? 1 : 0),
-          current_question_index: globalPosition,
+          current_question_index: nextQuestionIndex,
           last_practiced_at: new Date().toISOString()
         })
         .eq('user_id', userId)
@@ -269,7 +236,7 @@ function QuizContent() {
         topic_id: currentQuestion.topic_id,
         questions_attempted: 1,
         questions_correct: isCorrect ? 1 : 0,
-        current_question_index: globalPosition
+        current_question_index: nextQuestionIndex
       })
     }
 
@@ -302,29 +269,29 @@ function QuizContent() {
       setIsAnswered(false)
       setTimeLeft(90)
     } else {
-      // Session complete
-      setSessionComplete(true)
+      // Topic complete - last question reached
+      setTopicComplete(true)
     }
   }
 
-  async function handleNextSession() {
-    // Save position at start of next session
-    const nextSessionStart = sessionStart + 20
-
+  async function handleRestartTopic() {
     if (userId && topicId) {
+      // Reset progress to 0
       await supabase
         .from('user_topic_progress')
-        .update({ current_question_index: nextSessionStart })
+        .update({ current_question_index: 0 })
         .eq('user_id', userId)
         .eq('topic_id', topicId)
     }
 
-    // Reload quiz to load next 20 questions
-    setSessionComplete(false)
+    // Reload quiz from beginning
+    setTopicComplete(false)
     setCurrentQuestionIndex(0)
     setSessionStats({ correct: 0, incorrect: 0 })
     setScore(0)
-    loadQuiz()
+    setSelectedAnswer(null)
+    setIsAnswered(false)
+    setTimeLeft(90)
   }
 
   if (loading) {
@@ -351,24 +318,22 @@ function QuizContent() {
     )
   }
 
-  // Session complete screen
-  if (sessionComplete) {
-    const currentSessionNumber = Math.floor(sessionStart / 20) + 1
-    const totalSessions = Math.ceil(totalQuestions / 20)
-    const hasNextSession = sessionStart + 20 < totalQuestions
+  // Topic complete screen
+  if (topicComplete) {
+    const topic = curriculum.find((t) => t.id === topicId)
 
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-0)' }}>
         <div style={{ maxWidth: '540px', width: '100%', padding: '24px', textAlign: 'center' }}>
           <div style={{ fontSize: '64px', marginBottom: '24px' }}>🎯</div>
           <h1 style={{ fontSize: '32px', fontWeight: 600, color: 'var(--fg-0)', marginBottom: '12px' }}>
-            Session {currentSessionNumber}/{totalSessions} terminée !
+            Topic complété !
           </h1>
           <p style={{ fontSize: '15px', color: 'var(--fg-2)', marginBottom: '40px' }}>
-            Questions {sessionStart + 1}-{Math.min(sessionStart + 20, totalQuestions)} sur {totalQuestions}
+            Vous avez terminé toutes les {questions.length} questions de {topic?.titleEn}
           </p>
 
-          {/* Session stats */}
+          {/* Stats */}
           <div style={{
             background: 'var(--bg-1)',
             border: '1px solid var(--line)',
@@ -389,11 +354,9 @@ function QuizContent() {
 
           {/* Buttons */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {hasNextSession && (
-              <button onClick={handleNextSession} className="btn btn-primary" style={{ width: '100%' }}>
-                Session suivante ({currentSessionNumber + 1}/{totalSessions})
-              </button>
-            )}
+            <button onClick={handleRestartTopic} className="btn btn-primary" style={{ width: '100%' }}>
+              Recommencer depuis le début
+            </button>
             <button
               onClick={() => router.push('/dashboard')}
               className="btn btn-ghost"
@@ -412,25 +375,23 @@ function QuizContent() {
   const isTimerUrgent = timeLeft < 30
   const totalAttempted = sessionStats.correct + sessionStats.incorrect
   const successRate = totalAttempted > 0 ? Math.round((sessionStats.correct / totalAttempted) * 100) : 0
-  const currentSessionNumber = Math.floor(sessionStart / 20) + 1
-  const totalSessions = Math.ceil(totalQuestions / 20)
 
   return (
     <div className="quiz-wrap">
       {/* Status strip */}
       <div className="quiz-status">
         <div className="qs-cell">
-          <div className="l">MATIÈRE · SESSION</div>
+          <div className="l">MATIÈRE</div>
           <div className="v">
-            <span className="acc">{topic?.titleEn?.split(' ')[0] || 'Quiz'}</span> · Session {currentSessionNumber}/{totalSessions}
+            <span className="acc">{topic?.titleEn?.split(' ')[0] || 'Quiz'}</span>
           </div>
         </div>
         <div className="qs-cell">
           <div className="l">QUESTION</div>
-          <div className="v">{String(sessionStart + currentQuestionIndex + 1).padStart(2, '0')} / {totalQuestions}</div>
+          <div className="v">{currentQuestionIndex + 1} / {questions.length}</div>
         </div>
         <div className="qs-cell">
-          <div className="l">PRÉCISION SESSION</div>
+          <div className="l">PRÉCISION</div>
           <div className="v">
             {sessionStats.correct} / {totalAttempted} · <span className="acc">{successRate}%</span>
           </div>
@@ -447,7 +408,7 @@ function QuizContent() {
       {/* Progress */}
       <div className="qprog-wrap">
         <div className="qprog-head">
-          <span>PROGRESSION · SESSION</span>
+          <span>PROGRESSION</span>
           <span className="right">
             <span><span className="acc">●</span> {sessionStats.correct} CORRECTES</span>
             <span><span className="dn">●</span> {sessionStats.incorrect} INCORRECTES</span>
@@ -455,7 +416,7 @@ function QuizContent() {
           </span>
         </div>
         <div className="qprog">
-          {questions.map((_, idx) => {
+          {questions.slice(0, Math.min(questions.length, 20)).map((_, idx) => {
             let className = ''
             if (idx < currentQuestionIndex) {
               // Already answered - check from sessionStats
@@ -579,7 +540,7 @@ function QuizContent() {
             <div className="fb-stats">
               <div>
                 <div className="v">{successRate}%</div>
-                <div className="l">PRÉCISION SESSION</div>
+                <div className="l">PRÉCISION</div>
               </div>
               <div>
                 <div className="v">{90 - timeLeft}s</div>
