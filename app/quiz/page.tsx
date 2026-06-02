@@ -125,10 +125,10 @@ function QuizContent() {
     const allQuestions = questionMap[topicId || ''] || []
 
     if (allQuestions.length > 0) {
-      // Load saved progress
+      // Load saved progress and stats
       const { data: progressData, error: progressError } = await supabase
         .from('user_topic_progress')
-        .select('current_question_index')
+        .select('current_question_index, questions_attempted, questions_correct')
         .eq('user_id', user.id)
         .eq('topic_id', topicId)
         .maybeSingle()
@@ -141,6 +141,16 @@ function QuizContent() {
       // Set all questions and resume from saved index
       setQuestions(allQuestions)
       setCurrentQuestionIndex(progressData?.current_question_index || 0)
+
+      // Restore session stats from saved progress
+      const questionsCorrect = progressData?.questions_correct || 0
+      const questionsAttempted = progressData?.questions_attempted || 0
+      const questionsIncorrect = questionsAttempted - questionsCorrect
+
+      setSessionStats({
+        correct: questionsCorrect,
+        incorrect: questionsIncorrect
+      })
 
       setLoading(false)
       return
