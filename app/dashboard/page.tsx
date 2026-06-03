@@ -62,7 +62,7 @@ export default function DashboardPage() {
     console.log('📈 Fetching topic progress...')
     const { data: progressData, error: progressError } = await supabase
       .from('user_topic_progress')
-      .select('*')
+      .select('topic_id, questions_attempted, questions_correct')
       .eq('user_id', user.id)
 
     if (progressError) {
@@ -70,6 +70,14 @@ export default function DashboardPage() {
     } else {
       console.log('✅ Progress loaded:', progressData)
     }
+
+    console.log('topicProgress:', JSON.stringify(progressData))
+
+    const totalAttempted = progressData?.reduce((sum, t) => sum + (t.questions_attempted || 0), 0) || 0
+    const totalCorrect = progressData?.reduce((sum, t) => sum + (t.questions_correct || 0), 0) || 0
+    console.log('totalAttempted:', totalAttempted)
+    console.log('totalCorrect:', totalCorrect)
+    console.log('precision:', totalCorrect / totalAttempted * 100)
 
     setTopicProgress(progressData || [])
 
