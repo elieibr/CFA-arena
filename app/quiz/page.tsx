@@ -79,6 +79,7 @@ function QuizContent() {
   const [sessionStats, setSessionStats] = useState({ correct: 0, incorrect: 0 })
   const [topicComplete, setTopicComplete] = useState(false)
   const [answers, setAnswers] = useState<{[key: number]: 'correct' | 'incorrect'}>({})
+  const [questionStartTime, setQuestionStartTime] = useState<number>(Date.now())
 
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -195,6 +196,9 @@ function QuizContent() {
       // Load answers from database
       setAnswers(progressData?.answers || {})
 
+      // Reset start time for first/current question
+      setQuestionStartTime(Date.now())
+
       setLoading(false)
       return
     }
@@ -244,6 +248,9 @@ function QuizContent() {
     const currentQuestion = questions[currentQuestionIndex]
     const pointsEarned = isCorrect ? (100 * currentQuestion.difficulty + Math.floor(100 * currentQuestion.difficulty * 0.5 * (timeLeft / 90))) : 0
 
+    // Calculate actual time spent on this question (in seconds)
+    const timeSpent = Math.round((Date.now() - questionStartTime) / 1000)
+
     // Save to question_history
     await supabase.from('question_history').insert({
       user_id: userId,
@@ -253,6 +260,7 @@ function QuizContent() {
       correct_answer: currentQuestion.correct_answer,
       is_correct: isCorrect,
       time_taken: 90 - timeLeft,
+      time_spent: timeSpent,
       difficulty: currentQuestion.difficulty === 1 ? 'easy' : currentQuestion.difficulty === 2 ? 'medium' : 'hard',
       points_earned: pointsEarned
     })
@@ -341,6 +349,7 @@ function QuizContent() {
       setSelectedAnswer(null)
       setIsAnswered(false)
       setTimeLeft(90)
+      setQuestionStartTime(Date.now()) // Reset start time for next question
     } else {
       // Topic complete - last question reached
       setTopicComplete(true)
@@ -365,6 +374,7 @@ function QuizContent() {
     setSelectedAnswer(null)
     setIsAnswered(false)
     setTimeLeft(90)
+    setQuestionStartTime(Date.now()) // Reset start time for restarted quiz
   }
 
   function handleQuestionNavigation(index: number) {
@@ -373,6 +383,7 @@ function QuizContent() {
     setSelectedAnswer(null)
     setIsAnswered(false)
     setTimeLeft(90)
+    setQuestionStartTime(Date.now()) // Reset start time for navigated question
   }
 
   if (loading) {
