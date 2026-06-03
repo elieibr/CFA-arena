@@ -62,6 +62,9 @@ export default function Header() {
               Accueil
             </Link>
             <Link href="/dashboard#subjects">Matières</Link>
+            <Link href="/courses" className={pathname?.startsWith('/courses') ? 'active' : ''}>
+              Cours
+            </Link>
             <Link href="/exam">Examen blanc</Link>
             <Link href="/statistics" className={pathname === '/statistics' ? 'active' : ''}>
               Stats
