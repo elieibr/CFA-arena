@@ -81,7 +81,7 @@ export default function DashboardPage() {
 
     setTopicProgress(progressData || [])
 
-    // Get total hours from question_history
+    // Get total time from question_history
     console.log('⏱️  Fetching time spent...')
     const { data: timeData, error: timeError } = await supabase
       .from('question_history')
@@ -92,9 +92,8 @@ export default function DashboardPage() {
       console.error('❌ Error fetching time:', timeError)
     } else {
       const totalSeconds = (timeData || []).reduce((sum, record) => sum + (record.time_spent || 0), 0)
-      const hours = totalSeconds / 3600
-      setTotalHours(hours)
-      console.log('✅ Total hours:', hours.toFixed(1))
+      setTotalHours(totalSeconds) // Store total seconds, not hours
+      console.log('✅ Total seconds:', totalSeconds)
     }
 
     setLoading(false)
@@ -119,6 +118,23 @@ export default function DashboardPage() {
 
   // Active topics count (topics where questions_attempted > 0)
   const activeTopicsCount = topicProgress.filter(t => (t.questions_attempted || 0) > 0).length
+
+  // Format time display (totalHours is actually total seconds)
+  const formatTime = (seconds: number) => {
+    if (seconds === 0) return '0s'
+
+    const hours = Math.floor(seconds / 3600)
+    const minutes = Math.floor((seconds % 3600) / 60)
+    const secs = Math.floor(seconds % 60)
+
+    if (hours > 0) {
+      return `${hours}h ${minutes}m ${secs}s`
+    } else if (minutes > 0) {
+      return `${minutes}m ${secs}s`
+    } else {
+      return `${secs}s`
+    }
+  }
 
   // Map topic to color (from CFA_Prep.html)
   const getTopicColor = (topicId: string) => {
@@ -244,8 +260,8 @@ export default function DashboardPage() {
               </div>
               <div className="pc-meta">
                 <div className="pc-meta-item">
-                  <div className="label">Heures</div>
-                  <div className="value">{totalHours.toFixed(0)}<span style={{ color: 'var(--fg-3)', fontSize: '13px' }}>h</span></div>
+                  <div className="label">Temps</div>
+                  <div className="value" style={{ fontSize: '16px' }}>{formatTime(totalHours)}</div>
                 </div>
                 <div className="pc-meta-item">
                   <div className="label">Précision</div>
