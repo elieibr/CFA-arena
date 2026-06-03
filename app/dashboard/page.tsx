@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 export default function DashboardPage() {
   const [profile, setProfile] = useState<any>(null)
   const [topicProgress, setTopicProgress] = useState<any[]>([])
+  const [totalHours, setTotalHours] = useState(0)
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
   const router = useRouter()
@@ -71,6 +72,23 @@ export default function DashboardPage() {
     }
 
     setTopicProgress(progressData || [])
+
+    // Get total hours from question_history
+    console.log('⏱️  Fetching time spent...')
+    const { data: timeData, error: timeError } = await supabase
+      .from('question_history')
+      .select('time_spent')
+      .eq('user_id', user.id)
+
+    if (timeError) {
+      console.error('❌ Error fetching time:', timeError)
+    } else {
+      const totalSeconds = (timeData || []).reduce((sum, record) => sum + (record.time_spent || 0), 0)
+      const hours = totalSeconds / 3600
+      setTotalHours(hours)
+      console.log('✅ Total hours:', hours.toFixed(1))
+    }
+
     setLoading(false)
     console.log('=== Dashboard loadData END ===')
   }
@@ -83,13 +101,16 @@ export default function DashboardPage() {
     )
   }
 
-  // Calculate global stats
-  const totalQuestions = topicProgress.reduce((sum, t) => sum + t.questions_attempted, 0)
-  const totalCorrect = topicProgress.reduce((sum, t) => sum + t.questions_correct, 0)
+  // Calculate global stats from ALL topics
+  const totalQuestions = topicProgress.reduce((sum, t) => sum + (t.questions_attempted || 0), 0)
+  const totalCorrect = topicProgress.reduce((sum, t) => sum + (t.questions_correct || 0), 0)
   const totalPoints = profile?.total_points || 0
 
-  // Success rate
-  const successRate = totalQuestions > 0 ? (totalCorrect / totalQuestions) * 100 : 0
+  // Global success rate (precision globale)
+  const globalPrecision = totalQuestions > 0 ? (totalCorrect / totalQuestions) * 100 : 0
+
+  // Active topics count (topics where questions_attempted > 0)
+  const activeTopicsCount = topicProgress.filter(t => (t.questions_attempted || 0) > 0).length
 
   // Map topic to color (from CFA_Prep.html)
   const getTopicColor = (topicId: string) => {
@@ -206,21 +227,21 @@ export default function DashboardPage() {
                 <span className="pc-date">{new Date().toLocaleDateString('fr-FR')}</span>
               </div>
               <div className="pc-big">
-                <div className="pc-percent">{successRate.toFixed(0)}<span className="pct-sym">%</span></div>
+                <div className="pc-percent">{globalPrecision.toFixed(0)}<span className="pct-sym">%</span></div>
                 <div className="pc-delta">+ 0% / 7j</div>
               </div>
-              <div className="pc-label">{totalCorrect} / 10 concepts maîtrisés</div>
+              <div className="pc-label">{activeTopicsCount} / 10 matières actives</div>
               <div className="pc-bar">
-                <div className="pc-bar-fill" style={{ width: `${Math.min(successRate, 100)}%` }}></div>
+                <div className="pc-bar-fill" style={{ width: `${Math.min(globalPrecision, 100)}%` }}></div>
               </div>
               <div className="pc-meta">
                 <div className="pc-meta-item">
                   <div className="label">Heures</div>
-                  <div className="value">0<span style={{ color: 'var(--fg-3)', fontSize: '13px' }}>h</span></div>
+                  <div className="value">{totalHours.toFixed(0)}<span style={{ color: 'var(--fg-3)', fontSize: '13px' }}>h</span></div>
                 </div>
                 <div className="pc-meta-item">
                   <div className="label">Précision</div>
-                  <div className="value">{successRate.toFixed(0)}%</div>
+                  <div className="value">{globalPrecision.toFixed(0)}%</div>
                 </div>
                 <div className="pc-meta-item">
                   <div className="label">Streak</div>
