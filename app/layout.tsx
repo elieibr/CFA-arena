@@ -1,6 +1,28 @@
 import type { Metadata } from "next";
+import { Inter, IBM_Plex_Mono, Instrument_Serif } from 'next/font/google';
 import "./globals.css";
 import Header from "@/components/Header";
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter'
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  weight: ['400', '500', '600'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-ibm-plex-mono'
+});
+
+const instrumentSerif = Instrument_Serif({
+  weight: ['400'],
+  subsets: ['latin'],
+  display: 'swap',
+  style: ['normal', 'italic'],
+  variable: '--font-instrument-serif'
+});
 
 export const metadata: Metadata = {
   title: "CharterPath — Préparation CFA Level 1",
@@ -38,11 +60,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr">
+    <html lang="fr" className={`${inter.variable} ${ibmPlexMono.variable} ${instrumentSerif.variable}`}>
       <head>
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
       </head>
-      <body>
+      <body className={inter.className}>
         <Header />
         {children}
       </body>
