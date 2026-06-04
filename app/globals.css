@@ -1572,49 +1572,340 @@ section.block {
 }
 
 /* ============ RESPONSIVE ============ */
-@media (max-width: 960px) {
-  .hero-grid {
-    grid-template-columns: 1fr;
-    gap: 40px;
+@media (max-width: 768px) {
+  /* Global mobile rules */
+  body {
+    font-size: 14px;
   }
 
+  .wrap {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .page {
+    overflow-x: hidden;
+  }
+
+  /* Typography */
   h1.hero-title {
-    font-size: 44px;
+    font-size: 36px !important;
+    line-height: 1.1 !important;
+  }
+
+  h2 {
+    font-size: 24px !important;
+  }
+
+  /* Dashboard - Hero section */
+  .hero-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .hero-title {
+    font-size: 36px;
+    letter-spacing: -0.025em;
+  }
+
+  .hero-sub {
+    font-size: 14px;
+  }
+
+  .hero-cta {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .hero-cta .btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+  }
+
+  /* Dashboard - Progress card */
+  .progress-card {
+    padding: 20px;
+  }
+
+  .pc-big {
+    margin-bottom: 16px;
   }
 
   .pc-percent {
-    font-size: 44px;
+    font-size: 42px !important;
   }
 
+  .pc-meta {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .pc-meta-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: var(--bg-0);
+    border-radius: 8px;
+  }
+
+  .pc-meta-item .label {
+    text-align: left;
+  }
+
+  .pc-meta-item .value {
+    text-align: right;
+  }
+
+  /* Dashboard - Subjects grid */
+  .subjects-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .subj {
+    padding: 20px !important;
+  }
+
+  /* Quiz - Status bar */
+  .quiz-status {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0 !important;
+  }
+
+  .qs-cell {
+    padding: 14px 12px !important;
+    font-size: 11px !important;
+  }
+
+  .qs-cell.timer {
+    grid-column: span 2;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .qs-v {
+    font-size: 16px !important;
+  }
+
+  /* Quiz - Progress bar */
+  .quiz-progress {
+    padding: 12px 16px !important;
+  }
+
+  .qp-blocks {
+    gap: 3px !important;
+  }
+
+  .qp-block {
+    width: 8px !important;
+    height: 8px !important;
+  }
+
+  /* Quiz - Question card */
+  .quiz-card {
+    padding: 20px !important;
+  }
+
+  .qcard-top {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 12px;
+  }
+
+  .quiz-choices {
+    gap: 10px !important;
+  }
+
+  .choice {
+    padding: 14px 16px !important;
+    min-height: 44px;
+  }
+
+  .choice-text {
+    font-size: 14px !important;
+  }
+
+  /* Quiz - Feedback panel */
+  .fb-verdict {
+    font-size: 18px !important;
+  }
+
+  .fb-stats {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* Quiz - Question navigation grid */
+  .quiz-nav-grid {
+    grid-template-columns: repeat(8, 1fr) !important;
+    gap: 6px !important;
+  }
+
+  .quiz-nav-btn {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 11px !important;
+  }
+
+  /* Courses - Cards grid */
+  .courses-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Courses - Detail tabs */
+  .course-tabs {
+    flex-direction: column;
+  }
+
+  .course-tab {
+    width: 100%;
+    text-align: left;
+  }
+
+  /* Leaderboard - Table */
+  .leaderboard-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .leaderboard-table table {
+    min-width: 500px;
+  }
+
+  .leaderboard-table td,
+  .leaderboard-table th {
+    padding: 12px 8px !important;
+    font-size: 12px !important;
+  }
+
+  /* Profile - Stats strip */
+  .profile-stats-strip {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .profile-stats-strip > div {
+    padding: 24px 16px !important;
+  }
+
+  .profile-stat-value {
+    font-size: 28px !important;
+  }
+
+  /* Landing page */
+  .landing-hero h1 {
+    font-size: 36px !important;
+  }
+
+  .landing-features {
+    grid-template-columns: 1fr !important;
+  }
+
+  .landing-pricing {
+    grid-template-columns: 1fr !important;
+  }
+
+  .landing-faq {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Header */
   nav.primary {
     display: none;
   }
 
-  .quiz-header-top {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
+  header.site {
+    padding: 12px 0;
   }
 
-  .quiz-stats {
-    width: 100%;
-    justify-content: space-between;
+  .brand img {
+    max-width: 140px;
   }
 
-  .question-meta {
+  /* Buttons - touch targets */
+  .btn {
+    min-height: 44px;
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+
+  .btn-ghost {
+    min-height: 44px;
+  }
+
+  .btn-primary {
+    min-height: 44px;
+  }
+
+  /* Cards */
+  .card {
+    padding: 20px !important;
+  }
+
+  /* Block sections */
+  .block {
+    padding: 40px 0 !important;
+  }
+
+  .block-head h2 {
+    font-size: 24px !important;
+    margin-bottom: 16px !important;
+  }
+
+  /* Stat rows */
+  .stat-row {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: flex-start !important;
     gap: 12px;
   }
 
-  .leaderboard-table {
-    overflow-x: auto;
+  .stat-row .v {
+    font-size: 20px !important;
   }
 
-  .quiz-status {
-    grid-template-columns: 1fr 1fr;
+  /* Forms */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  textarea,
+  select {
+    min-height: 44px;
+    font-size: 16px; /* Prevents iOS zoom */
   }
-  .qs-cell.timer {
-    grid-column: span 2;
+
+  /* Modals/overlays */
+  .modal {
+    max-width: calc(100vw - 32px) !important;
+    margin: 16px;
+  }
+
+  /* Tables */
+  table {
+    font-size: 13px;
+  }
+
+  /* Spacing */
+  section {
+    padding-top: 32px !important;
+    padding-bottom: 32px !important;
+  }
+
+  /* Hide on mobile */
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+/* Tablet breakpoint */
+@media (max-width: 960px) and (min-width: 769px) {
+  .subjects-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .quiz-nav-grid {
+    grid-template-columns: repeat(10, 1fr) !important;
+  }
+
+  .profile-stats-strip {
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 }
