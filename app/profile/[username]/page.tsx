@@ -35,6 +35,22 @@ function getBadges(points: number, successRate: number, streak: number) {
   return badges
 }
 
+function getTopicIcon(code: string) {
+  const iconMap: { [key: string]: string } = {
+    'QM': '<path d="M3 14h10M3 11l3-4 3 2 4-6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    'EC': '<path d="M2 13h12M4 13V8m3 5V5m3 8V9m3 4V3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>',
+    'FSA': '<rect x="3" y="2" width="10" height="12" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M5 5h6M5 8h6M5 11h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
+    'CI': '<path d="M2 14h12M4 14V6l4-3 4 3v8M7 10h2M7 13h2" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    'EQ': '<path d="M8 2v12M3 7l5-5 5 5M3 11l5 3 5-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    'FI': '<path d="M2 8c2-3 4-3 6 0s4 3 6 0" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/><circle cx="8" cy="8" r="0.8" fill="currentColor"/>',
+    'DV': '<path d="M3 13L13 3M3 3l3 3M10 10l3 3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>',
+    'AI': '<path d="M8 2L2 6v6l6 4 6-4V6z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/><path d="M2 6l6 4 6-4M8 10v6" stroke="currentColor" stroke-width="1.5" fill="none"/>',
+    'PM': '<circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M8 2v6l4 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
+    'ETH': '<path d="M8 2L3 4v4c0 3 2 5 5 6 3-1 5-3 5-6V4z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/><path d="M6 8l1.5 1.5L10 7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+  }
+  return iconMap[code] || iconMap['ETH']
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { username } = await params
 
@@ -288,6 +304,7 @@ export default async function ProfilePage({ params }: PageProps) {
 
           {/* Stats Strip (4 metrics) */}
           <div
+            className="profile-stats-strip"
             style={{
               background: 'var(--bg-1)',
               border: '1px solid var(--line)',
@@ -472,6 +489,7 @@ export default async function ProfilePage({ params }: PageProps) {
               return (
                 <div
                   key={topic.id}
+                  className="profile-topic-row"
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -482,7 +500,7 @@ export default async function ProfilePage({ params }: PageProps) {
                 >
                   {/* Left: Icon + Name */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: 1 }}>
-                    {/* Icon placeholder */}
+                    {/* Icon SVG */}
                     <div
                       style={{
                         width: '32px',
@@ -493,10 +511,10 @@ export default async function ProfilePage({ params }: PageProps) {
                         display: 'grid',
                         placeItems: 'center',
                         flexShrink: 0,
-                        fontSize: '16px'
+                        color: 'var(--fg-2)'
                       }}
                     >
-                      📊
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" dangerouslySetInnerHTML={{ __html: getTopicIcon(topic.code) }} />
                     </div>
 
                     {/* Topic name + code */}
@@ -580,7 +598,7 @@ export default async function ProfilePage({ params }: PageProps) {
                     </div>
 
                     {/* Points */}
-                    <div style={{ textAlign: 'right', minWidth: '80px' }}>
+                    <div className="profile-topic-points" style={{ textAlign: 'right', minWidth: '80px' }}>
                       <div
                         style={{
                           fontFamily: 'var(--font-mono)',
