@@ -9,6 +9,7 @@ export default function Header() {
   const pathname = usePathname()
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<any>(null)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -57,7 +58,7 @@ export default function Header() {
             <img src="/charterpath-logo.svg" width="170" height="42" alt="CharterPath" />
           </Link>
 
-          <nav className="primary">
+          <nav className="primary desktop-only">
             <Link href="/dashboard" className={pathname === '/dashboard' ? 'active' : ''}>
               Accueil
             </Link>
@@ -77,6 +78,16 @@ export default function Header() {
             </Link>
           </nav>
 
+          <button
+            className="mobile-menu-button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Menu"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+
           <div className="nav-end">
             {user && (
               <>
@@ -91,6 +102,32 @@ export default function Header() {
             )}
           </div>
         </div>
+
+        {mobileMenuOpen && (
+          <nav className="mobile-menu">
+            <Link href="/dashboard" className={pathname === '/dashboard' ? 'active' : ''} onClick={() => setMobileMenuOpen(false)}>
+              Accueil
+            </Link>
+            <Link href="/dashboard#subjects" onClick={() => setMobileMenuOpen(false)}>
+              Matières
+            </Link>
+            <Link href="/courses" className={pathname?.startsWith('/courses') ? 'active' : ''} onClick={() => setMobileMenuOpen(false)}>
+              Cours
+            </Link>
+            <Link href="/exam" onClick={() => setMobileMenuOpen(false)}>
+              Examen blanc
+            </Link>
+            <Link href="/statistics" className={pathname === '/statistics' ? 'active' : ''} onClick={() => setMobileMenuOpen(false)}>
+              Stats
+            </Link>
+            <Link href="/subscription" className={pathname === '/subscription' ? 'active' : ''} onClick={() => setMobileMenuOpen(false)}>
+              Abonnement
+            </Link>
+            <Link href="/leaderboard" className={pathname === '/leaderboard' ? 'active' : ''} onClick={() => setMobileMenuOpen(false)}>
+              Classement
+            </Link>
+          </nav>
+        )}
       </div>
     </header>
   )

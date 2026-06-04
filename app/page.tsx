@@ -30,7 +30,7 @@ export default function LandingPage() {
             [ CFA LEVEL 1 · TERMINAL ]
           </div>
 
-          <h1 style={{
+          <h1 className="landing-hero-title" style={{
             fontSize: '72px',
             fontWeight: 700,
             color: 'var(--fg-0)',
@@ -52,7 +52,7 @@ export default function LandingPage() {
             1 000 questions officielles. 10 matières. Classement en temps réel. La plateforme de préparation CFA qui ne prend pas les candidats pour des idiots.
           </p>
 
-          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginBottom: '64px' }}>
+          <div className="landing-hero-buttons" style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginBottom: '64px' }}>
             <Link href="/signup" style={{
               padding: '14px 32px',
               fontSize: '16px',
@@ -72,7 +72,7 @@ export default function LandingPage() {
           </div>
 
           {/* Stats */}
-          <div style={{
+          <div className="landing-stats-strip" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(4, 1fr)',
             gap: '24px',
@@ -116,7 +116,7 @@ export default function LandingPage() {
             Tout ce dont vous avez besoin
           </h2>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px' }}>
+          <div className="landing-features-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px' }}>
             {[
               {
                 title: 'Quiz adaptatif',
@@ -176,7 +176,7 @@ export default function LandingPage() {
             Utilisé par des candidats sérieux
           </h2>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px' }}>
+          <div className="landing-testimonials-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px' }}>
             {[
               {
                 quote: "CharterPath m'a permis de passer 2h de révision par jour sans m'ennuyer.",
@@ -246,7 +246,7 @@ export default function LandingPage() {
             Tarifs transparents
           </h2>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '32px' }}>
+          <div className="landing-pricing-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '32px' }}>
             {/* Free */}
             <div style={{
               padding: '40px',

@@ -262,6 +262,10 @@ nav.primary {
   flex: 1;
 }
 
+.mobile-menu-button {
+  display: none;
+}
+
 nav.primary a {
   color: var(--fg-1);
   text-decoration: none;
@@ -1808,13 +1812,96 @@ section.block {
     grid-template-columns: 1fr !important;
   }
 
+  /* Landing page mobile */
+  .landing-hero-title {
+    font-size: 36px !important;
+  }
+
+  .landing-hero-buttons {
+    flex-direction: column !important;
+  }
+
+  .landing-hero-buttons a {
+    width: 100% !important;
+    text-align: center;
+  }
+
+  .landing-stats-strip {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .landing-features-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .landing-testimonials-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .landing-pricing-grid {
+    grid-template-columns: 1fr !important;
+  }
+
   /* Header */
-  nav.primary {
+  nav.primary.desktop-only {
     display: none;
+  }
+
+  .mobile-menu-button {
+    display: flex !important;
+    flex-direction: column;
+    gap: 5px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    margin-left: auto;
+  }
+
+  .mobile-menu-button span {
+    width: 24px;
+    height: 2px;
+    background: var(--fg-0);
+    border-radius: 2px;
+    transition: all 0.2s ease;
+  }
+
+  .mobile-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--line);
+    padding: 16px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 1000;
+  }
+
+  .mobile-menu a {
+    padding: 12px 16px;
+    font-size: 15px;
+    color: var(--fg-1);
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+  }
+
+  .mobile-menu a:hover {
+    background: var(--bg-2);
+    color: var(--fg-0);
+  }
+
+  .mobile-menu a.active {
+    background: var(--bg-2);
+    color: var(--acc);
   }
 
   header.site {
     padding: 12px 0;
+    position: relative;
   }
 
   .brand img {
