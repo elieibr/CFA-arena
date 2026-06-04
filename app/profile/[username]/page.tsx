@@ -474,7 +474,10 @@ export default async function ProfilePage({ params }: PageProps) {
               background: 'var(--bg-1)',
               border: '1px solid var(--line)',
               borderRadius: 'var(--radius)',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              width: '100%',
+              maxWidth: '100%',
+              overflowX: 'hidden'
             }}
           >
             {curriculum.map((topic, index) => {
