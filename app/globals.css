@@ -1910,10 +1910,12 @@ section.block {
 
   .profile-topic-row > div:last-child > div:nth-child(1) {
     grid-column: 3 !important;
+    min-width: 0 !important;
   }
 
   .profile-topic-row > div:last-child > div:nth-child(2) {
     grid-column: 4 !important;
+    min-width: 0 !important;
   }
 
   .profile-topic-row > div:last-child > div:nth-child(3) {
