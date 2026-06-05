@@ -1874,7 +1874,7 @@ section.block {
   .profile-topic-row {
     display: grid !important;
     grid-template-columns: 40px 1fr 60px 60px !important;
-    gap: 12px !important;
+    gap: 16px !important;
     align-items: center !important;
     padding: 12px !important;
   }
