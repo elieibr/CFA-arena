@@ -13,7 +13,7 @@ export default function BlogPage() {
   return (
     <>
       <Header />
-      <main style={{ background: 'var(--bg-0)', paddingTop: '80px' }}>
+      <main style={{ minHeight: '100vh', background: 'var(--bg-0)', paddingTop: '80px' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px' }}>
           {/* Hero */}
           <div style={{ paddingTop: '64px', paddingBottom: '48px', textAlign: 'center' }}>

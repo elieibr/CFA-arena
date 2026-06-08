@@ -9,7 +9,7 @@ export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
   return (
-    <div style={{ background: 'var(--bg-0)' }}>
+    <div style={{ background: 'var(--bg-0)', minHeight: '100vh' }}>
       {/* Hero */}
       <section style={{ padding: '120px 24px', textAlign: 'center' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>

@@ -492,7 +492,7 @@ export default function ExamPage() {
   const topic = curriculum.find((t) => t.id === currentQuestion.topic_id)
 
   return (
-    <div style={{ background: 'var(--bg-0)' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg-0)' }}>
       {/* Header */}
       <header style={{
         background: 'var(--bg-1)',
