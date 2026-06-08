@@ -40,15 +40,6 @@ export default function Header() {
     return 'CP'
   }
 
-  const getStreakDays = () => {
-    if (profile?.last_login_at && profile?.created_at) {
-      const now = new Date()
-      const lastLogin = new Date(profile.last_login_at)
-      const daysSinceLastLogin = Math.floor((now.getTime() - lastLogin.getTime()) / (1000 * 60 * 60 * 24))
-      return daysSinceLastLogin <= 1 ? Math.floor((now.getTime() - new Date(profile.created_at).getTime()) / (1000 * 60 * 60 * 24)) : 0
-    }
-    return 0
-  }
 
   return (
     <header className="site">
@@ -93,15 +84,9 @@ export default function Header() {
 
           <div className="nav-end">
             {user && (
-              <>
-                <span className="streak">
-                  <span>🔥</span>
-                  <span>{getStreakDays()} jours</span>
-                </span>
-                <div className="avatar" title={profile?.username || 'Profil'}>
-                  {getInitials()}
-                </div>
-              </>
+              <div className="avatar" title={profile?.username || 'Profil'}>
+                {getInitials()}
+              </div>
             )}
           </div>
         </div>

@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { getAllBlogPosts } from '@/lib/blog'
-import Header from '@/components/Header'
 
 export const metadata = {
   title: 'Blog — CharterPath',
@@ -11,9 +10,7 @@ export default function BlogPage() {
   const posts = getAllBlogPosts()
 
   return (
-    <>
-      <Header />
-      <main style={{ minHeight: '100vh', background: 'var(--bg-0)', paddingTop: '80px' }}>
+    <main style={{ minHeight: '100vh', background: 'var(--bg-0)', paddingTop: '80px' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px' }}>
           {/* Hero */}
           <div style={{ paddingTop: '64px', paddingBottom: '48px', textAlign: 'center' }}>
@@ -134,6 +131,5 @@ export default function BlogPage() {
           </div>
         </div>
       </main>
-    </>
   )
 }

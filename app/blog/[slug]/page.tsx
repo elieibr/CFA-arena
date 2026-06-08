@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getBlogPostBySlug, getAllBlogSlugs } from '@/lib/blog'
-import Header from '@/components/Header'
 import { remark } from 'remark'
 import html from 'remark-html'
 
@@ -42,8 +41,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const contentHtml = await markdownToHtml(post.content)
 
   return (
-    <>
-      <Header />
       <main style={{ minHeight: '100vh', background: 'var(--bg-0)', paddingTop: '80px' }}>
         <article style={{ maxWidth: '768px', margin: '0 auto', padding: '0 24px' }}>
           {/* Back link */}
@@ -125,6 +122,5 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           />
         </article>
       </main>
-    </>
   )
 }
