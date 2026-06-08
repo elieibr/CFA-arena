@@ -555,6 +555,7 @@ export default function LandingPage() {
           </div>
 
           <div style={{ display: 'flex', gap: '32px' }}>
+            <Link href="/blog" style={{ fontSize: '14px', color: 'var(--fg-2)', textDecoration: 'none' }}>Blog</Link>
             <Link href="/leaderboard" style={{ fontSize: '14px', color: 'var(--fg-2)', textDecoration: 'none' }}>Classement</Link>
             <Link href="/login" style={{ fontSize: '14px', color: 'var(--fg-2)', textDecoration: 'none' }}>Se connecter</Link>
             <Link href="/signup" style={{ fontSize: '14px', color: 'var(--fg-2)', textDecoration: 'none' }}>S'inscrire</Link>
