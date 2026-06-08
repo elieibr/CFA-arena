@@ -44,7 +44,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   return (
     <>
       <Header />
-      <main style={{ minHeight: '100vh', background: 'var(--bg-0)', paddingTop: '80px' }}>
+      <main style={{ background: 'var(--bg-0)', paddingTop: '80px' }}>
         <article style={{ maxWidth: '768px', margin: '0 auto', padding: '0 24px' }}>
           {/* Back link */}
           <Link
