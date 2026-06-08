@@ -66,6 +66,9 @@ export default function Header() {
             <Link href="/courses" className={pathname?.startsWith('/courses') ? 'active' : ''}>
               Cours
             </Link>
+            <Link href="/blog" className={pathname?.startsWith('/blog') ? 'active' : ''}>
+              Blog
+            </Link>
             <Link href="/exam">Examen blanc</Link>
             <Link href="/statistics" className={pathname === '/statistics' ? 'active' : ''}>
               Stats
@@ -113,6 +116,9 @@ export default function Header() {
             </Link>
             <Link href="/courses" className={pathname?.startsWith('/courses') ? 'active' : ''} onClick={() => setMobileMenuOpen(false)}>
               Cours
+            </Link>
+            <Link href="/blog" className={pathname?.startsWith('/blog') ? 'active' : ''} onClick={() => setMobileMenuOpen(false)}>
+              Blog
             </Link>
             <Link href="/exam" onClick={() => setMobileMenuOpen(false)}>
               Examen blanc
