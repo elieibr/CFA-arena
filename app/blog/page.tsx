@@ -1,8 +1,11 @@
-'use client'
-
 import Link from 'next/link'
 import { getAllBlogPosts } from '@/lib/blog'
 import Header from '@/components/Header'
+
+export const metadata = {
+  title: 'Blog — CharterPath',
+  description: 'CFA Level 1 study tips, formulas, and career advice',
+}
 
 export default function BlogPage() {
   const posts = getAllBlogPosts()
