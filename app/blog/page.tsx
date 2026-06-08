@@ -1,11 +1,8 @@
+'use client'
+
 import Link from 'next/link'
 import { getAllBlogPosts } from '@/lib/blog'
 import Header from '@/components/Header'
-
-export const metadata = {
-  title: 'Blog — CharterPath',
-  description: 'CFA Level 1 study tips, formulas, and career advice',
-}
 
 export default function BlogPage() {
   const posts = getAllBlogPosts()
@@ -67,6 +64,7 @@ export default function BlogPage() {
               <Link
                 key={post.slug}
                 href={`/blog/${post.slug}`}
+                className="blog-post-card"
                 style={{
                   background: 'var(--bg-1)',
                   border: '1px solid var(--line)',
@@ -75,14 +73,6 @@ export default function BlogPage() {
                   textDecoration: 'none',
                   transition: 'all 0.2s ease',
                   display: 'block',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'var(--bg-2)'
-                  e.currentTarget.style.borderColor = 'var(--line-strong)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'var(--bg-1)'
-                  e.currentTarget.style.borderColor = 'var(--line)'
                 }}
               >
                 <div
