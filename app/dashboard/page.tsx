@@ -201,10 +201,10 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="page">
+    <div className="page" style={{ width: '100%', maxWidth: '100vw', overflowX: 'hidden', boxSizing: 'border-box' }}>
       {/* Hero Section */}
-      <section className="hero">
-        <div className="wrap">
+      <section className="hero" style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
+        <div className="wrap" style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
           <div className="hero-grid">
             {/* Left: Main Content */}
             <div>
@@ -332,8 +332,8 @@ export default function DashboardPage() {
       </section>
 
       {/* Subjects Section */}
-      <section className="block" id="subjects">
-        <div className="wrap">
+      <section className="block" id="subjects" style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
+        <div className="wrap" style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
           <div className="block-head">
             <div className="left">
               <h2>10 matières · pondération CFA Institute</h2>
