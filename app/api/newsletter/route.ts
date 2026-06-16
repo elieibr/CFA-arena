@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
     // Send welcome email via Resend
     await resend.emails.send({
-      from: 'CharterPath <onboarding@cfa-arena.vercel.app>',
+      from: 'CharterPath <onboarding@charterpath.app>',
       to: email,
       subject: 'Welcome to CharterPath 🎯',
       html: `
@@ -120,14 +120,14 @@ export async function POST(request: Request) {
                 </p>
 
                 <div class="cta">
-                  <a href="https://cfa-arena.vercel.app" class="button">Start now</a>
+                  <a href="https://charterpath.app" class="button">Start now</a>
                 </div>
               </div>
 
               <div class="footer">
                 <p class="footer-title">CharterPath — CFA Level 1 Preparation</p>
                 <p class="footer-text">
-                  You received this email because you signed up at cfa-arena.vercel.app
+                  You received this email because you signed up at charterpath.app
                 </p>
               </div>
             </div>

@@ -28,14 +28,14 @@ const instrumentSerif = Instrument_Serif({
 export const metadata: Metadata = {
   title: "CharterPath — Préparation CFA Level 1",
   description: "1 000 questions CFA Level 1, classement en temps réel, quiz adaptatif. La plateforme de préparation CFA la plus sérieuse.",
-  metadataBase: new URL('https://cfa-arena.vercel.app'),
+  metadataBase: new URL('https://charterpath.app'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
     title: "CharterPath — Préparation CFA Level 1",
     description: "1 000 questions CFA Level 1, classement en temps réel, quiz adaptatif. La plateforme de préparation CFA la plus sérieuse.",
-    url: 'https://cfa-arena.vercel.app',
+    url: 'https://charterpath.app',
     siteName: 'CharterPath',
     locale: 'fr_FR',
     type: 'website',

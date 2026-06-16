@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/dashboard', '/quiz', '/settings', '/review', '/statistics', '/exam', '/subscription', '/onboarding'],
       },
     ],
-    sitemap: 'https://cfa-arena.vercel.app/sitemap.xml',
+    sitemap: 'https://charterpath.app/sitemap.xml',
   }
 }

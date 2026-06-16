@@ -76,7 +76,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const globalRank = (allProfiles?.findIndex(p => p.total_points <= profile.total_points) ?? -1) + 1
 
-  const profileUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://charterpath.vercel.app'}/profile/${username}`
+  const profileUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://charterpath.app'}/profile/${username}`
   const title = `${username} — CharterPath CFA Level 1`
   const description = `Rank #${globalRank} · Score ${profile.total_points.toLocaleString()} · CFA Level 1 preparation`
 
