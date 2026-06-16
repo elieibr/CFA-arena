@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 export default function SubscriptionPage() {
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [checkoutLoading, setCheckoutLoading] = useState(false)
   const router = useRouter()
 
   const supabase = createBrowserClient(
@@ -37,6 +38,41 @@ export default function SubscriptionPage() {
     setLoading(false)
   }
 
+  async function handleSubscribe() {
+    setCheckoutLoading(true)
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      router.push('/login')
+      return
+    }
+
+    try {
+      const response = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          email: user.email,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        console.error('No checkout URL returned')
+        setCheckoutLoading(false)
+      }
+    } catch (error) {
+      console.error('Checkout error:', error)
+      setCheckoutLoading(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -45,8 +81,8 @@ export default function SubscriptionPage() {
     )
   }
 
-  // Check if user has active subscription (placeholder logic)
-  const hasActiveSubscription = false // TODO: Implement actual subscription check
+  // Check if user has active subscription
+  const hasActiveSubscription = profile?.is_pro === true
 
   return (
     <div className="page">
@@ -266,19 +302,22 @@ export default function SubscriptionPage() {
                 </ul>
 
                 {/* CTA Button */}
-                <a
-                  href="#"
+                <button
+                  onClick={handleSubscribe}
+                  disabled={checkoutLoading}
                   className="btn btn-primary"
                   style={{
                     width: '100%',
                     justifyContent: 'center',
                     padding: '14px 24px',
                     fontSize: '15px',
-                    marginBottom: '20px'
+                    marginBottom: '20px',
+                    opacity: checkoutLoading ? 0.6 : 1,
+                    cursor: checkoutLoading ? 'wait' : 'pointer'
                   }}
                 >
-                  Démarrer · 7 jours gratuits
-                </a>
+                  {checkoutLoading ? 'Redirection vers Stripe...' : 'Passer Pro — 7,99€/mois'}
+                </button>
 
                 {/* Footer */}
                 <div

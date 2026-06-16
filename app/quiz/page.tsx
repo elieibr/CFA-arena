@@ -80,6 +80,7 @@ function QuizContent() {
   const [topicComplete, setTopicComplete] = useState(false)
   const [answers, setAnswers] = useState<{[key: number]: 'correct' | 'incorrect'}>({})
   const [questionStartTime, setQuestionStartTime] = useState<number>(Date.now())
+  const [hitFreeLimit, setHitFreeLimit] = useState(false)
 
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -145,6 +146,31 @@ function QuizContent() {
       return
     }
     setUserId(user.id)
+
+    // Check if user is Pro
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_pro')
+      .eq('id', user.id)
+      .single()
+
+    // Check total questions attempted across all topics
+    const { data: progressRecords } = await supabase
+      .from('user_topic_progress')
+      .select('questions_attempted')
+      .eq('user_id', user.id)
+
+    const totalQuestionsAttempted = (progressRecords || []).reduce(
+      (sum, record) => sum + (record.questions_attempted || 0),
+      0
+    )
+
+    // If not Pro and reached limit, show paywall
+    if (!profile?.is_pro && totalQuestionsAttempted >= 100) {
+      setHitFreeLimit(true)
+      setLoading(false)
+      return
+    }
 
     // Map topic ID to question sets - load ALL questions
     const questionMap: { [key: string]: Question[] } = {
@@ -390,6 +416,68 @@ function QuizContent() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-2xl">Chargement du quiz...</div>
+      </div>
+    )
+  }
+
+  // Paywall screen
+  if (hitFreeLimit) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-0)' }}>
+        <div style={{ maxWidth: '540px', width: '100%', padding: '24px', textAlign: 'center' }}>
+          <div style={{ fontSize: '64px', marginBottom: '24px' }}>🔒</div>
+          <h1 style={{ fontSize: '32px', fontWeight: 600, color: 'var(--fg-0)', marginBottom: '12px' }}>
+            Vous avez atteint la limite gratuite
+          </h1>
+          <p style={{ fontSize: '15px', color: 'var(--fg-2)', marginBottom: '40px' }}>
+            Vous avez répondu à 100 questions en version gratuite. Passez Pro pour un accès illimité à toutes les questions et fonctionnalités.
+          </p>
+
+          {/* Benefits */}
+          <div style={{
+            background: 'var(--bg-1)',
+            border: '1px solid var(--line)',
+            borderRadius: 'var(--radius)',
+            padding: '24px',
+            marginBottom: '32px',
+            textAlign: 'left'
+          }}>
+            <div style={{ fontSize: '13px', fontFamily: 'var(--font-mono)', color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '16px' }}>
+              CharterPath Pro
+            </div>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              <li style={{ fontSize: '14px', color: 'var(--fg-1)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: 'var(--acc)' }}>✓</span> Accès illimité à toutes les questions
+              </li>
+              <li style={{ fontSize: '14px', color: 'var(--fg-1)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: 'var(--acc)' }}>✓</span> Tous les 10 sujets du CFA Level 1
+              </li>
+              <li style={{ fontSize: '14px', color: 'var(--fg-1)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: 'var(--acc)' }}>✓</span> Examens blancs complets
+              </li>
+              <li style={{ fontSize: '14px', color: 'var(--fg-1)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: 'var(--acc)' }}>✓</span> Statistiques détaillées et progression
+              </li>
+            </ul>
+            <div style={{ marginTop: '20px', fontSize: '24px', fontFamily: 'var(--font-mono)', fontWeight: 600, color: 'var(--acc)' }}>
+              7,99€/mois
+            </div>
+          </div>
+
+          {/* Buttons */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <button onClick={() => router.push('/subscription')} className="btn btn-primary" style={{ width: '100%' }}>
+              Passer Pro
+            </button>
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="btn btn-ghost"
+              style={{ width: '100%' }}
+            >
+              Retour au Dashboard
+            </button>
+          </div>
+        </div>
       </div>
     )
   }
