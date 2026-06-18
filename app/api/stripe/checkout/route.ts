@@ -3,6 +3,9 @@ import { getStripe } from '@/lib/stripe'
 
 export async function POST(request: Request) {
   try {
+    console.log('STRIPE_SECRET_KEY exists:', !!process.env.STRIPE_SECRET_KEY)
+    console.log('STRIPE_PRICE_ID:', process.env.STRIPE_PRICE_ID)
+
     const { userId, email } = await request.json()
 
     if (!userId || !email) {
@@ -36,7 +39,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Stripe checkout error:', error)
     return NextResponse.json(
-      { error: 'Failed to create checkout session' },
+      { error: String(error) },
       { status: 500 }
     )
   }
