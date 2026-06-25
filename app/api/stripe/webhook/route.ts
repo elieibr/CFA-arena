@@ -9,6 +9,9 @@ export const config = {
 }
 
 export async function POST(request: Request) {
+  console.log('STRIPE_WEBHOOK_SECRET exists:', !!process.env.STRIPE_WEBHOOK_SECRET)
+  console.log('STRIPE_WEBHOOK_SECRET prefix:', process.env.STRIPE_WEBHOOK_SECRET?.substring(0, 10))
+
   const body = await request.text()
   const headersList = await headers()
   const signature = headersList.get('stripe-signature')
