@@ -5,6 +5,9 @@ export async function POST(request: Request) {
   try {
     console.log('STRIPE_SECRET_KEY exists:', !!process.env.STRIPE_SECRET_KEY)
     console.log('STRIPE_PRICE_ID:', process.env.STRIPE_PRICE_ID)
+    console.log('Price ID being used:', process.env.STRIPE_PRICE_ID)
+    console.log('Price ID length:', process.env.STRIPE_PRICE_ID?.length)
+    console.log('Price ID chars:', JSON.stringify(process.env.STRIPE_PRICE_ID))
 
     const { userId, email } = await request.json()
 
