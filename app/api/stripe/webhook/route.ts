@@ -1,84 +1,75 @@
 import { NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 import { getStripe } from '@/lib/stripe'
-import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+}
 
 export async function POST(request: Request) {
-  const stripe = getStripe()
-
   const body = await request.text()
   const headersList = await headers()
-  const sig = headersList.get('stripe-signature')!
+  const signature = headersList.get('stripe-signature')
+
+  if (!signature) {
+    return NextResponse.json({ error: 'No signature' }, { status: 400 })
+  }
 
   let event
 
   try {
+    const stripe = getStripe()
     event = stripe.webhooks.constructEvent(
       body,
-      sig,
+      signature,
       process.env.STRIPE_WEBHOOK_SECRET!
     )
-  } catch (err: any) {
-    console.error(`Webhook signature verification failed: ${err.message}`)
-    return NextResponse.json(
-      { error: 'Webhook signature verification failed' },
-      { status: 400 }
-    )
+  } catch (err) {
+    console.error('Webhook signature error:', err)
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
-  // Handle the event
-  switch (event.type) {
-    case 'checkout.session.completed': {
-      const session = event.data.object as any
-      const userId = session.metadata.userId
-      const customerId = session.customer
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object as any
+    const userId = session.metadata?.userId
 
-      // Update user to Pro
-      const { error } = await supabase
+    if (userId) {
+      const { createClient } = await import('@supabase/supabase-js')
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      )
+
+      await supabase
         .from('profiles')
         .update({
           is_pro: true,
           subscription_status: 'active',
-          stripe_customer_id: customerId,
+          stripe_customer_id: session.customer,
         })
         .eq('id', userId)
-
-      if (error) {
-        console.error('Error updating user to Pro:', error)
-      } else {
-        console.log(`User ${userId} upgraded to Pro`)
-      }
-      break
     }
+  }
 
-    case 'customer.subscription.deleted': {
-      const subscription = event.data.object as any
-      const customerId = subscription.customer
+  if (event.type === 'customer.subscription.deleted') {
+    const subscription = event.data.object as any
+    const customerId = subscription.customer
 
-      // Find user by stripe_customer_id and downgrade
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          is_pro: false,
-          subscription_status: 'cancelled',
-        })
-        .eq('stripe_customer_id', customerId)
+    const { createClient } = await import('@supabase/supabase-js')
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
 
-      if (error) {
-        console.error('Error downgrading user:', error)
-      } else {
-        console.log(`Customer ${customerId} subscription cancelled`)
-      }
-      break
-    }
-
-    default:
-      console.log(`Unhandled event type: ${event.type}`)
+    await supabase
+      .from('profiles')
+      .update({
+        is_pro: false,
+        subscription_status: 'cancelled',
+      })
+      .eq('stripe_customer_id', customerId)
   }
 
   return NextResponse.json({ received: true })
