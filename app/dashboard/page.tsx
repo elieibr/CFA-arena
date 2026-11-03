@@ -208,18 +208,16 @@ export default function DashboardPage() {
           <div className="hero-grid">
             {/* Left: Main Content */}
             <div>
-              <div className="eyebrow">Session · CharterPath</div>
+              <div className="eyebrow">Tableau de bord · CFA Level 1</div>
               <h1 className="hero-title" style={{ fontWeight: 700, color: '#e6ecf3' }}>
-                Préparez le<br />
-                CFA Level 1 avec <span style={{ color: '#00e0c6' }}>l'intelligence</span><br />
-                d'une <span style={{ color: '#00e0c6' }}>IA dédiée</span>.
+                Reprenez là où vous vous êtes <span style={{ color: '#00e0c6' }}>arrêté</span>.
               </h1>
               <p className="hero-sub">
-                Plan d'étude adaptatif, questions ciblées sur vos points faibles, et révision espacée calibrée pour l'examen. 10 matières, un objectif.
+                1 000 questions, 10 matières, une progression sauvegardée à chaque réponse. Votre rang dépend de votre régularité.
               </p>
               <div className="hero-cta">
                 <a
-                  href="#subjects"
+                  href="/quiz"
                   className="btn"
                   style={{
                     background: 'transparent',
@@ -236,10 +234,10 @@ export default function DashboardPage() {
                     e.currentTarget.style.color = '#00e0c6'
                   }}
                 >
-                  Continuer la session <span className="btn-arrow"></span>
+                  Reprendre le quiz <span className="btn-arrow"></span>
                 </a>
-                <a href="/exam" className="btn btn-ghost">
-                  Voir le plan d'étude
+                <a href="#subjects" className="btn btn-ghost">
+                  Voir les matières
                 </a>
               </div>
             </div>
@@ -321,7 +319,7 @@ export default function DashboardPage() {
                         <path d="M10 2h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-3" strokeLinecap="round" strokeLinejoin="round"/>
                         <rect x="2" y="2" width="8" height="8" rx="1" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
-                      <span>Share my profile</span>
+                      <span>Partager mon profil</span>
                     </>
                   )}
                 </button>
