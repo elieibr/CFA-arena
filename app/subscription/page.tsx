@@ -93,7 +93,7 @@ export default function SubscriptionPage() {
           top: 0,
           left: '50%',
           transform: 'translateX(-50%)',
-          width: '800px',
+          width: 'min(800px, 100%)',
           height: '600px',
           background: 'radial-gradient(circle at 50% 0%, oklch(0.78 0.16 180 / 0.15), transparent 70%)',
           pointerEvents: 'none',

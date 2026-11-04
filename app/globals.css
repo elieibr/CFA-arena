@@ -1749,13 +1749,18 @@ section.block {
   }
 
   /* Quiz - Question navigation grid */
+  /* Une seule rangée défilante : cibles 44px sans repousser la question */
   .quiz-nav-grid {
-    grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)) !important;
+    display: flex !important;
+    flex-wrap: nowrap;
+    overflow-x: auto;
     gap: 6px !important;
-    justify-items: center;
+    padding: 4px 2px 8px;
+    -webkit-overflow-scrolling: touch;
   }
 
   .quiz-nav-btn {
+    flex: 0 0 auto;
     width: 44px !important;
     height: 44px !important;
     font-size: 12px !important;
