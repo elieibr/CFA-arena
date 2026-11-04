@@ -61,7 +61,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className={`${inter.variable} ${ibmPlexMono.variable} ${instrumentSerif.variable}`}>
+    <html lang="fr" data-scroll-behavior="smooth" className={`${inter.variable} ${ibmPlexMono.variable} ${instrumentSerif.variable}`}>
       <head>
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
       </head>

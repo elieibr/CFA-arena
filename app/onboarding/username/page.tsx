@@ -143,7 +143,7 @@ export default function UsernameOnboardingPage() {
           top: '20%',
           left: '50%',
           transform: 'translateX(-50%)',
-          width: '600px',
+          width: 'min(600px, 100%)',
           height: '400px',
           background: 'radial-gradient(circle at 50% 0%, oklch(0.78 0.16 180 / 0.12), transparent 70%)',
           pointerEvents: 'none',

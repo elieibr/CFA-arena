@@ -143,6 +143,7 @@ export default function StatisticsPage() {
       <section className="block" style={{ paddingTop: 0, paddingBottom: '32px' }}>
         <div className="wrap" style={{ maxWidth: '1120px' }}>
           <div
+            className="profile-stats-strip"
             style={{
               background: 'var(--bg-1)',
               border: '1px solid var(--line)',

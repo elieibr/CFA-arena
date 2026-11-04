@@ -69,6 +69,11 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Ancre #subjects : ne pas passer sous le header sticky */
+#subjects {
+  scroll-margin-top: 88px;
+}
+
 body {
   background: var(--bg-0);
   color: var(--fg-0);
