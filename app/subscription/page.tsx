@@ -81,13 +81,6 @@ export default function SubscriptionPage() {
     try {
       const response = await fetch('/api/stripe/checkout', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          email: user.email,
-        }),
       })
 
       const data = await response.json()
