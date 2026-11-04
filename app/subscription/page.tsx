@@ -8,6 +8,9 @@ export default function SubscriptionPage() {
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
+  const [subInfo, setSubInfo] = useState<{ renewsAt: string | null; cancelAtPeriodEnd: boolean; amount: number | null; currency: string | null } | null>(null)
+  const [portalLoading, setPortalLoading] = useState(false)
+  const [portalError, setPortalError] = useState<string | null>(null)
   const router = useRouter()
 
   const supabase = createBrowserClient(
@@ -36,6 +39,34 @@ export default function SubscriptionPage() {
 
     setProfile(profileData)
     setLoading(false)
+
+    // Détails de l'abonnement (date de renouvellement) pour les comptes Pro
+    if (profileData?.is_pro) {
+      try {
+        const res = await fetch('/api/stripe/subscription')
+        if (res.ok) setSubInfo(await res.json())
+      } catch (error) {
+        console.error('Subscription info error:', error)
+      }
+    }
+  }
+
+  async function handleManageSubscription() {
+    setPortalLoading(true)
+    setPortalError(null)
+    try {
+      const res = await fetch('/api/stripe/portal', { method: 'POST' })
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+        return
+      }
+      setPortalError("Impossible d'ouvrir la gestion de l'abonnement. Contactez le support.")
+    } catch (error) {
+      console.error('Portal error:', error)
+      setPortalError("Impossible d'ouvrir la gestion de l'abonnement. Contactez le support.")
+    }
+    setPortalLoading(false)
   }
 
   async function handleSubscribe() {
@@ -396,20 +427,28 @@ export default function SubscriptionPage() {
                   marginBottom: '32px'
                 }}
               >
-                Renouvellement le 1er juin 2026 · €7,99
+                {subInfo?.renewsAt
+                  ? `${subInfo.cancelAtPeriodEnd ? 'Se termine le' : 'Renouvellement le'} ${new Date(subInfo.renewsAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}${subInfo.amount != null && !subInfo.cancelAtPeriodEnd ? ` · ${(subInfo.amount / 100).toLocaleString('fr-FR', { style: 'currency', currency: (subInfo.currency || 'eur').toUpperCase() })}` : ''}`
+                  : 'Abonnement Pro actif'}
               </div>
 
-              <a
-                href="#"
+              <button
+                onClick={handleManageSubscription}
+                disabled={portalLoading}
                 className="btn btn-ghost"
                 style={{
                   width: '100%',
                   justifyContent: 'center',
-                  padding: '12px 20px'
+                  padding: '12px 20px',
+                  cursor: portalLoading ? 'wait' : 'pointer',
+                  opacity: portalLoading ? 0.6 : 1
                 }}
               >
-                Gérer l'abonnement
-              </a>
+                {portalLoading ? 'Redirection vers Stripe…' : "Gérer l'abonnement"}
+              </button>
+              {portalError && (
+                <div style={{ marginTop: '12px', fontSize: '13px', color: 'var(--danger)' }}>{portalError}</div>
+              )}
             </div>
           )}
 
