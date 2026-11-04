@@ -118,15 +118,15 @@ export default function Header() {
 
                 {profileMenuOpen && (
                   <div style={{
-                    position: 'absolute',
-                    top: 'calc(100% + 8px)',
-                    right: 0,
+                    position: 'fixed',
+                    top: '70px',
+                    right: '24px',
                     background: '#0c1015',
                     border: '1px solid #1c232d',
                     borderRadius: '8px',
-                    minWidth: '180px',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-                    zIndex: 1000,
+                    minWidth: '200px',
+                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+                    zIndex: 9999,
                     overflow: 'hidden'
                   }}>
                     <Link
