@@ -130,7 +130,7 @@ export default function Header() {
                     overflow: 'hidden'
                   }}>
                     <Link
-                      href={`/profile/${profile?.username}`}
+                      href={profile?.username ? `/profile/${profile.username}` : '/settings'}
                       onClick={() => setProfileMenuOpen(false)}
                       style={{
                         display: 'block',

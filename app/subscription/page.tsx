@@ -423,7 +423,7 @@ export default function SubscriptionPage() {
             }}
           >
             Annulation possible à tout moment · Remboursement intégral sous 14 jours ·
-            Questions ? <a href="#" style={{ color: 'var(--acc)', textDecoration: 'underline', display: 'inline-block', padding: '12px 0' }}>support@charterpath.com</a>
+            Questions ? <a href="mailto:support@charterpath.com" style={{ color: 'var(--acc)', textDecoration: 'underline', display: 'inline-block', padding: '12px 0' }}>support@charterpath.com</a>
           </div>
         </div>
       </section>
