@@ -255,12 +255,13 @@ function LeaderboardContent() {
 
           {/* Leaderboard Table */}
           <div
+            className="leaderboard-table"
             style={{
               background: 'var(--bg-1)',
               border: '1px solid var(--line-soft)',
               borderRadius: 'var(--radius)',
               padding: '0',
-              overflow: 'hidden'
+              overflowX: 'auto'
             }}
           >
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>

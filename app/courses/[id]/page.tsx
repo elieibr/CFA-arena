@@ -38,7 +38,7 @@ export default function CoursePage() {
           </h1>
           <button
             onClick={() => router.push(`/quiz?topic=${course.id}`)}
-            className="bg-[var(--acc)] text-[var(--bg-0)] font-[500] text-[14px] px-6 py-2.5 rounded-[8px] hover:opacity-90 transition-opacity"
+            className="bg-[var(--acc)] text-[var(--bg-0)] font-[500] text-[14px] px-6 py-2.5 min-h-[44px] rounded-[8px] hover:opacity-90 transition-opacity"
           >
             S&apos;entraîner sur cette matière
           </button>
@@ -48,7 +48,7 @@ export default function CoursePage() {
         <div className="flex gap-1 mb-6 bg-[var(--bg-1)] border border-[var(--line)] rounded-[10px] p-1">
           <button
             onClick={() => setActiveTab('resume')}
-            className={`flex-1 px-4 py-2 rounded-[7px] text-[13px] font-[500] transition-all ${
+            className={`flex-1 px-2 sm:px-4 py-2 min-h-[44px] rounded-[7px] text-[13px] font-[500] transition-all ${
               activeTab === 'resume'
                 ? 'bg-[var(--bg-0)] text-[var(--fg-0)] shadow-sm'
                 : 'text-[var(--fg-3)] hover:text-[var(--fg-1)]'
@@ -58,7 +58,7 @@ export default function CoursePage() {
           </button>
           <button
             onClick={() => setActiveTab('formulas')}
-            className={`flex-1 px-4 py-2 rounded-[7px] text-[13px] font-[500] transition-all ${
+            className={`flex-1 px-2 sm:px-4 py-2 min-h-[44px] rounded-[7px] text-[13px] font-[500] transition-all ${
               activeTab === 'formulas'
                 ? 'bg-[var(--bg-0)] text-[var(--fg-0)] shadow-sm'
                 : 'text-[var(--fg-3)] hover:text-[var(--fg-1)]'
@@ -68,7 +68,7 @@ export default function CoursePage() {
           </button>
           <button
             onClick={() => setActiveTab('definitions')}
-            className={`flex-1 px-4 py-2 rounded-[7px] text-[13px] font-[500] transition-all ${
+            className={`flex-1 px-2 sm:px-4 py-2 min-h-[44px] rounded-[7px] text-[13px] font-[500] transition-all ${
               activeTab === 'definitions'
                 ? 'bg-[var(--bg-0)] text-[var(--fg-0)] shadow-sm'
                 : 'text-[var(--fg-3)] hover:text-[var(--fg-1)]'

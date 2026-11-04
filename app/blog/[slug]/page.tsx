@@ -51,6 +51,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
+              minHeight: '44px',
               fontFamily: 'var(--font-mono)',
               fontSize: '12px',
               fontWeight: 500,
@@ -86,7 +87,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           {/* Post title */}
           <h1
             style={{
-              fontSize: '48px',
+              fontSize: 'clamp(30px, 9vw, 48px)',
+            overflowWrap: 'anywhere',
               fontWeight: 500,
               color: 'var(--fg-0)',
               marginBottom: '16px',

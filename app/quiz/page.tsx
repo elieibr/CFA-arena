@@ -620,7 +620,7 @@ function QuizContent() {
           }}>
             NAVIGATION QUESTIONS
           </div>
-          <div style={{
+          <div className="quiz-nav-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, 24px)',
             gap: '8px'
@@ -636,6 +636,7 @@ function QuizContent() {
               return (
                 <button
                   key={idx}
+                  className="quiz-nav-btn"
                   onClick={() => handleQuestionNavigation(idx)}
                   style={{
                     width: '24px',

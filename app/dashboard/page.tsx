@@ -279,6 +279,7 @@ export default function DashboardPage() {
                     width: '100%',
                     marginTop: '16px',
                     padding: '10px 16px',
+                    minHeight: '44px',
                     background: copied ? 'oklch(0.78 0.16 180 / 0.12)' : 'var(--bg-0)',
                     border: '1px solid var(--line)',
                     borderRadius: '8px',

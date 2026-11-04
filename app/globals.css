@@ -1750,15 +1750,25 @@ section.block {
 
   /* Quiz - Question navigation grid */
   .quiz-nav-grid {
-    grid-template-columns: repeat(8, 1fr) !important;
+    grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)) !important;
     gap: 6px !important;
+    justify-items: center;
   }
 
   .quiz-nav-btn {
-    width: 32px !important;
-    height: 32px !important;
-    font-size: 11px !important;
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 12px !important;
   }
+
+  /* Quiz - layout */
+  .qprog-head { flex-wrap: wrap; gap: 6px 12px; }
+  .qprog-head .right { flex-wrap: wrap; gap: 4px 12px; }
+  .quiz-wrap { padding: 16px; }
+  .qbody { padding: 20px 16px; }
+  .qfoot { flex-wrap: wrap; gap: 12px; padding: 14px 16px; }
+  .qfoot-hint { display: none; }
+  .fb-head { flex-wrap: wrap; gap: 6px 12px; }
 
   /* Courses - Cards grid */
   .courses-grid {
@@ -1871,8 +1881,8 @@ section.block {
 
   .profile-topic-row {
     display: grid !important;
-    grid-template-columns: 40px 1fr 60px 60px !important;
-    gap: 20px !important;
+    grid-template-columns: 32px 1fr 52px 52px !important;
+    gap: 8px !important;
     align-items: center !important;
     padding: 12px !important;
   }
@@ -1953,6 +1963,10 @@ section.block {
     cursor: pointer;
     padding: 8px;
     margin-left: auto;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
   }
 
   .mobile-menu-button span {
@@ -1999,7 +2013,6 @@ section.block {
   header.site {
     padding: 12px 0;
     position: relative;
-    overflow-x: hidden;
   }
 
   .nav {
@@ -2023,6 +2036,17 @@ section.block {
     width: 32px;
     height: 32px;
     font-size: 11px;
+  }
+
+  /* Avatar: zone tactile 44px sans changer l'apparence */
+  .avatar {
+    position: relative;
+  }
+
+  .avatar::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
   }
 
   /* Buttons - touch targets */

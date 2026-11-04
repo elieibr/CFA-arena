@@ -223,7 +223,7 @@ export default function SubscriptionPage() {
                 <div
                   style={{
                     fontFamily: 'var(--font-mono)',
-                    fontSize: '56px',
+                    fontSize: 'clamp(44px, 13vw, 56px)',
                     fontWeight: 500,
                     letterSpacing: '-0.04em',
                     color: 'var(--fg-0)',
@@ -231,7 +231,7 @@ export default function SubscriptionPage() {
                     marginBottom: '12px'
                   }}
                 >
-                  €7,99 <span style={{ fontSize: '24px', color: 'var(--fg-2)' }}>/ mois</span>
+                  €7,99 <span style={{ fontSize: '20px', color: 'var(--fg-2)' }}>/ mois</span>
                 </div>
 
                 {/* Comparison */}
@@ -423,7 +423,7 @@ export default function SubscriptionPage() {
             }}
           >
             Annulation possible à tout moment · Remboursement intégral sous 14 jours ·
-            Questions ? <a href="#" style={{ color: 'var(--acc)', textDecoration: 'underline' }}>support@charterpath.com</a>
+            Questions ? <a href="#" style={{ color: 'var(--acc)', textDecoration: 'underline', display: 'inline-block', padding: '12px 0' }}>support@charterpath.com</a>
           </div>
         </div>
       </section>

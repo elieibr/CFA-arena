@@ -458,7 +458,8 @@ export default function LandingPage() {
                 <div style={{
                   display: 'flex',
                   justifyContent: 'space-between',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  gap: '12px'
                 }}>
                   <h3 style={{
                     fontSize: '18px',
@@ -540,6 +541,8 @@ export default function LandingPage() {
           maxWidth: '1200px',
           margin: '0 auto',
           display: 'flex',
+          flexWrap: 'wrap',
+          gap: '24px',
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
@@ -554,11 +557,11 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div style={{ display: 'flex', gap: '32px' }}>
-            <Link href="/blog" style={{ fontSize: '14px', color: 'var(--fg-2)', textDecoration: 'none' }}>Blog</Link>
-            <Link href="/leaderboard" style={{ fontSize: '14px', color: 'var(--fg-2)', textDecoration: 'none' }}>Classement</Link>
-            <Link href="/login" style={{ fontSize: '14px', color: 'var(--fg-2)', textDecoration: 'none' }}>Se connecter</Link>
-            <Link href="/signup" style={{ fontSize: '14px', color: 'var(--fg-2)', textDecoration: 'none' }}>S'inscrire</Link>
+          <div style={{ display: 'flex', flexWrap: 'wrap', columnGap: '24px', rowGap: '0' }}>
+            <Link href="/blog" style={{ fontSize: '14px', color: 'var(--fg-2)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', minHeight: '44px' }}>Blog</Link>
+            <Link href="/leaderboard" style={{ fontSize: '14px', color: 'var(--fg-2)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', minHeight: '44px' }}>Classement</Link>
+            <Link href="/login" style={{ fontSize: '14px', color: 'var(--fg-2)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', minHeight: '44px' }}>Se connecter</Link>
+            <Link href="/signup" style={{ fontSize: '14px', color: 'var(--fg-2)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', minHeight: '44px' }}>S'inscrire</Link>
           </div>
         </div>
 

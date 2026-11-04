@@ -27,6 +27,8 @@ export default function Footer() {
             style={{
               color: '#525a66',
               textDecoration: 'none',
+              display: 'inline-block',
+              padding: '14px 6px',
               transition: 'color 0.15s ease',
             }}
             onMouseEnter={(e) => {
@@ -44,6 +46,8 @@ export default function Footer() {
             style={{
               color: '#525a66',
               textDecoration: 'none',
+              display: 'inline-block',
+              padding: '14px 6px',
               transition: 'color 0.15s ease',
             }}
             onMouseEnter={(e) => {
@@ -61,6 +65,8 @@ export default function Footer() {
             style={{
               color: '#525a66',
               textDecoration: 'none',
+              display: 'inline-block',
+              padding: '14px 6px',
               transition: 'color 0.15s ease',
             }}
             onMouseEnter={(e) => {

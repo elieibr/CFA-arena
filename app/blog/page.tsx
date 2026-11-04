@@ -29,7 +29,8 @@ export default function BlogPage() {
             </div>
             <h1
               style={{
-                fontSize: '48px',
+                fontSize: 'clamp(30px, 9vw, 48px)',
+                overflowWrap: 'anywhere',
                 fontWeight: 500,
                 color: 'var(--fg-0)',
                 marginBottom: '16px',
@@ -55,7 +56,7 @@ export default function BlogPage() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 360px), 1fr))',
               gap: '24px',
               paddingBottom: '80px',
             }}

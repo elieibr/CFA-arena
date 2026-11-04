@@ -228,7 +228,8 @@ export default async function ProfilePage({ params }: PageProps) {
             {/* Username */}
             <h1
               style={{
-                fontSize: '40px',
+                fontSize: 'clamp(28px, 9vw, 40px)',
+                overflowWrap: 'anywhere',
                 fontWeight: 400,
                 letterSpacing: '-0.025em',
                 margin: '0 0 12px',
@@ -323,6 +324,7 @@ export default async function ProfilePage({ params }: PageProps) {
               }}
             >
               <div
+                className="profile-stat-value"
                 style={{
                   fontFamily: 'var(--font-mono)',
                   fontSize: '38px',
@@ -357,6 +359,7 @@ export default async function ProfilePage({ params }: PageProps) {
               }}
             >
               <div
+                className="profile-stat-value"
                 style={{
                   fontFamily: 'var(--font-mono)',
                   fontSize: '38px',
@@ -391,6 +394,7 @@ export default async function ProfilePage({ params }: PageProps) {
               }}
             >
               <div
+                className="profile-stat-value"
                 style={{
                   fontFamily: 'var(--font-mono)',
                   fontSize: '38px',
@@ -424,6 +428,7 @@ export default async function ProfilePage({ params }: PageProps) {
               }}
             >
               <div
+                className="profile-stat-value"
                 style={{
                   fontFamily: 'var(--font-mono)',
                   fontSize: '38px',
