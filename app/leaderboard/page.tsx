@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { curriculum } from '@/data/curriculum'
+import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 function LeaderboardContent() {
@@ -456,7 +457,11 @@ function LeaderboardContent() {
                   color: 'var(--fg-3)'
                 }}
               >
-                Aucun résultat
+                Personne n'est encore classé ici.
+                <br />
+                <Link href="/dashboard" style={{ color: 'var(--acc)', textDecoration: 'underline', display: 'inline-block', padding: '12px 0' }}>
+                  Répondez à quelques questions pour ouvrir le classement
+                </Link>
               </div>
             )}
           </div>

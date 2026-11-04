@@ -1,8 +1,13 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 export default function Footer() {
+  const pathname = usePathname()
+  // La landing a son propre footer complet
+  if (pathname === '/') return null
+
   return (
     <footer
       style={{
@@ -80,7 +85,7 @@ export default function Footer() {
           </Link>
         </div>
         <div>
-          © 2026 CharterPath — CFA Institute does not endorse or warrant the accuracy of this product
+          © 2026 CharterPath — Produit indépendant : le CFA Institute ne l'approuve pas et ne garantit pas l'exactitude de son contenu.
         </div>
       </div>
     </footer>

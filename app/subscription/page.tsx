@@ -261,7 +261,7 @@ export default function SubscriptionPage() {
                   }}
                 >
                   {[
-                    '1 200+ questions CFA Level 1 officielles',
+                    'Des centaines de questions au format CFA Level 1',
                     'Algorithme de répétition espacée (SM-2)',
                     'Examens blancs chronométrés illimités',
                     'Statistiques détaillées par matière',

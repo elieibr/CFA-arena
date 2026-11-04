@@ -49,7 +49,7 @@ export default function LandingPage() {
             maxWidth: '700px',
             margin: '0 auto 48px'
           }}>
-            1 000 questions officielles. 10 matières. Classement en temps réel. La plateforme de préparation CFA qui ne prend pas les candidats pour des idiots.
+            1 000 questions au format CFA. 10 matières. Classement en temps réel. La plateforme de préparation CFA qui ne prend pas les candidats pour des idiots.
           </p>
 
           <div className="landing-hero-buttons" style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginBottom: '64px' }}>
@@ -120,7 +120,7 @@ export default function LandingPage() {
             {[
               {
                 title: 'Quiz adaptatif',
-                desc: '1 000 questions style CFA officiel. Chrono. Difficulté progressive.',
+                desc: '1 000 questions au style de l\'examen CFA. Chrono. Difficulté progressive.',
                 icon: <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00e0c6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="2" width="18" height="20" rx="2"/><path d="M7 6h10M7 10h10M7 14h6"/></svg>
               },
               {
@@ -162,78 +162,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section style={{ padding: '80px 24px' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <h2 style={{
-            fontSize: '42px',
-            fontWeight: 600,
-            color: 'var(--fg-0)',
-            textAlign: 'center',
-            marginBottom: '64px',
-            letterSpacing: '-1px'
-          }}>
-            Utilisé par des candidats sérieux
-          </h2>
-
-          <div className="landing-testimonials-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px' }}>
-            {[
-              {
-                quote: "CharterPath m'a permis de passer 2h de révision par jour sans m'ennuyer.",
-                author: 'Sarah K.',
-                role: 'CFA Candidate'
-              },
-              {
-                quote: "Le classement m'a donné la motivation que les livres ne donnaient pas.",
-                author: 'Marc D.',
-                role: 'Finance Analyst'
-              },
-              {
-                quote: "La meilleure alternative à Schweser pour le prix.",
-                author: 'Thomas R.',
-                role: 'Portfolio Manager'
-              }
-            ].map((testimonial, i) => (
-              <div key={i} style={{
-                padding: '32px',
-                background: 'var(--bg-1)',
-                border: '1px solid var(--line)',
-                borderRadius: '12px'
-              }}>
-                <p style={{
-                  fontSize: '16px',
-                  color: 'var(--fg-1)',
-                  lineHeight: 1.6,
-                  marginBottom: '24px',
-                  fontStyle: 'italic'
-                }}>
-                  "{testimonial.quote}"
-                </p>
-                <div>
-                  <div style={{
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    color: 'var(--fg-0)',
-                    marginBottom: '4px'
-                  }}>
-                    {testimonial.author}
-                  </div>
-                  <div style={{
-                    fontSize: '13px',
-                    color: 'var(--fg-3)',
-                    fontFamily: 'var(--font-mono)'
-                  }}>
-                    {testimonial.role}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Pricing */}
-      <section id="pricing" style={{ padding: '80px 24px', background: 'var(--bg-1)' }}>
+      <section id="pricing" style={{ padding: '80px 24px' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
           <h2 style={{
             fontSize: '42px',
@@ -290,8 +220,8 @@ export default function LandingPage() {
                 gap: '12px'
               }}>
                 {[
-                  '10 questions/jour',
-                  '3 matières',
+                  '100 questions offertes',
+                  'Toutes les matières',
                   'Classement visible',
                   'Profil public'
                 ].map((item, i) => (
@@ -320,22 +250,6 @@ export default function LandingPage() {
               borderRadius: '12px',
               position: 'relative'
             }}>
-              <div style={{
-                position: 'absolute',
-                top: '-12px',
-                right: '24px',
-                padding: '4px 12px',
-                background: 'var(--acc)',
-                color: '#07090c',
-                fontSize: '11px',
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                letterSpacing: '0.1em',
-                borderRadius: '4px'
-              }}>
-                BIENTÔT
-              </div>
-
               <div style={{
                 fontSize: '14px',
                 fontWeight: 600,
@@ -390,27 +304,16 @@ export default function LandingPage() {
                 ))}
               </ul>
 
-              <button
-                disabled
-                className="btn"
-                style={{
-                  width: '100%',
-                  justifyContent: 'center',
-                  background: 'var(--bg-2)',
-                  color: 'var(--fg-3)',
-                  cursor: 'not-allowed',
-                  border: '1px solid var(--line)'
-                }}
-              >
-                Bientôt disponible
-              </button>
+              <Link href="/subscription" className="btn" style={{ width: '100%', justifyContent: 'center', background: 'var(--acc)', color: '#07090c', fontWeight: 500 }}>
+                Passer Pro
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
       {/* FAQ */}
-      <section style={{ padding: '80px 24px' }}>
+      <section style={{ padding: '80px 24px', background: 'var(--bg-1)' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           <h2 style={{
             fontSize: '42px',
@@ -431,19 +334,19 @@ export default function LandingPage() {
               },
               {
                 q: "CharterPath remplace-t-il Schweser ?",
-                a: "CharterPath est un complément idéal à Schweser ou Kaplan. Nos 1 000 questions vous permettent de tester vos connaissances de manière interactive, avec un classement en temps réel pour rester motivé."
+                a: "CharterPath est un complément idéal à Schweser ou Kaplan. Nos questions vous permettent de tester vos connaissances de manière interactive, avec un classement en temps réel pour rester motivé."
               },
               {
                 q: "Les questions sont-elles officielles ?",
-                a: "Nos questions sont rédigées dans le style exact de l'examen CFA officiel, avec des vignettes narratives, des chiffres précis, et 3 choix de réponse. Elles respectent la pondération officielle de chaque matière."
+                a: "Non, ce ne sont pas des questions du CFA Institute. Elles sont rédigées dans le style de l'examen (vignettes narratives, chiffres précis, 3 choix de réponse) et suivent la pondération officielle de chaque matière."
               },
               {
                 q: "Comment fonctionne le classement ?",
-                a: "Le classement est mis à jour en temps réel en fonction de vos points (calculés selon la difficulté et le temps de réponse). Vous pouvez vous comparer à d'autres candidats et grimper dans les leagues (Bronze, Silver, Gold, Master)."
+                a: "Le classement est mis à jour en temps réel en fonction de vos points (calculés selon la difficulté et le temps de réponse). Vous pouvez vous comparer à d'autres candidats et grimper dans les ligues (Bronze, Silver, Gold, Diamond, Master)."
               },
               {
                 q: "Puis-je annuler mon abonnement ?",
-                a: "Oui, l'abonnement Pro (bientôt disponible) sera sans engagement. Vous pourrez annuler à tout moment depuis votre compte. Le plan Free reste gratuit pour toujours."
+                a: "Oui, l'abonnement Pro est sans engagement et résiliable à tout moment. Le plan Free reste gratuit pour toujours, dans la limite de 100 questions."
               }
             ].map((faq, i) => (
               <div key={i} style={{
@@ -496,7 +399,7 @@ export default function LandingPage() {
       </section>
 
       {/* Final CTA */}
-      <section style={{ padding: '80px 24px', background: 'var(--bg-1)', textAlign: 'center' }}>
+      <section style={{ padding: '80px 24px', textAlign: 'center' }}>
         <div style={{ maxWidth: '700px', margin: '0 auto' }}>
           <h2 style={{
             fontSize: '48px',
@@ -575,7 +478,7 @@ export default function LandingPage() {
           color: 'var(--fg-3)',
           fontFamily: 'var(--font-mono)'
         }}>
-          © 2026 CharterPath
+          © 2026 CharterPath — Produit indépendant : le CFA Institute ne l'approuve pas et ne garantit pas l'exactitude de son contenu.
         </div>
       </footer>
     </div>

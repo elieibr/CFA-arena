@@ -148,7 +148,7 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn btn-primary w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Création du compte...' : 'Créer mon compte'}
           </button>
@@ -191,7 +191,7 @@ export default function SignupPage() {
 
         <p className="text-center text-sm text-gray-600">
           Déjà un compte?{' '}
-          <Link href="/login" className="font-semibold text-blue-600 hover:text-blue-700">
+          <Link href="/login" className="font-semibold" style={{ color: 'var(--acc)' }}>
             Connectez-vous
           </Link>
         </p>

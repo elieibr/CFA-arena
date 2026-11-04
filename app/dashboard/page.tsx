@@ -172,9 +172,9 @@ export default function DashboardPage() {
 
   // Get difficulty level
   const getDifficultyLevel = (topic: any) => {
-    if (topic.difficultyMultiplier >= 1.3) return { level: 'adv', label: 'Advanced' }
-    if (topic.difficultyMultiplier >= 1.1) return { level: 'int', label: 'Intermediate' }
-    return { level: 'beg', label: 'Beginner' }
+    if (topic.difficultyMultiplier >= 1.3) return { level: 'adv', label: 'Avancé' }
+    if (topic.difficultyMultiplier >= 1.1) return { level: 'int', label: 'Intermédiaire' }
+    return { level: 'beg', label: 'Débutant' }
   }
 
   // Get status text
@@ -234,7 +234,7 @@ export default function DashboardPage() {
                     e.currentTarget.style.color = '#00e0c6'
                   }}
                 >
-                  Reprendre le quiz <span className="btn-arrow"></span>
+                  {totalQuestions > 0 ? 'Reprendre le quiz' : 'Commencer le quiz'} <span className="btn-arrow"></span>
                 </a>
                 <a href="#subjects" className="btn btn-ghost">
                   Voir les matières

@@ -4,11 +4,14 @@ import { courses } from '@/data/courses'
 export default function CoursesPage() {
   return (
     <div className="min-h-screen bg-[var(--bg-0)] text-[var(--fg-0)]">
-      <div className="max-w-7xl mx-auto px-6 py-16">
+      <div className="max-w-[1100px] mx-auto px-6 py-16">
         {/* Header */}
         <div className="mb-12">
-          <h1 className="text-[28px] font-[500] mb-3" style={{ letterSpacing: '-0.02em' }}>
-            Fiches de Cours
+          <div className="font-[var(--font-mono)] text-[11px] uppercase tracking-[0.1em] text-[var(--fg-3)] mb-3">
+            CFA Level 1 · 10 matières
+          </div>
+          <h1 className="mb-3" style={{ fontSize: 'clamp(30px, 8vw, 40px)', fontWeight: 400, letterSpacing: '-0.025em', lineHeight: 1.1 }}>
+            Fiches de cours
           </h1>
           <p className="text-[var(--fg-2)] text-[14px]">
             Formules essentielles et définitions clés pour chaque matière du CFA Level 1
@@ -31,7 +34,7 @@ export default function CoursesPage() {
               </div>
 
               {/* Course Name */}
-              <h2 className="text-[16px] font-[500] text-[var(--fg-0)] mb-2 leading-[1.4]">
+              <h2 className="text-[var(--fg-0)] mb-2" style={{ fontSize: '18px', fontWeight: 500, lineHeight: 1.35, letterSpacing: '-0.01em' }}>
                 {course.name}
               </h2>
 
