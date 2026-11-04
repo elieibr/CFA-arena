@@ -3,20 +3,7 @@
 import { useState, useEffect, useRef, Suspense } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { curriculum } from '@/data/curriculum'
-import { ethicsQuestions } from '@/data/questions/ethics'
-import { ethicsAdvancedQuestions } from '@/data/questions/ethics-advanced'
-import { quantQuestions } from '@/data/questions/quant'
-import { quantAdvancedQuestions } from '@/data/questions/quant-advanced'
-import { economicsQuestions } from '@/data/questions/economics'
-import { economicsAdvancedQuestions } from '@/data/questions/economics-advanced'
-import { fraQuestions } from '@/data/questions/fra'
-import { fraAdvancedQuestions } from '@/data/questions/fra-advanced'
-import { corporateFinanceAdvancedQuestions } from '@/data/questions/corporate-finance-advanced'
-import { equityAdvancedQuestions } from '@/data/questions/equity-advanced'
-import { fixedIncomeAdvancedQuestions } from '@/data/questions/fixed-income-advanced'
-import { derivativesAdvancedQuestions } from '@/data/questions/derivatives-advanced'
-import { alternativeInvestmentsAdvancedQuestions } from '@/data/questions/alternative-investments-advanced'
-import { portfolioManagementAdvancedQuestions } from '@/data/questions/portfolio-management-advanced'
+import { questionBank } from '@/data/question-bank'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 interface Question {
@@ -190,21 +177,8 @@ function QuizContent() {
       }
     }
 
-    // Map topic ID to question sets - load ALL questions
-    const questionMap: { [key: string]: Question[] } = {
-      'ethical-standards': [...ethicsQuestions, ...ethicsAdvancedQuestions],
-      'quantitative-methods': [...quantQuestions, ...quantAdvancedQuestions],
-      'economics': [...economicsQuestions, ...economicsAdvancedQuestions],
-      'financial-statement-analysis': [...fraQuestions, ...fraAdvancedQuestions],
-      'corporate-issuers': corporateFinanceAdvancedQuestions,
-      'equity-investments': equityAdvancedQuestions,
-      'fixed-income': fixedIncomeAdvancedQuestions,
-      'derivatives': derivativesAdvancedQuestions,
-      'alternative-investments': alternativeInvestmentsAdvancedQuestions,
-      'portfolio-management': portfolioManagementAdvancedQuestions
-    }
-
-    const allQuestions = questionMap[topicId || ''] || []
+    // Load ALL questions of the topic
+    const allQuestions = questionBank[topicId || ''] || []
 
     if (allQuestions.length > 0) {
       // Load saved progress, stats, and answers

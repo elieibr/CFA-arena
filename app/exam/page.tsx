@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { curriculum } from '@/data/curriculum'
+import { questionBank } from '@/data/question-bank'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
@@ -104,24 +105,32 @@ export default function ExamPage() {
     }
     setUserId(user.id)
 
-    // Get 180 questions distributed by topic weight
-    const allQuestions: Question[] = []
-
-    for (const topic of curriculum) {
-      const count = Math.round(180 * topic.weight)
-      const { data } = await supabase
-        .from('questions')
-        .select('*')
-        .eq('topic_id', topic.id)
-        .limit(count)
-
-      if (data) {
-        allQuestions.push(...data)
+    // 180 questions distributed by topic weight, drawn from the local question bank
+    const EXAM_SIZE = 180
+    const shuffle = <T,>(arr: T[]): T[] => {
+      const a = [...arr]
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]]
       }
+      return a
     }
 
-    // Shuffle questions
-    const shuffled = allQuestions.sort(() => Math.random() - 0.5).slice(0, 180)
+    const picked: Question[] = []
+    const leftovers: Question[] = []
+    for (const topic of curriculum) {
+      const pool = shuffle(questionBank[topic.id] || [])
+      const count = Math.round(EXAM_SIZE * topic.weight)
+      picked.push(...pool.slice(0, count))
+      leftovers.push(...pool.slice(count))
+    }
+
+    // Les pondérations ne totalisent pas 100 % : compléter avec des questions restantes
+    if (picked.length < EXAM_SIZE) {
+      picked.push(...shuffle(leftovers).slice(0, EXAM_SIZE - picked.length))
+    }
+
+    const shuffled = shuffle(picked).slice(0, EXAM_SIZE)
     setQuestions(shuffled)
 
     // Initialize answers array
