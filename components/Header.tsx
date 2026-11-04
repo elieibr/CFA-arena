@@ -1,15 +1,18 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useState, useRef } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 
 export default function Header() {
   const pathname = usePathname()
+  const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<any>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false)
+  const profileMenuRef = useRef<HTMLDivElement>(null)
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -19,6 +22,19 @@ export default function Header() {
   useEffect(() => {
     loadUser()
   }, [])
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setProfileMenuOpen(false)
+      }
+    }
+
+    if (profileMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [profileMenuOpen])
 
   async function loadUser() {
     const { data: { user } } = await supabase.auth.getUser()
@@ -31,6 +47,12 @@ export default function Header() {
         .single()
       setProfile(profileData)
     }
+  }
+
+  async function handleLogout() {
+    await supabase.auth.signOut()
+    router.push('/')
+    router.refresh()
   }
 
   const getInitials = () => {
@@ -84,8 +106,87 @@ export default function Header() {
 
           <div className="nav-end">
             {user && (
-              <div className="avatar" title={profile?.username || 'Profil'}>
-                {getInitials()}
+              <div style={{ position: 'relative' }} ref={profileMenuRef}>
+                <div
+                  className="avatar"
+                  title={profile?.username || 'Profil'}
+                  onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  {getInitials()}
+                </div>
+
+                {profileMenuOpen && (
+                  <div style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 8px)',
+                    right: 0,
+                    background: '#0c1015',
+                    border: '1px solid #1c232d',
+                    borderRadius: '8px',
+                    minWidth: '180px',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+                    zIndex: 1000,
+                    overflow: 'hidden'
+                  }}>
+                    <Link
+                      href={`/profile/${profile?.username}`}
+                      onClick={() => setProfileMenuOpen(false)}
+                      style={{
+                        display: 'block',
+                        padding: '12px 16px',
+                        color: '#b6bfcc',
+                        fontSize: '14px',
+                        textDecoration: 'none',
+                        borderBottom: '1px solid #1c232d',
+                        transition: 'color 0.15s ease'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#00e0c6'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#b6bfcc'}
+                    >
+                      Mon profil
+                    </Link>
+                    <Link
+                      href="/settings"
+                      onClick={() => setProfileMenuOpen(false)}
+                      style={{
+                        display: 'block',
+                        padding: '12px 16px',
+                        color: '#b6bfcc',
+                        fontSize: '14px',
+                        textDecoration: 'none',
+                        borderBottom: '1px solid #1c232d',
+                        transition: 'color 0.15s ease'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#00e0c6'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#b6bfcc'}
+                    >
+                      Paramètres
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setProfileMenuOpen(false)
+                        handleLogout()
+                      }}
+                      style={{
+                        display: 'block',
+                        width: '100%',
+                        padding: '12px 16px',
+                        color: '#b6bfcc',
+                        fontSize: '14px',
+                        textAlign: 'left',
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        transition: 'color 0.15s ease'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#00e0c6'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#b6bfcc'}
+                    >
+                      Se déconnecter
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -117,6 +218,29 @@ export default function Header() {
             <Link href="/leaderboard" className={pathname === '/leaderboard' ? 'active' : ''} onClick={() => setMobileMenuOpen(false)}>
               Classement
             </Link>
+            <div style={{ borderTop: '1px solid #1c232d', margin: '8px 0' }}></div>
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false)
+                handleLogout()
+              }}
+              style={{
+                display: 'block',
+                width: '100%',
+                padding: '12px 16px',
+                color: '#b6bfcc',
+                fontSize: '14px',
+                textAlign: 'left',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'color 0.15s ease'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#00e0c6'}
+              onMouseLeave={(e) => e.currentTarget.style.color = '#b6bfcc'}
+            >
+              Se déconnecter
+            </button>
           </nav>
         )}
       </div>
