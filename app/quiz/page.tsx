@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { curriculum } from '@/data/curriculum'
 import { ethicsQuestions } from '@/data/questions/ethics'
@@ -67,6 +67,9 @@ function shuffleQuestionOptions(question: Question): ShuffledQuestion {
   }
 }
 
+// Nombre de réponses autorisées pour un compte gratuit (toutes matières confondues)
+const FREE_QUESTION_LIMIT = 100
+
 function QuizContent() {
   const [questions, setQuestions] = useState<ShuffledQuestion[]>([])
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -81,6 +84,13 @@ function QuizContent() {
   const [answers, setAnswers] = useState<{[key: number]: 'correct' | 'incorrect'}>({})
   const [questionStartTime, setQuestionStartTime] = useState<number>(Date.now())
   const [hitFreeLimit, setHitFreeLimit] = useState(false)
+  // Limite gratuite : ref (et non state) pour que les handlers clavier/minuteur
+  // ne lisent jamais une valeur périmée.
+  const freeLimit = useRef<{ isPro: boolean | null; total: number }>({ isPro: null, total: 0 })
+
+  function freeLimitReached() {
+    return freeLimit.current.isPro === false && freeLimit.current.total >= FREE_QUESTION_LIMIT
+  }
 
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -148,28 +158,36 @@ function QuizContent() {
     setUserId(user.id)
 
     // Check if user is Pro
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('is_pro')
       .eq('id', user.id)
       .single()
 
     // Check total questions attempted across all topics
-    const { data: progressRecords } = await supabase
+    const { data: progressRecords, error: progressError } = await supabase
       .from('user_topic_progress')
       .select('questions_attempted')
       .eq('user_id', user.id)
 
-    const totalQuestionsAttempted = (progressRecords || []).reduce(
-      (sum, record) => sum + (record.questions_attempted || 0),
-      0
-    )
+    if (profileError || progressError) {
+      // On ne bloque que si on sait avec certitude que l'utilisateur est gratuit
+      // et a atteint la limite : en cas d'erreur, ne jamais pénaliser un abonné Pro.
+      console.error('Free limit check failed:', profileError || progressError)
+      freeLimit.current = { isPro: null, total: 0 }
+    } else {
+      const totalQuestionsAttempted = (progressRecords || []).reduce(
+        (sum, record) => sum + (record.questions_attempted || 0),
+        0
+      )
+      freeLimit.current = { isPro: !!profile?.is_pro, total: totalQuestionsAttempted }
 
-    // If not Pro and reached limit, show paywall
-    if (!profile?.is_pro && totalQuestionsAttempted >= 100) {
-      setHitFreeLimit(true)
-      setLoading(false)
-      return
+      // If not Pro and reached limit, show paywall
+      if (freeLimitReached()) {
+        setHitFreeLimit(true)
+        setLoading(false)
+        return
+      }
     }
 
     // Map topic ID to question sets - load ALL questions
@@ -233,6 +251,10 @@ function QuizContent() {
   }
 
   function handleTimeUp() {
+    if (freeLimitReached()) {
+      setHitFreeLimit(true)
+      return
+    }
     setIsAnswered(true)
     setSelectedAnswer(null)
     setSessionStats(prev => ({ ...prev, incorrect: prev.incorrect + 1 }))
@@ -241,6 +263,12 @@ function QuizContent() {
 
   async function handleAnswerSelect(answer: string) {
     if (isAnswered) return
+
+    // Limite gratuite atteinte pendant la session : pas de réponse supplémentaire
+    if (freeLimitReached()) {
+      setHitFreeLimit(true)
+      return
+    }
 
     setSelectedAnswer(answer)
     setIsAnswered(true)
@@ -347,6 +375,9 @@ function QuizContent() {
       })
     }
 
+    // Garder le compteur de la limite gratuite à jour (même logique que questions_attempted)
+    freeLimit.current.total += 1
+
     // If incorrect, add to spaced repetition
     if (!isCorrect) {
       await supabase.from('spaced_repetition_cards').insert({
@@ -370,6 +401,10 @@ function QuizContent() {
   }
 
   function handleNextQuestion() {
+    if (freeLimitReached()) {
+      setHitFreeLimit(true)
+      return
+    }
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1)
       setSelectedAnswer(null)
@@ -404,6 +439,10 @@ function QuizContent() {
   }
 
   function handleQuestionNavigation(index: number) {
+    if (freeLimitReached()) {
+      setHitFreeLimit(true)
+      return
+    }
     // Navigate to specific question
     setCurrentQuestionIndex(index)
     setSelectedAnswer(null)
