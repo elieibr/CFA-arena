@@ -1,28 +1,40 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { createBrowserClient } from '@supabase/ssr'
 import { curriculum } from '@/data/curriculum'
-import { Brain, CheckCircle, XCircle, RotateCcw, Calendar } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
+// Ligne de la table spaced_repetition_cards (voir supabase-schema.sql)
 interface ReviewCard {
   id: string
-  question_id: string
   topic_id: string
-  interval: number
-  ease_factor: number
-  next_review: string
-  repetitions: number
-  question: {
-    question_text: string
+  question_text: string
+  question_data: {
+    question_text?: string
     option_a: string
     option_b: string
     option_c: string
     correct_answer: string
-    explanation: string
+    explanation?: string
   }
+  review_count: number
+  next_review_date: string
 }
+
+// Intervalles (en jours) selon le nombre de révisions réussies d'affilée
+const INTERVALS = [1, 3, 7, 14, 30]
+const intervalFor = (count: number) => INTERVALS[Math.min(Math.max(count, 0), INTERVALS.length - 1)]
+
+const wrapStyle = { maxWidth: '760px', margin: '0 auto', padding: '48px 24px 64px' } as const
+const eyebrow = {
+  fontFamily: 'var(--font-mono)',
+  fontSize: '11px',
+  textTransform: 'uppercase',
+  letterSpacing: '0.1em',
+  color: 'var(--fg-3)',
+} as const
 
 export default function ReviewPage() {
   const [cards, setCards] = useState<ReviewCard[]>([])
@@ -30,8 +42,8 @@ export default function ReviewPage() {
   const [showAnswer, setShowAnswer] = useState(false)
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
-  const [userId, setUserId] = useState<string | null>(null)
-  const [stats, setStats] = useState({ due: 0, reviewed: 0, remaining: 0 })
+  const [saving, setSaving] = useState(false)
+  const [reviewed, setReviewed] = useState(0)
 
   const router = useRouter()
 
@@ -42,6 +54,7 @@ export default function ReviewPage() {
 
   useEffect(() => {
     loadReviewCards()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function loadReviewCards() {
@@ -52,307 +65,173 @@ export default function ReviewPage() {
       router.push('/login')
       return
     }
-    setUserId(user.id)
 
-    // Get cards due for review (next_review <= now)
-    const { data: cardsData } = await supabase
+    // Cartes à réviser : next_review_date <= maintenant
+    const { data, error } = await supabase
       .from('spaced_repetition_cards')
-      .select(`
-        *,
-        question:questions(*)
-      `)
+      .select('id, topic_id, question_text, question_data, review_count, next_review_date')
       .eq('user_id', user.id)
-      .lte('next_review', new Date().toISOString())
-      .order('next_review', { ascending: true })
+      .lte('next_review_date', new Date().toISOString())
+      .order('next_review_date', { ascending: true })
 
-    if (cardsData) {
-      setCards(cardsData as any)
-      setStats({
-        due: cardsData.length,
-        reviewed: 0,
-        remaining: cardsData.length
-      })
-    }
-
+    if (error) console.error('Review cards load failed:', error)
+    setCards((data as ReviewCard[]) || [])
     setLoading(false)
   }
 
-  async function handleAnswerSelect(answer: string) {
+  function handleAnswerSelect(answer: string) {
+    if (showAnswer) return
     setSelectedAnswer(answer)
     setShowAnswer(true)
   }
 
-  // SM-2 Algorithm for spaced repetition
-  async function handleQuality(quality: number) {
-    // quality: 0-5 (0=total blackout, 5=perfect response)
-    if (!userId || !cards[currentCardIndex]) return
-
+  // rating: 'again' = raté, 'hard' = difficile, 'good' = bien
+  async function handleRating(rating: 'again' | 'hard' | 'good') {
     const card = cards[currentCardIndex]
-    let newEaseFactor = card.ease_factor
-    let newInterval = card.interval
-    let newRepetitions = card.repetitions
+    if (!card || saving) return
+    setSaving(true)
 
-    if (quality >= 3) {
-      // Correct answer
-      if (newRepetitions === 0) {
-        newInterval = 1
-      } else if (newRepetitions === 1) {
-        newInterval = 6
-      } else {
-        newInterval = Math.round(newInterval * newEaseFactor)
-      }
-      newRepetitions += 1
-    } else {
-      // Incorrect answer - reset
-      newRepetitions = 0
-      newInterval = 1
-    }
+    const count = card.review_count || 0
+    const newCount = rating === 'again' ? 0 : rating === 'good' ? count + 1 : count
+    const days = rating === 'again' ? 1 : intervalFor(newCount)
+    const next = new Date()
+    next.setDate(next.getDate() + days)
 
-    // Update ease factor
-    newEaseFactor = newEaseFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02))
-    if (newEaseFactor < 1.3) newEaseFactor = 1.3
-
-    const nextReview = new Date()
-    nextReview.setDate(nextReview.getDate() + newInterval)
-
-    // Update card in database
-    await supabase
+    const { error } = await supabase
       .from('spaced_repetition_cards')
       .update({
-        interval: newInterval,
-        ease_factor: newEaseFactor,
-        repetitions: newRepetitions,
-        next_review: nextReview.toISOString(),
-        last_reviewed: new Date().toISOString()
+        review_count: newCount,
+        next_review_date: next.toISOString(),
+        last_reviewed_at: new Date().toISOString(),
       })
       .eq('id', card.id)
 
-    // Move to next card
-    setStats({
-      ...stats,
-      reviewed: stats.reviewed + 1,
-      remaining: stats.remaining - 1
-    })
+    if (error) console.error('Review card update failed:', error)
+
+    setSaving(false)
+    setReviewed((r) => r + 1)
 
     if (currentCardIndex < cards.length - 1) {
       setCurrentCardIndex(currentCardIndex + 1)
       setShowAnswer(false)
       setSelectedAnswer(null)
     } else {
-      // Review session complete
       router.push('/dashboard')
     }
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-2xl">Chargement des cartes de révision...</div>
+      <div style={{ ...wrapStyle, textAlign: 'center', color: 'var(--fg-2)' }}>
+        Chargement des cartes de révision…
       </div>
     )
   }
 
   if (cards.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="bg-white rounded-xl p-12 shadow-lg text-center">
-            <Brain className="w-24 h-24 text-green-500 mx-auto mb-6" />
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              🎉 Aucune carte à réviser!
-            </h1>
-            <p className="text-xl text-gray-600 mb-8">
-              Toutes vos révisions sont à jour. Continuez à pratiquer pour ajouter de nouvelles cartes.
-            </p>
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-bold text-lg hover:from-blue-700 hover:to-blue-800 transition"
-            >
-              Retour au Dashboard
-            </button>
-          </div>
-        </div>
+      <div style={wrapStyle}>
+        <div style={{ ...eyebrow, marginBottom: '12px' }}>Révision espacée</div>
+        <h1 style={{ fontSize: 'clamp(30px, 8vw, 40px)', fontWeight: 400, letterSpacing: '-0.025em', lineHeight: 1.1, marginBottom: '16px' }}>
+          Aucune carte à réviser
+        </h1>
+        <p style={{ color: 'var(--fg-2)', fontSize: '16px', lineHeight: 1.6, marginBottom: '32px' }}>
+          Les questions auxquelles vous répondez de travers sont ajoutées ici pour être revues au bon moment.
+          Continuez à vous entraîner pour alimenter vos révisions.
+        </p>
+        <Link href="/dashboard" className="btn btn-primary">
+          Retour au tableau de bord
+        </Link>
       </div>
     )
   }
 
-  const currentCard = cards[currentCardIndex]
-  const question = currentCard.question
-  const topic = curriculum.find((t) => t.id === currentCard.topic_id)
+  const card = cards[currentCardIndex]
+  const q = card.question_data
+  const questionText = q.question_text || card.question_text
+  const topic = curriculum.find((t) => t.id === card.topic_id)
   const progress = ((currentCardIndex + 1) / cards.length) * 100
+  const count = card.review_count || 0
+
+  const ratings: { key: 'again' | 'hard' | 'good'; label: string; days: number }[] = [
+    { key: 'again', label: 'Raté', days: 1 },
+    { key: 'hard', label: 'Difficile', days: intervalFor(count) },
+    { key: 'good', label: 'Bien', days: intervalFor(count + 1) },
+  ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                <Brain className="w-6 h-6 text-purple-600" />
-                Révision Espacée
-              </h1>
-              <p className="text-sm text-gray-600">{topic?.titleFr || 'Quiz'}</p>
-            </div>
+    <div style={wrapStyle}>
+      <div style={{ ...eyebrow, marginBottom: '12px' }}>
+        Révision espacée · {topic?.titleFr || 'Quiz'}
+      </div>
+      <h1 style={{ fontSize: 'clamp(28px, 7vw, 36px)', fontWeight: 400, letterSpacing: '-0.025em', lineHeight: 1.1, marginBottom: '24px' }}>
+        Carte {currentCardIndex + 1} sur {cards.length}
+      </h1>
 
-            <div className="flex gap-4">
-              {/* Stats */}
-              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-100 text-blue-700">
-                <Calendar className="w-5 h-5" />
-                <span className="font-bold">{stats.remaining} restantes</span>
-              </div>
+      <div style={{ height: '4px', background: 'var(--bg-2)', borderRadius: '2px', overflow: 'hidden', marginBottom: '32px' }}>
+        <div style={{ width: `${progress}%`, height: '100%', background: 'var(--acc)', transition: 'width 0.3s ease' }} />
+      </div>
 
-              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-100 text-green-700">
-                <CheckCircle className="w-5 h-5" />
-                <span className="font-bold">{stats.reviewed} révisées</span>
-              </div>
-            </div>
-          </div>
+      <div style={{ background: 'var(--bg-1)', border: '1px solid var(--line)', borderRadius: '12px', padding: '24px' }}>
+        <p className="qstem" style={{ marginBottom: '24px' }}>{questionText}</p>
 
-          {/* Progress Bar */}
-          <div className="mt-4">
-            <div className="flex justify-between text-sm mb-1">
-              <span className="text-gray-600">Progression</span>
-              <span className="font-bold text-gray-900">
-                {currentCardIndex + 1}/{cards.length}
-              </span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-          </div>
+        <div className="choices">
+          {['A', 'B', 'C'].map((letter) => {
+            const text = q[`option_${letter.toLowerCase()}` as 'option_a' | 'option_b' | 'option_c']
+            const isSelected = selectedAnswer === letter
+            const isCorrect = letter === q.correct_answer
+
+            let className = 'choice'
+            if (showAnswer) {
+              if (isCorrect) className += ' correct'
+              else if (isSelected) className += ' wrong'
+              className += ' disabled'
+            } else if (isSelected) {
+              className += ' selected'
+            }
+
+            return (
+              <button key={letter} onClick={() => handleAnswerSelect(letter)} disabled={showAnswer} className={className}>
+                <div className="choice-letter">{letter}</div>
+                <div className="choice-text">{text}</div>
+              </button>
+            )
+          })}
         </div>
-      </header>
 
-      {/* Card */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-xl p-8 shadow-lg border border-gray-200">
-          {/* Card Info */}
-          <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="text-sm text-gray-600">
-                Intervalle actuel: <span className="font-bold text-purple-600">{currentCard.interval} jour(s)</span>
+        {showAnswer && (
+          <>
+            {q.explanation && (
+              <div style={{ marginTop: '24px', padding: '16px 20px', background: 'var(--bg-0)', border: '1px solid var(--line)', borderLeft: '3px solid var(--acc)', borderRadius: '8px' }}>
+                <div style={{ ...eyebrow, marginBottom: '8px' }}>Explication</div>
+                <p style={{ color: 'var(--fg-1)', fontSize: '15px', lineHeight: 1.6 }}>{q.explanation}</p>
               </div>
-              <div className="text-sm text-gray-600">
-                Répétitions: <span className="font-bold text-purple-600">{currentCard.repetitions}</span>
+            )}
+
+            <div style={{ marginTop: '24px' }}>
+              <div style={{ ...eyebrow, marginBottom: '12px' }}>Comment l&apos;avez-vous trouvée ?</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px' }}>
+                {ratings.map((r) => (
+                  <button
+                    key={r.key}
+                    onClick={() => handleRating(r.key)}
+                    disabled={saving}
+                    className="btn btn-ghost"
+                    style={{ flexDirection: 'column', alignItems: 'center', gap: '2px', minHeight: '56px' }}
+                  >
+                    <span>{r.label}</span>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--fg-3)' }}>
+                      revue dans {r.days} j
+                    </span>
+                  </button>
+                ))}
               </div>
             </div>
-            <div className="text-sm text-gray-600">
-              Facilité: <span className="font-bold text-purple-600">{currentCard.ease_factor.toFixed(2)}</span>
-            </div>
-          </div>
+          </>
+        )}
+      </div>
 
-          {/* Question */}
-          <h2 className="text-xl font-bold text-gray-900 mb-8">
-            {question.question_text}
-          </h2>
-
-          {/* Answer Options */}
-          <div className="space-y-4 mb-8">
-            {['A', 'B', 'C'].map((option) => {
-              const optionText = question[`option_${option.toLowerCase()}` as keyof typeof question] as string
-              const isSelected = selectedAnswer === option
-              const isCorrect = option === question.correct_answer
-
-              let bgColor = 'bg-gray-50 hover:bg-gray-100 border-gray-300'
-              if (showAnswer) {
-                if (isCorrect) {
-                  bgColor = 'bg-green-100 border-green-500'
-                } else if (isSelected && !isCorrect) {
-                  bgColor = 'bg-red-100 border-red-500'
-                }
-              } else if (isSelected) {
-                bgColor = 'bg-blue-100 border-blue-500'
-              }
-
-              return (
-                <button
-                  key={option}
-                  onClick={() => handleAnswerSelect(option)}
-                  disabled={showAnswer}
-                  className={`w-full text-left p-4 rounded-lg border-2 transition ${bgColor} ${
-                    showAnswer ? 'cursor-not-allowed' : 'cursor-pointer'
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white border-2 border-gray-300 flex items-center justify-center font-bold">
-                      {option}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-gray-900">{optionText}</p>
-                    </div>
-                    {showAnswer && isCorrect && (
-                      <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" />
-                    )}
-                    {showAnswer && isSelected && !isCorrect && (
-                      <XCircle className="w-6 h-6 text-red-600 flex-shrink-0" />
-                    )}
-                  </div>
-                </button>
-              )
-            })}
-          </div>
-
-          {/* Explanation */}
-          {showAnswer && (
-            <>
-              <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
-                <h3 className="font-bold text-blue-900 mb-2">Explication:</h3>
-                <p className="text-blue-800">{question.explanation}</p>
-              </div>
-
-              {/* Quality Rating Buttons */}
-              <div className="space-y-3">
-                <h3 className="font-bold text-gray-900 mb-3">Comment avez-vous trouvé cette question?</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <button
-                    onClick={() => handleQuality(0)}
-                    className="px-4 py-3 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-medium transition"
-                  >
-                    😰 Blackout<br/>
-                    <span className="text-xs">+1 jour</span>
-                  </button>
-                  <button
-                    onClick={() => handleQuality(3)}
-                    className="px-4 py-3 bg-orange-100 hover:bg-orange-200 text-orange-700 rounded-lg font-medium transition"
-                  >
-                    😐 Difficile<br/>
-                    <span className="text-xs">+1 jour</span>
-                  </button>
-                  <button
-                    onClick={() => handleQuality(4)}
-                    className="px-4 py-3 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg font-medium transition"
-                  >
-                    🙂 Bien<br/>
-                    <span className="text-xs">+{currentCard.repetitions === 0 ? 1 : currentCard.repetitions === 1 ? 6 : Math.round(currentCard.interval * currentCard.ease_factor)} jours</span>
-                  </button>
-                  <button
-                    onClick={() => handleQuality(5)}
-                    className="px-4 py-3 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg font-medium transition"
-                  >
-                    😎 Facile<br/>
-                    <span className="text-xs">+{currentCard.repetitions === 0 ? 1 : currentCard.repetitions === 1 ? 6 : Math.round(currentCard.interval * (currentCard.ease_factor + 0.1))} jours</span>
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* Show Answer Button */}
-          {!showAnswer && !selectedAnswer && (
-            <button
-              onClick={() => setShowAnswer(true)}
-              className="w-full py-4 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-bold text-lg hover:from-purple-700 hover:to-purple-800 transition flex items-center justify-center gap-2"
-            >
-              <RotateCcw className="w-5 h-5" />
-              Voir la Réponse
-            </button>
-          )}
-        </div>
-      </main>
+      <div style={{ ...eyebrow, marginTop: '16px', textAlign: 'right' }}>{reviewed} révisée{reviewed > 1 ? 's' : ''}</div>
     </div>
   )
 }

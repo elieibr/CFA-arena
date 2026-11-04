@@ -183,15 +183,26 @@ export default function ExamPage() {
     setAnswers(updatedAnswers)
     setScore((correctCount / questions.length) * 100)
 
-    // Save exam result to database
+    // Save exam result to database (colonnes de la table exam_simulations)
     if (userId) {
-      await supabase.from('exam_simulations').insert({
+      const topicBreakdown: { [topicId: string]: { correct: number; total: number } } = {}
+      updatedAnswers.forEach((answer, index) => {
+        const topicId = questions[index].topic_id
+        const entry = topicBreakdown[topicId] || { correct: 0, total: 0 }
+        entry.total += 1
+        if (answer.isCorrect) entry.correct += 1
+        topicBreakdown[topicId] = entry
+      })
+
+      const { error: saveError } = await supabase.from('exam_simulations').insert({
         user_id: userId,
         total_questions: questions.length,
         correct_answers: correctCount,
-        score: (correctCount / questions.length) * 100,
-        time_taken: (4.5 * 60 * 60) - timeLeft
+        score_percentage: Math.round((correctCount / questions.length) * 10000) / 100,
+        time_taken: Math.round((4.5 * 60 * 60) - timeLeft),
+        topic_breakdown: topicBreakdown
       })
+      if (saveError) console.error('Exam result not saved:', saveError)
     }
   }
 

@@ -37,7 +37,7 @@ export default function StatisticsPage() {
       .from('profiles')
       .select('*')
       .eq('id', user.id)
-      .single()
+      .maybeSingle()
 
     setProfile(profileData)
 
@@ -57,8 +57,8 @@ export default function StatisticsPage() {
       .from('question_history')
       .select('*')
       .eq('user_id', user.id)
-      .gte('created_at', thirtyDaysAgo.toISOString())
-      .order('created_at', { ascending: true })
+      .gte('answered_at', thirtyDaysAgo.toISOString())
+      .order('answered_at', { ascending: true })
 
     setQuestionHistory(historyData || [])
 
@@ -67,7 +67,7 @@ export default function StatisticsPage() {
       .from('exam_simulations')
       .select('*')
       .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
+      .order('completed_at', { ascending: false })
       .limit(5)
 
     setExamHistory(examData || [])
@@ -90,7 +90,7 @@ export default function StatisticsPage() {
 
   // Calculate streak
   let currentStreak = 0
-  const uniqueDates = [...new Set(questionHistory.map((q) => q.created_at.split('T')[0]))].sort().reverse()
+  const uniqueDates = [...new Set(questionHistory.map((q) => q.answered_at.split('T')[0]))].sort().reverse()
 
   for (let i = 0; i < uniqueDates.length; i++) {
     const expectedDate = new Date()
