@@ -47,7 +47,7 @@ export default function SettingsPage() {
         .from('profiles')
         .select('username, is_pro')
         .eq('id', user.id)
-        .single()
+        .maybeSingle()
 
       setAccount({
         email: user.email || '',

@@ -149,7 +149,7 @@ function QuizContent() {
       .from('profiles')
       .select('is_pro')
       .eq('id', user.id)
-      .single()
+      .maybeSingle()
 
     // Check total questions attempted across all topics
     const { data: progressRecords, error: progressError } = await supabase
@@ -299,7 +299,7 @@ function QuizContent() {
         .from('profiles')
         .select('total_points')
         .eq('id', userId)
-        .single()
+        .maybeSingle()
 
       const newTotal = (currentProfile?.total_points || 0) + pointsEarned
 

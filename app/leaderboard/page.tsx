@@ -40,7 +40,7 @@ function LeaderboardContent() {
       .from('profiles')
       .select('*')
       .eq('id', user.id)
-      .single()
+      .maybeSingle()
 
     setCurrentUser(profile)
 

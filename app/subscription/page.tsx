@@ -32,7 +32,7 @@ export default function SubscriptionPage() {
       .from('profiles')
       .select('*')
       .eq('id', user.id)
-      .single()
+      .maybeSingle()
 
     setProfile(profileData)
     setLoading(false)

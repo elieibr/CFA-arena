@@ -17,7 +17,7 @@ export async function signUp(formData: FormData) {
     .from('profiles')
     .select('username')
     .eq('username', username)
-    .single()
+    .maybeSingle()
 
   if (existingProfile) {
     return { error: 'Ce nom d\'utilisateur est déjà pris' }

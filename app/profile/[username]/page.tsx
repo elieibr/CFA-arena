@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     .from('profiles')
     .select('total_points, username')
     .eq('username', username)
-    .single()
+    .maybeSingle()
 
   if (!profile) {
     return {
@@ -105,7 +105,7 @@ export default async function ProfilePage({ params }: PageProps) {
     .from('profiles')
     .select('*')
     .eq('username', username)
-    .single()
+    .maybeSingle()
 
   if (profileError || !profile) {
     notFound()

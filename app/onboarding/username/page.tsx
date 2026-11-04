@@ -33,7 +33,7 @@ export default function UsernameOnboardingPage() {
       .from('profiles')
       .select('username')
       .eq('id', user.id)
-      .single()
+      .maybeSingle()
 
     if (profile?.username) {
       // User already has username, redirect to dashboard
@@ -112,8 +112,7 @@ export default function UsernameOnboardingPage() {
 
     const { error: updateError } = await supabase
       .from('profiles')
-      .update({ username: username.toLowerCase() })
-      .eq('id', user.id)
+      .upsert({ id: user.id, username: username.toLowerCase() }, { onConflict: 'id' })
 
     if (updateError) {
       setError('Erreur lors de l\'enregistrement: ' + updateError.message)

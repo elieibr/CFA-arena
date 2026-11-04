@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState, useRef } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
+import { ensureProfile } from '@/lib/ensure-profile'
 
 export default function Header() {
   const pathname = usePathname()
@@ -40,11 +41,8 @@ export default function Header() {
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
       setUser(user)
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single()
+      // Crée le profil s'il manque (compte sans ligne dans `profiles`)
+      const profileData = await ensureProfile(supabase, user)
       setProfile(profileData)
     }
   }
