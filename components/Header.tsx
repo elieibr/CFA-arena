@@ -104,9 +104,9 @@ export default function Header() {
             <span></span>
           </button>
 
-          <div className="nav-end">
+          <div className="nav-end" style={{ position: 'relative' }}>
             {user && (
-              <div style={{ position: 'relative' }} ref={profileMenuRef}>
+              <div ref={profileMenuRef}>
                 <div
                   className="avatar"
                   title={profile?.username || 'Profil'}
@@ -118,15 +118,15 @@ export default function Header() {
 
                 {profileMenuOpen && (
                   <div style={{
-                    position: 'fixed',
-                    top: '70px',
-                    right: '24px',
+                    position: 'absolute',
+                    top: '48px',
+                    right: '0',
                     background: '#0c1015',
                     border: '1px solid #1c232d',
                     borderRadius: '8px',
                     minWidth: '200px',
                     boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
-                    zIndex: 9999,
+                    zIndex: 100,
                     overflow: 'hidden'
                   }}>
                     <Link
