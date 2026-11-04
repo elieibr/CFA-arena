@@ -217,8 +217,6 @@ header.site {
   top: 0;
   z-index: 50;
   width: 100%;
-  max-width: 100vw;
-  overflow-x: hidden;
   box-sizing: border-box;
 }
 
