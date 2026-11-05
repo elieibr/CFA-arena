@@ -2,8 +2,10 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getStripe } from '@/lib/stripe'
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
+    const origin = process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin
+
     // L'identité vient de la session Supabase, jamais du corps de la requête :
     // sinon n'importe qui pourrait activer le Pro d'un autre compte.
     const supabase = await createClient()
@@ -36,8 +38,8 @@ export async function POST() {
           quantity: 1,
         },
       ],
-      success_url: 'https://charterpath.app/dashboard?success=true',
-      cancel_url: 'https://charterpath.app/subscription',
+      success_url: `${origin}/dashboard?success=true`,
+      cancel_url: `${origin}/subscription`,
       customer_email: user.email,
       metadata: {
         userId: user.id,
