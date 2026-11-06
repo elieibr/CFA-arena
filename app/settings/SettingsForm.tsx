@@ -61,7 +61,7 @@ export default function SettingsForm({ profile, user }: SettingsFormProps) {
           {/* Username (read-only) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Nom d'utilisateur
+              Nom d&apos;utilisateur
             </label>
             <input
               type="text"
@@ -70,7 +70,7 @@ export default function SettingsForm({ profile, user }: SettingsFormProps) {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
             />
             <p className="text-xs text-gray-500 mt-1">
-              Le nom d'utilisateur ne peut pas être modifié
+              Le nom d&apos;utilisateur ne peut pas être modifié
             </p>
           </div>
 

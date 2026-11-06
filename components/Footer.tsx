@@ -85,7 +85,7 @@ export default function Footer() {
           </Link>
         </div>
         <div>
-          © 2026 CharterPath — Produit indépendant : le CFA Institute ne l'approuve pas et ne garantit pas l'exactitude de son contenu.
+          © 2026 CharterPath — Produit indépendant : le CFA Institute ne l&apos;approuve pas et ne garantit pas l&apos;exactitude de son contenu.
         </div>
       </div>
     </footer>

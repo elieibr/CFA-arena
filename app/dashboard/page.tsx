@@ -336,7 +336,7 @@ export default function DashboardPage() {
           <div className="block-head">
             <div className="left">
               <h2>10 matières · pondération CFA Institute</h2>
-              <p>Cliquez une carte pour réviser. Les pondérations reflètent le poids de chaque matière à l'examen.</p>
+              <p>Cliquez une carte pour réviser. Les pondérations reflètent le poids de chaque matière à l&apos;examen.</p>
             </div>
           </div>
 

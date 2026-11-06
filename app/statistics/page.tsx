@@ -458,7 +458,7 @@ export default function StatisticsPage() {
                     }}
                   />
                   <span style={{ color: 'var(--fg-1)', fontSize: '13.5px', lineHeight: 1.5 }}>
-                    Créez une habitude d'étude quotidienne pour améliorer votre rétention.
+                    Créez une habitude d&apos;étude quotidienne pour améliorer votre rétention.
                   </span>
                 </li>
               )}
@@ -495,7 +495,7 @@ export default function StatisticsPage() {
                     }}
                   />
                   <span style={{ color: 'var(--fg-1)', fontSize: '13.5px', lineHeight: 1.5 }}>
-                    Votre temps moyen par question est de {avgTimePerQuestion.toFixed(0)}s. Essayez de viser 90s pour l'examen.
+                    Votre temps moyen par question est de {avgTimePerQuestion.toFixed(0)}s. Essayez de viser 90s pour l&apos;examen.
                   </span>
                 </li>
               )}

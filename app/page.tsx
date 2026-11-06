@@ -464,7 +464,7 @@ export default function LandingPage() {
             <Link href="/blog" style={{ fontSize: '14px', color: 'var(--fg-2)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', minHeight: '44px' }}>Blog</Link>
             <Link href="/leaderboard" style={{ fontSize: '14px', color: 'var(--fg-2)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', minHeight: '44px' }}>Classement</Link>
             <Link href="/login" style={{ fontSize: '14px', color: 'var(--fg-2)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', minHeight: '44px' }}>Se connecter</Link>
-            <Link href="/signup" style={{ fontSize: '14px', color: 'var(--fg-2)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', minHeight: '44px' }}>S'inscrire</Link>
+            <Link href="/signup" style={{ fontSize: '14px', color: 'var(--fg-2)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', minHeight: '44px' }}>S&apos;inscrire</Link>
           </div>
         </div>
 
@@ -478,7 +478,7 @@ export default function LandingPage() {
           color: 'var(--fg-3)',
           fontFamily: 'var(--font-mono)'
         }}>
-          © 2026 CharterPath — Produit indépendant : le CFA Institute ne l'approuve pas et ne garantit pas l'exactitude de son contenu.
+          © 2026 CharterPath — Produit indépendant : le CFA Institute ne l&apos;approuve pas et ne garantit pas l&apos;exactitude de son contenu.
         </div>
       </footer>
     </div>

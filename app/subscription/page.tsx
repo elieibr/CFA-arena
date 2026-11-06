@@ -160,7 +160,7 @@ export default function SubscriptionPage() {
               color: 'var(--fg-0)'
             }}
           >
-            Le prix d'un café par semaine.
+            Le prix d&apos;un café par semaine.
           </h1>
 
           {/* Pricing Card */}
@@ -269,7 +269,7 @@ export default function SubscriptionPage() {
                     borderBottom: '1px solid var(--line-soft)'
                   }}
                 >
-                  Schweser Premium · 1 290€ — <span style={{ color: 'var(--acc)' }}>99,4% d'économie</span>
+                  Schweser Premium · 1 290€ — <span style={{ color: 'var(--acc)' }}>99,4% d&apos;économie</span>
                 </div>
 
                 {/* Features */}

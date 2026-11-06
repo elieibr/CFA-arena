@@ -216,7 +216,7 @@ export default function ExamPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-2xl">Chargement de l'examen...</div>
+        <div className="text-2xl">Chargement de l&apos;examen...</div>
       </div>
     )
   }
@@ -304,7 +304,7 @@ export default function ExamPage() {
                   borderRadius: '50%',
                   boxShadow: '0 0 8px var(--acc-amber)'
                 }}></span>
-                Conditions d'examen
+                Conditions d&apos;examen
               </div>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <li style={{ color: 'var(--fg-2)', fontSize: '14px', lineHeight: '1.5' }}>
@@ -383,7 +383,7 @@ export default function ExamPage() {
             {/* Start button */}
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <button onClick={handleStartExam} className="btn btn-primary">
-                Démarrer l'Examen
+                Démarrer l&apos;Examen
               </button>
             </div>
           </div>
@@ -467,7 +467,7 @@ export default function ExamPage() {
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--fg-3)', marginBottom: '8px' }}>
                         <span>{topicCorrect} / {topicQuestions.length}</span>
-                        <span>{(topic.weight * 100).toFixed(0)}% de l'examen</span>
+                        <span>{(topic.weight * 100).toFixed(0)}% de l&apos;examen</span>
                       </div>
                       <div style={{
                         width: '100%',

@@ -187,7 +187,7 @@ export default function UsernameOnboardingPage() {
               color: 'var(--fg-0)'
             }}
           >
-            Choisissez votre nom d'utilisateur
+            Choisissez votre nom d&apos;utilisateur
           </h1>
           <p
             style={{
@@ -216,7 +216,7 @@ export default function UsernameOnboardingPage() {
                 letterSpacing: '0.06em'
               }}
             >
-              Nom d'utilisateur
+              Nom d&apos;utilisateur
             </label>
             <div style={{ position: 'relative' }}>
               <input
@@ -335,7 +335,7 @@ export default function UsernameOnboardingPage() {
             lineHeight: 1.5
           }}
         >
-          Votre nom d'utilisateur sera visible sur votre profil public
+          Votre nom d&apos;utilisateur sera visible sur votre profil public
         </div>
       </div>
     </div>

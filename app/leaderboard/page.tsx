@@ -457,7 +457,7 @@ function LeaderboardContent() {
                   color: 'var(--fg-3)'
                 }}
               >
-                Personne n'est encore classé ici.
+                Personne n&apos;est encore classé ici.
                 <br />
                 <Link href="/dashboard" style={{ color: 'var(--acc)', textDecoration: 'underline', display: 'inline-block', padding: '12px 0' }}>
                   Répondez à quelques questions pour ouvrir le classement
