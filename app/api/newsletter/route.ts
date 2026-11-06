@@ -3,16 +3,48 @@ import { Resend } from 'resend'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
+const EMAIL_RE = /^[^\s@]{1,64}@[^\s@]+\.[^\s@]{2,}$/
+
+// Limitation de débit en mémoire (par instance serverless : freine l'abus basique,
+// pas un attaquant distribué). Pour du solide : Upstash/Redis ou Vercel WAF.
+const WINDOW_MS = 10 * 60 * 1000
+const MAX_PER_IP = 5
+const hitsByIp = new Map<string, number[]>()
+const recentEmails = new Map<string, number>()
+
+function tooManyRequests(ip: string): boolean {
+  const now = Date.now()
+  const hits = (hitsByIp.get(ip) ?? []).filter((t) => now - t < WINDOW_MS)
+  hits.push(now)
+  hitsByIp.set(ip, hits)
+  if (hitsByIp.size > 5000) hitsByIp.clear()
+  return hits.length > MAX_PER_IP
+}
+
 export async function POST(request: Request) {
   try {
-    const { email } = await request.json()
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown'
+    if (tooManyRequests(ip)) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+    }
 
-    if (!email || !email.includes('@')) {
+    const body = await request.json().catch(() => null)
+    const email = typeof body?.email === 'string' ? body.email.trim().toLowerCase() : ''
+
+    if (email.length > 254 || !EMAIL_RE.test(email)) {
       return NextResponse.json(
         { error: 'Invalid email address' },
         { status: 400 }
       )
     }
+
+    // Un même email ne reçoit pas le mail de bienvenue plus d'une fois par 24 h
+    const last = recentEmails.get(email)
+    if (last && Date.now() - last < 24 * 60 * 60 * 1000) {
+      return NextResponse.json({ success: true })
+    }
+    recentEmails.set(email, Date.now())
+    if (recentEmails.size > 5000) recentEmails.clear()
 
     // Send welcome email via Resend
     await resend.emails.send({
