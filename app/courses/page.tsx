@@ -1,3 +1,4 @@
+import { formulaSets } from '@/data/formulas'
 import Link from 'next/link'
 import { courses } from '@/data/courses'
 
@@ -40,7 +41,7 @@ export default function CoursesPage() {
 
               {/* Stats */}
               <div className="flex items-center gap-4 mb-4 text-[12px] font-[var(--font-mono)] text-[var(--fg-3)]">
-                <span>{course.formulas.length} formules</span>
+                <span>{(formulaSets[course.id] ?? course.formulas).length} formules</span>
                 <span>·</span>
                 <span>{course.definitions.length} définitions</span>
               </div>

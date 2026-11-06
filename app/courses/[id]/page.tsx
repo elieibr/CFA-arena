@@ -3,6 +3,8 @@
 import { useParams, useRouter } from 'next/navigation'
 import { courses } from '@/data/courses'
 import { useState } from 'react'
+import FormulaExplorer from '@/components/FormulaExplorer'
+import { formulaSets } from '@/data/formulas'
 
 export default function CoursePage() {
   const params = useParams()
@@ -10,6 +12,7 @@ export default function CoursePage() {
   const [activeTab, setActiveTab] = useState<'resume' | 'formulas' | 'definitions'>('resume')
 
   const course = courses.find((c) => c.id === params.id)
+  const richFormulas = course ? formulaSets[course.id] : undefined
 
   if (!course) {
     return (
@@ -64,7 +67,7 @@ export default function CoursePage() {
                 : 'text-[var(--fg-3)] hover:text-[var(--fg-1)]'
             }`}
           >
-            Formules ({course.formulas.length})
+            Formules ({richFormulas ? richFormulas.length : course.formulas.length})
           </button>
           <button
             onClick={() => setActiveTab('definitions')}
@@ -92,23 +95,27 @@ export default function CoursePage() {
           {activeTab === 'formulas' && (
             <div>
               <h2 className="text-[20px] font-[500] mb-6">Formules Essentielles</h2>
-              <div className="space-y-6">
-                {course.formulas.map((formula, index) => (
-                  <div key={index} className="pb-6 border-b border-[var(--line-soft)] last:border-b-0 last:pb-0">
-                    <h3 className="text-[15px] font-[500] text-[var(--fg-0)] mb-3">
-                      {formula.name}
-                    </h3>
-                    <div className="bg-[var(--bg-0)] border border-[var(--line)] rounded-[8px] px-4 py-3 mb-3">
-                      <code className="font-[var(--font-mono)] text-[13px] text-[var(--acc)]">
-                        {formula.formula}
-                      </code>
+              {richFormulas ? (
+                <FormulaExplorer formulas={richFormulas} />
+              ) : (
+                <div className="space-y-6">
+                  {course.formulas.map((formula, index) => (
+                    <div key={index} className="pb-6 border-b border-[var(--line-soft)] last:border-b-0 last:pb-0">
+                      <h3 className="text-[15px] font-[500] text-[var(--fg-0)] mb-3">
+                        {formula.name}
+                      </h3>
+                      <div className="bg-[var(--bg-0)] border border-[var(--line)] rounded-[8px] px-4 py-3 mb-3">
+                        <code className="font-[var(--font-mono)] text-[13px] text-[var(--acc)]">
+                          {formula.formula}
+                        </code>
+                      </div>
+                      <p className="text-[var(--fg-2)] text-[14px] leading-[1.6]">
+                        {formula.explanation}
+                      </p>
                     </div>
-                    <p className="text-[var(--fg-2)] text-[14px] leading-[1.6]">
-                      {formula.explanation}
-                    </p>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
