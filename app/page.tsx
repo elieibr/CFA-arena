@@ -465,6 +465,9 @@ export default function LandingPage() {
             <Link href="/leaderboard" style={{ fontSize: '14px', color: 'var(--fg-2)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', minHeight: '44px' }}>Classement</Link>
             <Link href="/login" style={{ fontSize: '14px', color: 'var(--fg-2)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', minHeight: '44px' }}>Se connecter</Link>
             <Link href="/signup" style={{ fontSize: '14px', color: 'var(--fg-2)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', minHeight: '44px' }}>S&apos;inscrire</Link>
+            <Link href="/terms" style={{ fontSize: '14px', color: 'var(--fg-2)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', minHeight: '44px' }}>CGU</Link>
+            <Link href="/privacy" style={{ fontSize: '14px', color: 'var(--fg-2)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', minHeight: '44px' }}>Confidentialité</Link>
+            <Link href="/legal" style={{ fontSize: '14px', color: 'var(--fg-2)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', minHeight: '44px' }}>Mentions légales</Link>
           </div>
         </div>
 

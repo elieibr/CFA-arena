@@ -83,6 +83,42 @@ export default function Footer() {
           >
             Classement
           </Link>
+          {' · '}
+          <Link
+            href="/terms"
+            style={{
+              color: '#525a66',
+              textDecoration: 'none',
+              display: 'inline-block',
+              padding: '14px 6px',
+            }}
+          >
+            CGU
+          </Link>
+          {' · '}
+          <Link
+            href="/privacy"
+            style={{
+              color: '#525a66',
+              textDecoration: 'none',
+              display: 'inline-block',
+              padding: '14px 6px',
+            }}
+          >
+            Confidentialité
+          </Link>
+          {' · '}
+          <Link
+            href="/legal"
+            style={{
+              color: '#525a66',
+              textDecoration: 'none',
+              display: 'inline-block',
+              padding: '14px 6px',
+            }}
+          >
+            Mentions légales
+          </Link>
         </div>
         <div>
           © 2026 CharterPath — Produit indépendant : le CFA Institute ne l&apos;approuve pas et ne garantit pas l&apos;exactitude de son contenu.
