@@ -1,14 +1,16 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
 import Link from 'next/link'
 
-export default function LoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  const [formError, setError] = useState<string | null>(null)
+  const searchParams = useSearchParams()
+  const error = formError ?? (searchParams.get('error') === 'auth' ? 'La connexion a échoué, réessaie.' : null)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
@@ -111,5 +113,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   )
 }

@@ -56,7 +56,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   // Fetch user profile for metadata
   const { data: profile } = await supabase
-    .from('profiles')
+    .from('public_profiles')
     .select('total_points, username')
     .eq('username', username)
     .maybeSingle()
@@ -70,7 +70,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   // Calculate global rank
   const { data: allProfiles } = await supabase
-    .from('profiles')
+    .from('public_profiles')
     .select('total_points')
     .order('total_points', { ascending: false })
 
@@ -102,7 +102,7 @@ export default async function ProfilePage({ params }: PageProps) {
 
   // Fetch user profile
   const { data: profile, error: profileError } = await supabase
-    .from('profiles')
+    .from('public_profiles')
     .select('*')
     .eq('username', username)
     .maybeSingle()
@@ -160,7 +160,7 @@ export default async function ProfilePage({ params }: PageProps) {
                 lineHeight: 1.5
               }}
             >
-              Ce profil est privé et n'est pas accessible publiquement.
+              Ce profil est privé et n&apos;est pas accessible publiquement.
             </p>
           </div>
         </div>
@@ -170,7 +170,7 @@ export default async function ProfilePage({ params }: PageProps) {
 
   // Fetch global rank
   const { data: allProfiles } = await supabase
-    .from('profiles')
+    .from('public_profiles')
     .select('total_points')
     .order('total_points', { ascending: false })
 
