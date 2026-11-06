@@ -1,124 +1,57 @@
-# Guide de Déploiement - CFA Arena
+# Déploiement
 
-## 📋 Prérequis
+## 1. Supabase
 
-1. Compte GitHub: https://github.com
-2. Compte Vercel: https://vercel.com
-3. Projet Supabase configuré avec le schéma de base de données
+Dans le SQL Editor, exécuter dans l'ordre :
 
-## 🚀 Étape 1: Pousser le code sur GitHub
+1. `supabase/schema/supabase-schema.sql`
+2. `supabase/schema/supabase-trigger-profile.sql`
+3. `supabase/schema/supabase-remove-elo.sql`
+4. `supabase/schema/supabase-fix-rls.sql` et `supabase/schema/fix-schema.sql`
+5. Les migrations de `supabase/migrations/` :
+   `add_question_index.sql`, `add_subscription_columns.sql`, `protect_billing_columns.sql`,
+   puis `public_profiles_view.sql`.
 
-```bash
-# Créer un nouveau repository sur GitHub (ne pas initialiser avec README)
-# Copier l'URL du repository (ex: https://github.com/votre-username/cfa-arena.git)
+> `public_profiles_view.sql` contient en commentaire un `DROP POLICY` à exécuter **après** le déploiement
+> du code qui lit la vue `public_profiles`. C'est ce qui empêche de lire `is_pro` / `stripe_customer_id`
+> des autres utilisateurs.
 
-# Ajouter le remote GitHub
-git remote add origin https://github.com/votre-username/cfa-arena.git
+Authentication → URL Configuration : Site URL = URL de production, Redirect URLs = `https://<domaine>/auth/callback`.
+Providers : Email (obligatoire), Google (optionnel).
 
-# Pousser le code
-git branch -M main
-git push -u origin main
-```
+Test de sécurité (connecté en tant qu'utilisateur, doit échouer) :
+`update profiles set is_pro = true where id = auth.uid();`
 
-## 🌐 Étape 2: Déployer sur Vercel
+## 2. Stripe
 
-### Méthode 1: Via l'interface web (Recommandé)
+1. Créer le produit et le prix d'abonnement → `STRIPE_PRICE_ID`.
+2. Activer le portail client (Settings → Billing → Customer portal).
+3. Créer un webhook vers `https://<domaine>/api/stripe/webhook` avec les événements :
+   `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`,
+   `invoice.payment_failed` → `STRIPE_WEBHOOK_SECRET`.
+4. En production, utiliser les clés **live** (`sk_live_...`, `pk_live_...`).
 
-1. Aller sur https://vercel.com
-2. Cliquer sur "Add New" → "Project"
-3. Importer votre repository GitHub
-4. Vercel détectera automatiquement Next.js
-5. Configurer les variables d'environnement:
-   - `NEXT_PUBLIC_SUPABASE_URL` = votre URL Supabase
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = votre clé anonyme Supabase
-6. Cliquer sur "Deploy"
+## 3. Resend
 
-### Méthode 2: Via la CLI Vercel
+Vérifier le domaine d'envoi (SPF, DKIM) avant d'utiliser `onboarding@charterpath.app`.
 
-```bash
-# Installer Vercel CLI
-npm install -g vercel
+## 4. Vercel
 
-# Se connecter
-vercel login
+Importer le dépôt GitHub (déploiement automatique à chaque push sur `main`) et définir :
 
-# Déployer (suivre les instructions)
-vercel
+| Variable | Rôle |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | URL du projet Supabase |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clé anon (publique) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Clé service (serveur uniquement, utilisée par le webhook) |
+| `NEXT_PUBLIC_APP_URL` | URL de production (redirections Stripe et OAuth) |
+| `STRIPE_SECRET_KEY` | Clé secrète Stripe |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Clé publique Stripe |
+| `STRIPE_PRICE_ID` | Prix de l'abonnement Pro |
+| `STRIPE_WEBHOOK_SECRET` | Secret de signature du webhook |
+| `RESEND_API_KEY` | Envoi d'emails |
 
-# Ajouter les variables d'environnement
-vercel env add NEXT_PUBLIC_SUPABASE_URL production
-vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY production
+## 5. Vérification après déploiement
 
-# Redéployer avec les nouvelles variables
-vercel --prod
-```
-
-## 🗄️ Étape 3: Configuration Supabase
-
-1. Aller dans votre projet Supabase
-2. Dans "SQL Editor", exécuter dans l'ordre:
-   ```sql
-   -- 1. Schéma principal
-   [Coller le contenu de supabase-schema.sql]
-
-   -- 2. Trigger pour création automatique de profil
-   [Coller le contenu de supabase-trigger-profile.sql]
-
-   -- 3. Suppression du système ELO
-   [Coller le contenu de supabase-remove-elo.sql]
-   ```
-
-3. Dans "Authentication" → "URL Configuration":
-   - Ajouter votre URL Vercel dans "Site URL"
-   - Ajouter `https://votre-app.vercel.app/**` dans "Redirect URLs"
-
-4. Dans "Authentication" → "Providers":
-   - Activer "Email" (obligatoire)
-   - (Optionnel) Activer "Google OAuth"
-
-## ✅ Vérification
-
-1. Visiter votre URL Vercel
-2. Tester la création de compte (`/signup`)
-3. Tester la connexion (`/login`)
-4. Vérifier le dashboard
-
-## 🔧 Commandes utiles
-
-```bash
-# Voir les logs en temps réel
-vercel logs
-
-# Lister les déploiements
-vercel ls
-
-# Ouvrir le dashboard Vercel
-vercel
-
-# Redéployer
-vercel --prod
-```
-
-## 🐛 Résolution de problèmes
-
-### Erreur: Variables d'environnement manquantes
-```bash
-vercel env pull .env.local
-```
-
-### Erreur: Base de données
-- Vérifier que tous les scripts SQL sont exécutés
-- Vérifier que le trigger `handle_new_user()` est actif
-- Vérifier les RLS policies dans Supabase
-
-### Erreur de build
-```bash
-npm run build
-# Résoudre les erreurs localement avant de push
-```
-
-## 📝 Notes
-
-- Le site sera accessible sur: `https://votre-projet.vercel.app`
-- Les déploiements automatiques se font à chaque push sur `main`
-- Vercel supporte les domaines personnalisés (Settings → Domains)
+Inscription → onboarding → quiz → limite gratuite (100 questions) → paiement → statut Pro →
+portail client → annulation (le Pro doit être retiré).

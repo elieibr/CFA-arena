@@ -6,7 +6,7 @@ import { createBrowserClient } from '@supabase/ssr'
 import { curriculum } from '@/data/curriculum'
 import { useRouter } from 'next/navigation'
 
-// Ligne de la table spaced_repetition_cards (voir supabase-schema.sql)
+// Ligne de la table spaced_repetition_cards (voir supabase/schema/supabase-schema.sql)
 interface ReviewCard {
   id: string
   topic_id: string
