@@ -30,14 +30,14 @@ export async function GET() {
       limit: 5,
     })
 
-    const sub: any = subs.data.find((s) => s.status === 'active' || s.status === 'trialing') || subs.data[0]
+    const sub = subs.data.find((s) => s.status === 'active' || s.status === 'trialing') || subs.data[0]
     if (!sub) {
       return NextResponse.json({ error: 'No subscription' }, { status: 404 })
     }
 
-    // Selon la version d'API, la fin de période est sur l'abonnement ou sur son item
+    // Avec cette version d'API, la fin de période est portée par l'item de l'abonnement
     const item = sub.items?.data?.[0]
-    const periodEnd: number | undefined = item?.current_period_end ?? sub.current_period_end
+    const periodEnd: number | undefined = item?.current_period_end
 
     return NextResponse.json({
       status: sub.status,

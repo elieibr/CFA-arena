@@ -41,8 +41,8 @@ function LoginForm() {
         router.push('/dashboard')
         router.refresh()
       }
-    } catch (err: any) {
-      setError(err.message || 'Une erreur est survenue')
+    } catch (err) {
+      setError(err instanceof Error && err.message ? err.message : 'Une erreur est survenue')
       setLoading(false)
     }
   }
